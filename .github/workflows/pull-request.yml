@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # checkout to the commit that has been pushed
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # Setup mise
       - uses: jdx/mise-action@v3
