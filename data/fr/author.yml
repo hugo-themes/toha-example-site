@@ -1,0 +1,19 @@
+# some information about you
+name: "Romain CAPELLE"
+nickname: ""
+# greeting message before your name. it will default to "Hi! I am" if not provided
+greeting: "Bienvenue sur le blog de"
+image: "images/author/romain.png"
+# give your some contact information. they will be used in the footer
+contactInfo:
+  email: "romain.capelle3@gmail.com"
+  phone: "0629887897"
+  github: Shinr0
+  linkedin: romain-capelle
+
+# some summary about what you do
+summary:
+  - Je suis un DevOps
+  - Je suis un Cloud Builder
+  - Je suis un Platform Engineer
+  - Je suis passionné de nouvelles technologies
