@@ -41,7 +41,7 @@ skills:
 
 - name: Cloud GCP
   logo: /images/sections/skills/cloud.png
-  summary: "Worked with most of the major clouds such as GCP, AWS, Azure etc."
+  summary: "J'ai travaillé sur une grande partie des services de Google Cloud. "
   categories: ["others"]
 
 - name: Ansible
