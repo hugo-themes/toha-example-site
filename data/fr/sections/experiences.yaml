@@ -1,0 +1,70 @@
+# section information
+section:
+  name: Mon parcours
+  id: experiences
+  enable: true
+  weight: 3
+  showOnNavbar: true
+  # Can optionally hide the title in sections
+  # hideTitle: true 
+
+# Your experiences
+experiences:
+- company:
+    name: U TECH
+    url: "https://u-emploi.com/organisation-cooperative-u/u-tech"
+    location: Carquefou
+    logo: /images/sections/experiences/u_tech.webp
+    # Can optionally show a different logo for dark theme
+    # darkLogo: /images/sections/experiences/company1.jpg
+    # company overview
+    overview: Mission chez U TECH dans l'équipe Factory IAAS
+  positions:
+  - designation: Consultant DevOps Cloud
+    start: Mars 2023
+    # don't provide end date if you are currently working there. It will be replaced by "Present"
+    # end: Dec 2020
+    # give some points about what was your responsibilities at the company.
+    responsibilities:
+    - Déploiement d'infrastructure sur GCP avec Terraform et des outils de CI
+    - Développement de job CICD sur Github Action et Jenkins
+    - Production et configuration de golden images Linux et Windows avec Packer / Ansible et Cloud Init
+    - Maintien en condition opérationnelle de la stack IaaS sur Cloud Function / PubSub / Ansible AWX
+    - Développement en python et tests unitaires
+    - Formation des utilisateurs de la plateforme IAAS
+
+- company:
+    name: DSI France Travail
+    url: ""
+    location: Nantes
+    logo: /images/sections/experiences/France-travail-2023.svg.png
+    # Can optionally show a different logo for dark theme
+    # darkLogo: /images/sections/experiences/company2.jpg
+    overview: Mission chez France Travail en tant qu'Ops Produit sur la gestion de la GED
+  positions:
+  - designation: Consultant DevOps
+    start: Octobre 2021
+    end: Mars 2023
+    responsibilities:
+    - Expertise sur l'intégration dans le SI auprès des équipes de développement
+    - Déploiement d'application sur Kubernetes On Prem (SOLR)
+    - Maintien en condition opérationnelle des stacks Weblogic, Kubernetes et Oracle
+    - Intégration continue via XLR/XLD/JENKINS/CONCOURSE
+    - Pairing/montée en compétence de l'équipe de développement
+
+- company:
+    name: SNCF Voyages et RFF
+    url: ""
+    location: Pessac
+    logo: /images/sections/experiences/Logo_SNCF_(2011).svg.png
+    # Can optionally show a different logo for dark theme
+    # darkLogo: /images/sections/experiences/company3.jpg
+    overview: Mission chez SNCF en tant qu'intégrateur DevOps
+  positions:
+  - designation: Consultant Infrastructure DevOps
+    start: Mars 2019
+    end: Octobre 2021
+    responsibilities:
+    - Intégration applicative sur des systèmes Linux et Windows
+    - Développement de playbook et rôles communs Ansible au sein d'une équipe d'automatisation
+    - Administration de base de données

@@ -1,0 +1,67 @@
+# section information
+section:
+  name: Compétences
+  id: skills
+  enable: true
+  weight: 2
+  showOnNavbar: true
+  filter: true
+  # Can optionally hide the title in sections
+  # hideTitle: true
+
+# filter buttons
+buttons:
+- name: Toutes
+  filter: "all"
+- name: Basique
+  filter: "basic"
+- name: Langage
+  filter: "language"
+- name: Conteneur
+  filter: "container"
+- name: CICD
+  filter: "cicd"
+- name: Autres
+  filter: "others"
+
+# Your Skills.
+# Give a summary of you each skill in the summary section.
+skills:
+- name: Kubernetes
+  logo: /images/sections/skills/kubernetes.png
+  summary: "Certifié CKA. Je suis en capacité de déployer et maintenir une application sur Kubernetes. Je possède de solides connaissances sur l'administration d'un cluster."
+  categories: ["container"]
+  url: "https://kubernetes.io/"
+
+- name: Développement Python
+  logo: /images/sections/skills/go.png
+  summary: "Using as the main language for professional development. Capable of writing scalable, testable, and maintainable program."
+  categories: ["basic", "language"]
+  url: "https://golang.org/"
+
+- name: Cloud GCP
+  logo: /images/sections/skills/cloud.png
+  summary: "Worked with most of the major clouds such as GCP, AWS, Azure etc."
+  categories: ["others"]
+
+- name: Ansible
+  logo: /images/sections/skills/docker.svg
+  summary: "Write most of the programs as dockerized container. Experienced with multi-stage, multi-arch build process."
+  categories: ["container"]
+  url: "https://www.docker.com/"
+
+- name: Linux
+  logo: /images/sections/skills/linux.png
+  summary: "Capable of setup, configure Prometheus metrics. Experienced with PromQL, AlertManager. Also, experienced with writing metric exporters."
+  categories: ["basic"]
+  url: "https://prometheus.io/"
+
+- name: Github
+  logo: /images/sections/skills/git.png
+  summary: "Using as the main operating system. Capable of writing bash/shell scripts."
+  categories: ["others"]
+
+- name: Terraform
+  logo: /images/sections/skills/c++.png
+  summary: "Know basic C/C++ programming. Used for contest programming and problem solving."
+  categories: ["basic", "language"]

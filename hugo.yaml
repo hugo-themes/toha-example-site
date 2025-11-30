@@ -23,7 +23,7 @@ languages:
   fr:
     languageCode: fr
     languageName: "Français"
-    title: "Blog de Romain"
+    title: ""
     weight: 1
 # default language for the content
 defaultContentLanguage: fr
@@ -59,10 +59,10 @@ params:
 
   # Provide logos for your site. The inverted logo will be used in the initial
   # transparent navbar and the main logo will be used in the non-transparent navbar.
-  logo:
-    main: /images/site/logo.png
-    inverted: /images/site/logo.png
-    favicon: /images/site/logo.png
+  # logo:
+  #   main: /images/site/logo.png
+  #   inverted: /images/site/logo.png
+  #   favicon: /images/site/logo.png
 
   # GitHub repo of your site
   gitRepo: https://github.com/Shinr0/Shinr0.github.io
@@ -85,7 +85,7 @@ params:
     theme:
       enable: true
       services:
-        light: true # enable light theme. default "true"
+        light: false # enable light theme. default "true"
         dark: true # enable dark theme. default "true"
         default: system # can be either light, dark or system. default "system"
 

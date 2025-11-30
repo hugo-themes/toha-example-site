@@ -2,7 +2,7 @@
 name: "Romain CAPELLE"
 nickname: ""
 # greeting message before your name. it will default to "Hi! I am" if not provided
-greeting: "Bienvenue sur le blog de"
+greeting: ""
 image: "images/author/romain.png"
 # give your some contact information. they will be used in the footer
 contactInfo:
@@ -13,6 +13,4 @@ contactInfo:
 
 # some summary about what you do
 summary:
-  - Je suis un DevOps
-  - Je suis un Cloud Builder
-  - Je suis un Platform Engineer
+  - Consultant Cloud DevOps
