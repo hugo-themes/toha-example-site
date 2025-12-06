@@ -21,8 +21,8 @@ buttons:
   filter: "container"
 - name: CICD
   filter: "cicd"
-- name: Autres
-  filter: "others"
+- name: Cloud
+  filter: "cloud"
 
 # Your Skills.
 # Give a summary of you each skill in the summary section.
@@ -35,33 +35,43 @@ skills:
 
 - name: Développement Python
   logo: /images/sections/skills/go.png
-  summary: "Using as the main language for professional development. Capable of writing scalable, testable, and maintainable program."
+  summary: "Je l'utilise comme langage principal pour le développement de mes programmes. En capacité d'écrire des programmes évolutifs, testables (pytest) et maintenables."
   categories: ["basic", "language"]
-  url: "https://golang.org/"
+  url: "https://www.python.org/"
 
 - name: Cloud GCP
-  logo: /images/sections/skills/cloud.png
-  summary: "J'ai travaillé sur une grande partie des services de Google Cloud. "
-  categories: ["others"]
+  logo: /images/sections/skills/gcp.svg
+  summary: "Certifié GCP Associate avec 3 années d'expériences d'utilisation des services GCP (Compute Engine, Cloud Function, Cloud Run, Big Query, IAM etc...)."
+  categories: ["cloud"]
 
 - name: Ansible
   logo: /images/sections/skills/docker.svg
-  summary: "Write most of the programs as dockerized container. Experienced with multi-stage, multi-arch build process."
-  categories: ["container"]
+  summary: "Dévéloppement de playbooks et rôles ansible fromscratch. Utilisation couplée avec AWX pour la MCO des machines."
+  categories: ["basic", "language"]
   url: "https://www.docker.com/"
 
 - name: Linux
   logo: /images/sections/skills/linux.png
-  summary: "Capable of setup, configure Prometheus metrics. Experienced with PromQL, AlertManager. Also, experienced with writing metric exporters."
+  summary: "Bonnes connaissances en administration système (RHEL) et création de scripts bash."
   categories: ["basic"]
   url: "https://prometheus.io/"
 
-- name: Github
-  logo: /images/sections/skills/git.png
-  summary: "Using as the main operating system. Capable of writing bash/shell scripts."
-  categories: ["others"]
+- name: Github Actions
+  logo: /images/sections/skills/github.svg
+  summary: "Utilisation quotidienne de GitHub pour le versioning de mon code. Utilisation des Github Action pour la CI/CD et l'automatisation du repo (release please, renovate,...)"
+  categories: ["cicd"]
 
 - name: Terraform
-  logo: /images/sections/skills/c++.png
-  summary: "Know basic C/C++ programming. Used for contest programming and problem solving."
+  logo: /images/sections/skills/terraform.svg
+  summary: "Certifié Terraform. Création de modules Terraform fromscratch et déploiement des ressources GCP."
   categories: ["basic", "language"]
+
+- name: Packer
+  logo: /images/sections/skills/packer.svg
+  summary: "Création de golden images Linux et Windows avec Packer."
+  categories: ["basic", "language"]
+
+- name: Cloud Init
+  logo: /images/sections/skills/cloudinit.svg
+  summary: "Utilisation de cloud-init pour la configuration des machines."
+  categories: ["cloud"]
