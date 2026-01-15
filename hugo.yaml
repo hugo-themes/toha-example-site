@@ -279,6 +279,9 @@ params:
     pagination:
        maxPostsPerPage: 12
 
+    # Enable Scroll Snap (scrolling sections by sections on home page)
+    scrollSnap:
+      enable: false
 
   # Provide footer configuration.
   footer:
