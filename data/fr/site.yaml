@@ -1,0 +1,24 @@
+# Copyright Notice
+copyright: © 2025 Copyright.
+
+# A disclaimer notice for the footer. Make sure you have set "params.footer.disclaimer.enable: true" in your `hugo.yaml` file.
+disclaimer: "Ce thème est sous licence MIT."
+
+# Meta description for your site. This will help the search engines to find your site.
+description: Portfolio et blog personnel.
+
+# Liste des menus personnalisés en haut à droite (après les sections / blog / notes, avec séparateur).
+# Voir aussi params.footer.navigation.customMenus pour le pied de page.
+customMenus:
+  - name: CV
+    url: /files/cv.html
+    hideFromNavbar: false
+    showOnFooter: false
+
+# Specify OpenGraph Headers
+openGraph:
+  title: Portfolio
+  type: website
+  description: Portfolio et blog personnel.
+  image: images/author/john.png
+  url: https://Shinr0.github.io

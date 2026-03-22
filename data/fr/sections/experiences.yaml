@@ -28,8 +28,10 @@ experiences:
     responsibilities:
     - Déploiement d'infrastructure sur GCP avec Terraform et des outils de CI
     - Développement de job CICD sur Github Action et Jenkins
+    - Déploiement de la solution AWX sur GKE / Kubernetes
     - Production et configuration de golden images Linux et Windows avec Packer / Ansible et Cloud Init
     - Maintien en condition opérationnelle de la stack IaaS sur Cloud Function / PubSub / Ansible AWX
+    - Mise en place de la stack de monitoring de la Plateforme IAAS
     - Développement en python et tests unitaires
     - Formation des utilisateurs de la plateforme IAAS
 
@@ -48,7 +50,9 @@ experiences:
     responsibilities:
     - Expertise sur l'intégration dans le SI auprès des équipes de développement
     - Déploiement d'application sur Kubernetes On Prem (SOLR)
-    - Maintien en condition opérationnelle des stacks Weblogic, Kubernetes et Oracle
+    - Mise à disposition d'environnements dans un contexte Infra As Code
+    - MCO des environnements de Dev à Prod sur VM (Cloud Privé) et conteneurs (Kubernetes)
+    - Contribution au plan de MEP et participation aux astreintes majeures.
     - Intégration continue via XLR/XLD/JENKINS/CONCOURSE
     - Pairing/montée en compétence de l'équipe de développement
 
@@ -66,5 +70,8 @@ experiences:
     end: Octobre 2021
     responsibilities:
     - Intégration applicative sur des systèmes Linux et Windows
-    - Développement de playbook et rôles communs Ansible au sein d'une équipe d'automatisation
-    - Administration de base de données
+    - Développement / rétro-ingénierie de playbook/roles Ansible pour l'intégration d'applications sur Cloud (AWS / Azure) et On Premise (Linux / Windows).
+    - MCO des pipelines CI/CD sur Jenkins
+    - Administration de base de données (Oracle)
+    - Réalisation de scripts pour des chaînes d'ordonnancements (Python / Shell)
+    - Création et paramétrage de chaînes d'ordonnancements sur $Universe, VTOM et Automator

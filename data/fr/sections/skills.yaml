@@ -41,7 +41,7 @@ skills:
 
 - name: Cloud GCP
   logo: /images/sections/skills/gcp.svg
-  summary: "Certifié GCP Associate avec 3 années d'expériences d'utilisation des services GCP (Compute Engine, Cloud Function, Cloud Run, Big Query, IAM etc...)."
+  summary: "Certifié Professional Cloud Architect avec 3 années d'expériences d'utilisation des services GCP (Compute Engine, Cloud Function, Cloud Run, Big Query, IAM etc...)."
   categories: ["cloud"]
 
 - name: Ansible
@@ -58,7 +58,7 @@ skills:
 
 - name: Github Actions
   logo: /images/sections/skills/github.svg
-  summary: "Utilisation quotidienne de GitHub pour le versioning de mon code. Utilisation des Github Action pour la CI/CD et l'automatisation du repo (release please, renovate,...)"
+  summary: "Utilisation des Github Action pour la CI/CD et l'automatisation du repo (release please, renovate,...)"
   categories: ["cicd"]
 
 - name: Terraform
@@ -73,5 +73,5 @@ skills:
 
 - name: Cloud Init
   logo: /images/sections/skills/cloudinit.svg
-  summary: "Utilisation de cloud-init pour la configuration des machines."
+  summary: "Utilisation de cloud-init pour la configuration des machines Linux."
   categories: ["cloud"]

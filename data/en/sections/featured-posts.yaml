@@ -8,5 +8,4 @@ section:
 
 # posts to feature
 posts:
-  - markdown-sample
-  - shortcodes
+  - platform-engineering

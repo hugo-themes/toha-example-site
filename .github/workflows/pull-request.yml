@@ -43,7 +43,7 @@ jobs:
           prCommentEnabled: true
           prCommentSaveOld: true
           timeout: 5
-          urls: "${{ steps.preview.outputs.url }},${{ steps.preview.outputs.url }}/posts/,${{ steps.preview.outputs.url }}/posts/markdown-sample/,${{ steps.preview.outputs.url }}/posts/shortcodes/"
+          urls: "${{ steps.preview.outputs.url }},${{ steps.preview.outputs.url }}/posts/,${{ steps.preview.outputs.url }}/posts/platform-engineering/"
 
   # Check for any broken links
   markdown-link-check:

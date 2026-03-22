@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-label="Illustration abstraite  plateforme et automatisation">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0c1222"/>
+      <stop offset="100%" style="stop-color:#1a2744"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3d9ee5"/>
+      <stop offset="100%" style="stop-color:#7c5cbf"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#accent)" stroke-width="1.5" opacity="0.85">
+    <path d="M80 280 L200 200 L320 240 L440 160 L560 220 L680 140 L800 200 L920 120 L1040 180 L1120 140"/>
+    <circle cx="200" cy="200" r="6" fill="#3d9ee5" stroke="none"/>
+    <circle cx="440" cy="160" r="6" fill="#7c5cbf" stroke="none"/>
+    <circle cx="680" cy="140" r="6" fill="#3d9ee5" stroke="none"/>
+    <circle cx="920" cy="120" r="6" fill="#7c5cbf" stroke="none"/>
+  </g>
+  <g opacity="0.35" stroke="#5a7a9a" stroke-width="1" fill="none">
+    <rect x="100" y="80" width="200" height="72" rx="4"/>
+    <rect x="340" y="80" width="200" height="72" rx="4"/>
+    <rect x="580" y="80" width="200" height="72" rx="4"/>
+    <rect x="820" y="80" width="200" height="72" rx="4"/>
+  </g>
+  <text x="600" y="360" text-anchor="middle" fill="#8aa4c4" font-family="system-ui,sans-serif" font-size="14" letter-spacing="0.2em">PLATFORM · INTERNAL DEVELOPER EXPERIENCE</text>
+</svg>

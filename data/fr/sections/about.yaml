@@ -16,7 +16,7 @@ designation: Consultant Cloud DevOps | 7 ans d'expériences
 # resume: "files/resume.pdf"
 
 # a summary about you
-summary: "J'accompagne vos équipes dans l'industrialisation de vos déploiements, la sécurisation et l'optimisation de vos architectures Cloud."
+summary: "J'accélère vos mises en production et réduis vos coûts Cloud en sécurisant et automatisant vos infrastructures."
 
 # your social links
 # give as many as you want. use font-awesome for the icons.
@@ -37,7 +37,7 @@ socialLinks:
 # For example, you can put link for your resume.
 resourceLinks:
 - title: "Mon CV PDF"
-  url: "files/resume.pdf"
+  url: "files/cv.html"
 
 # Show your badges
 # You can show your verifiable certificates from https://www.credly.com.
@@ -50,9 +50,14 @@ badges:
   badge: "https://images.credly.com/size/340x340/images/8b8ed108-e77d-4396-ac59-2504583b9d54/cka_from_cncfsite__281_29.png"
 
 - type: certification
-  name: Google Cloud Engineer Associate
+  name: Associate Cloud Engineer
   url: "https://www.credly.com/badges/b5c5d612-5b7c-41bf-be96-99a137a03f33/public_url"
   badge: "https://images.credly.com/size/340x340/images/08096465-cbfc-4c3e-93e5-93c5aa61f23e/image.png"
+
+- type: certification
+  name: Professional Cloud Architect
+  url: "https://www.credly.com/badges/5e790c42-a11c-414a-9411-9b5a572fbcad/public_url"
+  badge: "https://images.credly.com/size/340x340/images/71c579e0-51fd-4247-b493-d2fa8167157a/image.png"
 
 - type: certification
   name: Terraform Associate
@@ -65,14 +70,9 @@ badges:
   color: blue
 
 - type: soft-skill-indicator
-  name: Formation des équipiers
+  name: Gestion du Finops
   percentage: 90
   color: yellow
-
-- type: soft-skill-indicator
-  name: Amélioration continue
-  percentage: 85
-  color: orange
 
 # you can also provide color code instead of the color name
 # - type: soft-skill-indicator
