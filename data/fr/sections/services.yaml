@@ -1,0 +1,44 @@
+# section information
+section:
+  name: Services
+  id: services
+  enable: true
+  weight: 2
+  showOnNavbar: true
+  # template custom du site (layouts/partials/sections/services.html)
+  template: sections/services.html
+
+# Vos offres de services, orientées valeur client.
+# - name : titre de l'offre
+# - logo : icône affichée à côté du titre (chemin relatif à "assets")
+# - pitch : ce que le client y gagne (markdown supporté)
+# - technologies : tags affichés en bas de carte
+# - url / urlText : lien optionnel vers une preuve (article, repo, ...)
+services:
+- name: Infrastructure Cloud GCP & IaC
+  logo: /images/sections/skills/gcp.svg
+  pitch: "Des environnements créés à la main, impossibles à reproduire et coûteux à maintenir ? Je conçois et déploie votre infrastructure GCP en **Infrastructure as Code** : chaque ressource est versionnée, revue et déployée automatiquement. Vous gagnez des environnements reproductibles à la demande, un historique complet des changements et une facture Cloud sous contrôle. *Certifié Google Professional Cloud Architect.*"
+  technologies: [Terraform, GCP, Packer, Cloud-init, Ansible]
+
+- name: Kubernetes & conteneurisation
+  logo: /images/sections/skills/kubernetes.png
+  pitch: "Je conteneurise vos applications et les déploie sur Kubernetes selon les bonnes pratiques : haute disponibilité, mises à jour sans coupure, montée en charge automatique. J'en assure aussi l'exploitation au quotidien — supervision, sauvegardes, montées de version du cluster — pour que vos équipes restent concentrées sur leur produit. *Certifié CKA (Certified Kubernetes Administrator).*"
+  technologies: [Kubernetes, GKE, Docker, Argo CD]
+
+- name: CI/CD & automatisation
+  logo: /images/sections/skills/github.svg
+  pitch: "Des mises en production encore manuelles, longues et risquées ? Je mets en place des pipelines qui testent, versionnent et déploient automatiquement votre code, et j'automatise la maintenance de votre parc de machines. Résultat : des **livraisons plus fréquentes et plus fiables**, et des équipes libérées des tâches répétitives."
+  technologies: [GitHub Actions, Jenkins, Ansible / AWX, Python]
+
+- name: Platform Engineering
+  logo: /images/sections/skills/cloud.png
+  pitch: "Vos développeurs attendent des jours qu'un ticket leur ouvre un environnement ? Je construis votre plateforme interne en **self-service** : ils provisionnent eux-mêmes leurs ressources via un portail ou un simple commit, dans un cadre maîtrisé (sécurité, conformité, coûts). Moins de tickets, moins d'attente — et je forme vos équipes pour qu'elles soient autonomes."
+  technologies: [Crossplane, Argo CD, GitOps, Kubernetes]
+  url: /posts/platform-engineering/
+  urlText: "Lire mon retour d'expérience"
+
+# Appel à l'action affiché sous les cartes : prise de rendez-vous Calendly
+cta:
+  note: "Un besoin qui ne rentre pas dans ces cases ? **Parlons-en.**"
+  text: "Discutons de votre projet"
+  url: "https://calendly.com/romain-capelle3/entretien"

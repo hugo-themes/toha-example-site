@@ -1,11 +1,11 @@
 # Copyright Notice
-copyright: © 2025 Copyright.
+copyright: © 2025 Romain Capelle.
 
 # A disclaimer notice for the footer. Make sure you have set "params.footer.disclaimer.enable: true" in your `hugo.yaml` file.
 disclaimer: "Ce thème est sous licence MIT."
 
 # Meta description for your site. This will help the search engines to find your site.
-description: Portfolio et blog personnel.
+description: Romain Capelle, consultant freelance Cloud DevOps à Nantes — GCP, Kubernetes, Terraform, CI/CD. J'automatise et sécurise vos infrastructures Cloud.
 
 # Liste des menus personnalisés en haut à droite (après les sections / blog / notes, avec séparateur).
 # Voir aussi params.footer.navigation.customMenus pour le pied de page.
@@ -17,8 +17,8 @@ customMenus:
 
 # Specify OpenGraph Headers
 openGraph:
-  title: Portfolio
+  title: Romain Capelle — Consultant freelance Cloud DevOps
   type: website
-  description: Portfolio et blog personnel.
-  image: images/author/john.png
-  url: https://Shinr0.github.io
+  description: Consultant freelance Cloud DevOps à Nantes — GCP, Kubernetes, Terraform, CI/CD.
+  image: images/author/rom.png
+  url: https://romain-capelle.cloud

@@ -1,9 +1,11 @@
 # section information
+# Section désactivée : remplacée par la section "Services" (services.yaml),
+# orientée valeur client. Remettre enable: true pour la réafficher.
 section:
   name: Compétences
   id: skills
-  enable: true
-  weight: 2
+  enable: false
+  weight: 5
   showOnNavbar: true
   filter: true
   # Can optionally hide the title in sections
@@ -34,7 +36,7 @@ skills:
   url: "https://kubernetes.io/"
 
 - name: Développement Python
-  logo: /images/sections/skills/go.png
+  logo: /images/sections/skills/python.svg
   summary: "Je l'utilise comme langage principal pour le développement de mes programmes. En capacité d'écrire des programmes évolutifs, testables (pytest) et maintenables."
   categories: ["basic", "language"]
   url: "https://www.python.org/"
@@ -43,28 +45,31 @@ skills:
   logo: /images/sections/skills/gcp.svg
   summary: "Certifié Professional Cloud Architect avec 3 années d'expériences d'utilisation des services GCP (Compute Engine, Cloud Function, Cloud Run, Big Query, IAM etc...)."
   categories: ["cloud"]
+  url: "https://cloud.google.com/"
 
 - name: Ansible
-  logo: /images/sections/skills/docker.svg
-  summary: "Dévéloppement de playbooks et rôles ansible fromscratch. Utilisation couplée avec AWX pour la MCO des machines."
+  logo: /images/sections/skills/ansible.svg
+  summary: "Développement de playbooks et rôles Ansible from scratch. Utilisation couplée avec AWX pour la MCO des machines."
   categories: ["basic", "language"]
-  url: "https://www.docker.com/"
+  url: "https://www.ansible.com/"
 
 - name: Linux
   logo: /images/sections/skills/linux.png
   summary: "Bonnes connaissances en administration système (RHEL) et création de scripts bash."
   categories: ["basic"]
-  url: "https://prometheus.io/"
+  url: "https://www.kernel.org/"
 
-- name: Github Actions
+- name: GitHub Actions
   logo: /images/sections/skills/github.svg
-  summary: "Utilisation des Github Action pour la CI/CD et l'automatisation du repo (release please, renovate,...)"
+  summary: "Utilisation de GitHub Actions pour la CI/CD et l'automatisation des repos (release-please, Renovate, ...)"
   categories: ["cicd"]
+  url: "https://github.com/features/actions"
 
 - name: Terraform
   logo: /images/sections/skills/terraform.svg
-  summary: "Certifié Terraform. Création de modules Terraform fromscratch et déploiement des ressources GCP."
+  summary: "Certifié Terraform. Création de modules Terraform from scratch et déploiement des ressources GCP."
   categories: ["basic", "language"]
+  url: "https://developer.hashicorp.com/terraform"
 
 - name: Packer
   logo: /images/sections/skills/packer.svg

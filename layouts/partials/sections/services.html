@@ -1,0 +1,58 @@
+{{ $sectionID := replace (lower .section.name) " " "-" }}
+{{ if .section.id }}
+  {{ $sectionID = .section.id }}
+{{ end }}
+
+<div class="container-fluid anchor pb-5 skills-section" id="{{ $sectionID }}">
+  {{ if not (.section.hideTitle) }}
+    <h1 class="text-center">
+      <span id="{{ $sectionID }}"></span>{{ .section.name }}</h1>
+  {{ end }}
+  <div class="container d-flex-block">
+    <div class="row">
+      {{ range .services }}
+      <div class="col-sm-12 col-md-6 pt-2 d-flex">
+        <div class="card w-100">
+          <div class="card-head d-flex">
+            {{ if .logo }}
+              {{ $logoImage := resources.Get .logo }}
+              {{ if $logoImage }}
+                {{/* svg don't support "Fit" operation */}}
+                {{ if ne $logoImage.MediaType.SubType "svg" }}
+                  {{ $logoImage = $logoImage.Fit "24x24" }}
+                {{ end }}
+                <img class="card-img-xs" src="{{ $logoImage.RelPermalink }}" alt="{{ .name }}" />
+              {{ end }}
+            {{ end }}
+            <h5 class="card-title">{{ .name }}</h5>
+          </div>
+          <div class="card-body text-justify pt-1 pb-2 d-flex flex-column">
+            <p class="card-text">{{ .pitch | markdownify }}</p>
+            <div class="project-card-footer mt-auto">
+              {{ if .technologies }}
+              <div class="project-tags-holder">
+                {{ range .technologies }}
+                <span class="badge btn-info">{{ . }}</span>
+                {{ end }}
+              </div>
+              {{ end }}
+              {{ if .url }}
+              <div class="project-btn-holder pt-2">
+                <a class="btn btn-outline-info btn-sm" href="{{ .url | relURL }}">{{ .urlText | default "En savoir plus" }}</a>
+              </div>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{ end }}
+    </div>
+    {{ with .cta }}
+    <div class="text-center pt-4">
+      {{ with .note }}<p class="mb-2">{{ . | markdownify }}</p>{{ end }}
+      <a href="{{ .url | safeURL }}" title="{{ .text }}" target="_blank" rel="noopener">
+        <button class="btn btn-info">{{ .text }}</button></a>
+    </div>
+    {{ end }}
+  </div>
+</div>

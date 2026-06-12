@@ -1,6 +1,6 @@
 # ⚠️ If hosting under a repo path, use full URL (e.g. https://<github_username>.github.io/<repo_name>) or images won’t display correctly
 baseURL: https://romain-capelle.cloud
-languageCode: bn
+languageCode: fr
 title: "Romain Capelle"
 
 # Use Hugo modules to add theme

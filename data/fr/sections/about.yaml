@@ -18,6 +18,16 @@ designation: Consultant Cloud DevOps | 7 ans d'expériences
 # a summary about you
 summary: "J'accélère vos mises en production et réduis vos coûts Cloud en sécurisant et automatisant vos infrastructures."
 
+# Disponibilité affichée sous le titre (mettre à jour selon votre planning)
+availability:
+  enable: true
+  text: "Disponible à partir de septembre 2026"
+
+# Bouton d'appel à l'action : prise de rendez-vous Calendly
+cta:
+  text: "Discutons de votre projet"
+  url: "https://calendly.com/romain-capelle3/entretien"
+
 # your social links
 # give as many as you want. use font-awesome for the icons.
 socialLinks:
@@ -61,21 +71,5 @@ badges:
 
 - type: certification
   name: Terraform Associate
-  url: "https://cas-bridge.xethub.hf.co/xet-bridge-us/67a47037749ea2c4b9fafd4b/f637162baba5fe8ec8df98a3ff40c0b66b027d7663bb33397d5269e090167348?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cas%2F20251130%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251130T141945Z&X-Amz-Expires=3600&X-Amz-Signature=305303daf5d24203bbefe1f9746bc38b2235a7fa301071b1564f2c7a27719a44&X-Amz-SignedHeaders=host&X-Xet-Cas-Uid=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%272025-06-29.png%3B+filename%3D%222025-06-29.png%22%3B&response-content-type=image%2Fpng&x-id=GetObject&Expires=1764515985&Policy=eyJTdGF0ZW1lbnQiOlt7IkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc2NDUxNTk4NX19LCJSZXNvdXJjZSI6Imh0dHBzOi8vY2FzLWJyaWRnZS54ZXRodWIuaGYuY28veGV0LWJyaWRnZS11cy82N2E0NzAzNzc0OWVhMmM0YjlmYWZkNGIvZjYzNzE2MmJhYmE1ZmU4ZWM4ZGY5OGEzZmY0MGMwYjY2YjAyN2Q3NjYzYmIzMzM5N2Q1MjY5ZTA5MDE2NzM0OCoifV19&Signature=cFyHd6Haf9S2dZTlLzH%7EoG7qn3Scpd5FwRhLYzScGfhCpFCF%7EdFcJXRFwgpCGJ%7EpPVzuMQyoFt6%7Es-S0eVjF2W1uqTw3mByRIN9rYIAvVMy6w9Gzu8Hm5jyrk-uypp1CDdhiYV63kqpEQYqaPAdSM25nWWu8QurUDbZackT0%7EJD%7Eg7KNtaLfHsxkzV0-oAC0pVH-Qqy80amUIvpa745NUAGeRF4zrY2tNLohCBgKZ2WkbBj1ZZ0h3pSdml7HXj-SpJjHij4IUGWnpnPOQuo7gEJ2SbuR9iQxyJsmURX6LaSzrS2jYaE6OjN0m9h-SWzSkfcq9SD5jI4VdHMe7jl38Q__&Key-Pair-Id=K2L8F4GPSG1IFC"
+  url: "https://www.credly.com/users/romain-capelle"
   badge: "https://images.credly.com/size/340x340/images/cd038261-9d1c-4792-bc62-3a3b5bda175c/blob"
-
-- type: soft-skill-indicator
-  name: Travail en méthode agile
-  percentage: 85
-  color: blue
-
-- type: soft-skill-indicator
-  name: Gestion du Finops
-  percentage: 90
-  color: yellow
-
-# you can also provide color code instead of the color name
-# - type: soft-skill-indicator
-#   name: Example 1
-#   percentage: 75
-#   color: "#00adb5"
