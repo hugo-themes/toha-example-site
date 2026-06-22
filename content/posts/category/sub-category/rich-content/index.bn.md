@@ -26,7 +26,7 @@ categories: ["বেসিক"]
 
 ### টুইটের নুমুনা
 
-{{< tweet user="SanDiegoZoo" id="1453110110599868418" >}}
+{{< x user="SanDiegoZoo" id="1453110110599868418" >}}
 
 {{< vs >}}
 
