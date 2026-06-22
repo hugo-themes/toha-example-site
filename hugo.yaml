@@ -1,39 +1,38 @@
 # ⚠️ If hosting under a repo path, use full URL (e.g. https://<github_username>.github.io/<repo_name>) or images won’t display correctly
-baseURL: https://hugo-themes.github.io/toha-example-site/
+baseURL: https://toha-preview.hugo-themes.com
 
-languageCode: bn
+locale: bn
 title: "John's Blog"
 
 # Use Hugo modules to add theme
 module:
   imports:
-  - path: github.com/hugo-toha/toha/v4
+    - path: github.com/hugo-toha/toha/v4
   mounts:
-  - source: static/files
-    target: static/files
-  - source: ./node_modules/flag-icons/flags
-    target: static/flags
-  - source: ./node_modules/@fontsource/mulish/files
-    target: static/files
-  - source: ./node_modules/katex/dist/fonts
-    target: static/fonts
+    - source: static/files
+      target: static/files
+    - source: ./node_modules/flag-icons/flags
+      target: static/flags
+    - source: ./node_modules/@fontsource/mulish/files
+      target: static/files
+    - source: ./node_modules/katex/dist/fonts
+      target: static/fonts
 
 # Manage languages
 # For any more details, you can check the official documentation: https://gohugo.io/content-management/multilingual/
 languages:
   en:
-    languageCode: en
-    languageName: English
+    locale: en
+    label: English
     title: "John's Blog"
     weight: 1
   bn:
-    languageCode: bn
-    languageName: বাংলা
+    locale: bn
+    label: বাংলা
     title: জনের ব্লগ
     weight: 2
 # default language for the content
 defaultContentLanguage: en
-
 
 # Allow raw html in markdown file
 markup:
@@ -116,7 +115,7 @@ params:
         # diaspora: true
         # mastodon: true
 
-    # Enable & configure "Notes" features
+        # Enable & configure "Notes" features
     notes:
       enable: true
 
@@ -126,35 +125,35 @@ params:
       services:
         disqus:
           shortName: toha-example-site
-        # valine:
-        #   appId: HTV6askWxVo3vOxlqjjaq2hd-MsYXbMMI
-        #   appKey: pVrT3C85KGIuk27t07eh6bUC
-        #   avatar: retro
-        #   placeholder: Share your thought.
-        #   lang: en
-        #   recordIP: true
-        #   enableQQ: true
-        # utteranc:
-        #   repo: github.com/hugo-toha/hugo-toha.github.io
-        #   issueTerm: title
-        #   theme: github-light
-        # giscus:
-        #   repo: your-repo/name
-        #   repoID: your-repo-id
-        #   category: your-category
-        #   categoryID: your-category-id
+          # valine:
+          #   appId: HTV6askWxVo3vOxlqjjaq2hd-MsYXbMMI
+          #   appKey: pVrT3C85KGIuk27t07eh6bUC
+          #   avatar: retro
+          #   placeholder: Share your thought.
+          #   lang: en
+          #   recordIP: true
+          #   enableQQ: true
+          # utteranc:
+          #   repo: github.com/hugo-toha/hugo-toha.github.io
+          #   issueTerm: title
+          #   theme: github-light
+          # giscus:
+          #   repo: your-repo/name
+          #   repoID: your-repo-id
+          #   category: your-category
+          #   categoryID: your-category-id
           # theme: light
           # map: url
           # reaction: 1
           # metadata: 0
           # inputPosition: bottom
           # crossOrigin: anonymous
-        # commento:
-        #   serverURL: cdn.commento.io
-        #   autoInit: true
-        #   hideDeleted: false
+          # commento:
+          #   serverURL: cdn.commento.io
+          #   autoInit: true
+          #   hideDeleted: false
 
-    # Enable Analytics
+          # Enable Analytics
     analytics:
       enable: true
       services:
@@ -172,7 +171,7 @@ params:
         #   instance: matomo.example.com
         #   siteId: 1 # Or any other number
 
-    # Enable Support
+        # Enable Support
     support:
       enable: false
       services:
@@ -187,7 +186,7 @@ params:
         #   info: Buy me a coffee!
         #   color: '#FFDD00'
 
-    # specify whether you want to show Table of Contents in reading page
+        # specify whether you want to show Table of Contents in reading page
     toc:
       enable: true
 
@@ -204,7 +203,7 @@ params:
       #   - languageCode: en
       #     countryCode: us
 
-    # Enable this to use `embed-pdf` shortcode.
+      # Enable this to use `embed-pdf` shortcode.
     embedpdf:
       enable: true
 
@@ -266,19 +265,18 @@ params:
         plyr:
           # options doc: https://github.com/sampotts/plyr#options
           # fullscreen: true
-    
-    # Enables copy code button
+
+          # Enables copy code button
     copyCodeButton:
       enable: true
 
     # Enable reading time support in post cards and in post pages
     readingTime:
       enable: false
-    
+
     # Number of posts to show to each page. Default is "12"
     pagination:
-       maxPostsPerPage: 12
-
+      maxPostsPerPage: 12
 
   # Provide footer configuration.
   footer:
@@ -305,6 +303,6 @@ params:
       # provider: mailchimp
       # mailchimpURL: https://github.us1.list-manage.com/subscribe/post?u=19de52a4603135aae97163fd8&amp;id=094a24c76e
 
-    # Show/hide disclaimer notice in the footer. Default is "false".
+      # Show/hide disclaimer notice in the footer. Default is "false".
     disclaimer:
       enable: true
