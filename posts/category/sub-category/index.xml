@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Sub-Category on John's Blog</title><link>https://hugo-themes.github.io/toha-example-site/posts/category/sub-category/</link><description>Recent content in Sub-Category on John's Blog</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 08 Jun 2020 08:06:25 +0600</lastBuildDate><atom:link href="https://hugo-themes.github.io/toha-example-site/posts/category/sub-category/index.xml" rel="self" type="application/rss+xml"/><item><title>Rich Content</title><link>https://hugo-themes.github.io/toha-example-site/posts/category/sub-category/rich-content/</link><pubDate>Mon, 08 Jun 2020 08:06:25 +0600</pubDate><guid>https://hugo-themes.github.io/toha-example-site/posts/category/sub-category/rich-content/</guid><description>&lt;p&gt;This sample post tests the followings:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Sub-Category on John's Blog</title><link>https://toha-preview.hugo-themes.com/posts/category/sub-category/</link><description>Recent content in Sub-Category on John's Blog</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 08 Jun 2020 08:06:25 +0600</lastBuildDate><atom:link href="https://toha-preview.hugo-themes.com/posts/category/sub-category/index.xml" rel="self" type="application/rss+xml"/><item><title>Rich Content</title><link>https://toha-preview.hugo-themes.com/posts/category/sub-category/rich-content/</link><pubDate>Mon, 08 Jun 2020 08:06:25 +0600</pubDate><guid>https://toha-preview.hugo-themes.com/posts/category/sub-category/rich-content/</guid><description>&lt;p&gt;This sample post tests the followings:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Category, sub-category nesting in the sidebar.&lt;/li&gt;
 &lt;li&gt;Hero image and other images are in &lt;code&gt;images&lt;/code&gt; folder inside this post directory.&lt;/li&gt;
 &lt;li&gt;Different media rendering like image, tweet, YouTube video, Vimeo video etc.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id="image-sample"&gt;Image Sample&lt;/h3&gt;
-&lt;img src="https://hugo-themes.github.io/toha-example-site/posts/category/sub-category/rich-content/images/forest.jpg"
+&lt;img src="https://toha-preview.hugo-themes.com/posts/category/sub-category/rich-content/images/forest.jpg"
 alt="Forest"
 class="center"
 &gt;
 &lt;div style="margin-top: rem;"&gt;&lt;/div&gt;
 &lt;h3 id="tweet-sample"&gt;Tweet Sample&lt;/h3&gt;
-&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Owl bet you&amp;#39;ll lose this staring contest 🦉 &lt;a href="https://t.co/eJh4f2zncC"&gt;pic.twitter.com/eJh4f2zncC&lt;/a&gt;&lt;/p&gt;&amp;mdash; San Diego Zoo Wildlife Alliance (@sandiegozoo) &lt;a href="https://twitter.com/sandiegozoo/status/1453110110599868418?ref_src=twsrc%5Etfw"&gt;October 26, 2021&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Owl bet you&amp;#39;ll lose this staring contest 🦉 &lt;a href="https://t.co/eJh4f2zncC"&gt;pic.twitter.com/eJh4f2zncC&lt;/a&gt;&lt;/p&gt;&amp;mdash; San Diego Zoo Wildlife Alliance (@sandiegozoo) &lt;a href="https://x.com/sandiegozoo/status/1453110110599868418?ref_src=twsrc%5Etfw"&gt;October 26, 2021&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src="https://platform.x.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
 &lt;div style="margin-top: rem;"&gt;&lt;/div&gt;
 &lt;h3 id="youtube-video-sample"&gt;YouTube Video Sample&lt;/h3&gt;
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"&gt;

@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Top Category Sample on জনের ব্লগ</title><link>https://hugo-themes.github.io/toha-example-site/bn/posts/category/</link><description>Recent content in Top Category Sample on জনের ব্লগ</description><generator>Hugo -- gohugo.io</generator><language>bn</language><lastBuildDate>Mon, 08 Jun 2020 08:06:25 +0600</lastBuildDate><atom:link href="https://hugo-themes.github.io/toha-example-site/bn/posts/category/index.xml" rel="self" type="application/rss+xml"/><item><title>সমৃদ্ধ কন্টেন্ট</title><link>https://hugo-themes.github.io/toha-example-site/bn/posts/category/sub-category/rich-content/</link><pubDate>Mon, 08 Jun 2020 08:06:25 +0600</pubDate><guid>https://hugo-themes.github.io/toha-example-site/bn/posts/category/sub-category/rich-content/</guid><description>&lt;p&gt;এই নমুনা পোস্টটি এই বিষয়গুলো পরীক্ষা করার জন্যে করা হয়েছেঃ&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Top Category Sample on জনের ব্লগ</title><link>https://toha-preview.hugo-themes.com/bn/posts/category/</link><description>Recent content in Top Category Sample on জনের ব্লগ</description><generator>Hugo -- gohugo.io</generator><language>bn</language><lastBuildDate>Mon, 08 Jun 2020 08:06:25 +0600</lastBuildDate><atom:link href="https://toha-preview.hugo-themes.com/bn/posts/category/index.xml" rel="self" type="application/rss+xml"/><item><title>সমৃদ্ধ কন্টেন্ট</title><link>https://toha-preview.hugo-themes.com/bn/posts/category/sub-category/rich-content/</link><pubDate>Mon, 08 Jun 2020 08:06:25 +0600</pubDate><guid>https://toha-preview.hugo-themes.com/bn/posts/category/sub-category/rich-content/</guid><description>&lt;p&gt;এই নমুনা পোস্টটি এই বিষয়গুলো পরীক্ষা করার জন্যে করা হয়েছেঃ&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;বিভাগ, উপ-বিভাগে সাইডবারে একটির ভেতর আরেকটি কিভাবে আছে সেটা দেখা।&lt;/li&gt;
 &lt;li&gt;হেরো ছবিটি পোস্ট যে পথে আছে সে পথে &lt;code&gt;images&lt;/code&gt; ফোল্ডার এ থাকবে।&lt;/li&gt;
 &lt;li&gt;বিভিন্ন মিডিয়া যেমন ছবি, টুইট, ইউটিউব ভিডিও, ভীমেও ভিডিও ইত্যাদি রেন্ডারিং।&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id="ছবর-নমন"&gt;ছবির নমুনা&lt;/h3&gt;
-&lt;img src="https://hugo-themes.github.io/toha-example-site/posts/category/sub-category/rich-content/images/forest.jpg"
+&lt;img src="https://toha-preview.hugo-themes.com/posts/category/sub-category/rich-content/images/forest.jpg"
 alt="Forest"
 class="center"
 &gt;
 &lt;div style="margin-top: rem;"&gt;&lt;/div&gt;
 &lt;h3 id="টইটর-নমন"&gt;টুইটের নুমুনা&lt;/h3&gt;
-&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Owl bet you&amp;#39;ll lose this staring contest 🦉 &lt;a href="https://t.co/eJh4f2zncC"&gt;pic.twitter.com/eJh4f2zncC&lt;/a&gt;&lt;/p&gt;&amp;mdash; San Diego Zoo Wildlife Alliance (@sandiegozoo) &lt;a href="https://twitter.com/sandiegozoo/status/1453110110599868418?ref_src=twsrc%5Etfw"&gt;October 26, 2021&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+&lt;blockquote class="twitter-tweet"&gt;&lt;p lang="en" dir="ltr"&gt;Owl bet you&amp;#39;ll lose this staring contest 🦉 &lt;a href="https://t.co/eJh4f2zncC"&gt;pic.twitter.com/eJh4f2zncC&lt;/a&gt;&lt;/p&gt;&amp;mdash; San Diego Zoo Wildlife Alliance (@sandiegozoo) &lt;a href="https://x.com/sandiegozoo/status/1453110110599868418?ref_src=twsrc%5Etfw"&gt;October 26, 2021&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src="https://platform.x.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
 &lt;div style="margin-top: rem;"&gt;&lt;/div&gt;
 &lt;h3 id="ইউটওবর-ভডও-নমন"&gt;ইউটিওবের ভিডিও নমুনা&lt;/h3&gt;
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"&gt;
