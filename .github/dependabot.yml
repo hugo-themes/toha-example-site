@@ -1,12 +1,10 @@
-# Update dependencies
+# Keep the GitHub Actions used by the deploy workflow up to date
 
 version: 2
 updates:
-# Update the Github Action  versions
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
     interval: "daily"
   labels:
   - "dependencies"
-  - "automerge"

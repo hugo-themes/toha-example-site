@@ -1,3 +1,2 @@
-resources/*
-node_modules/*
-public/*
+_site/
+.DS_Store

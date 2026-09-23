@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-progress deploy finish instead of cancelling it
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: actions/configure-pages@v6
+
+    # Publish only the site files, not README, LICENSE or .github
+    - name: Assemble site
+      run: |
+        mkdir _site
+        cp -r index.html 404.html assets files _site/
+
+    - uses: actions/upload-pages-artifact@v5
+      with:
+        path: _site
+
+    - name: Deploy
+      id: deployment
+      uses: actions/deploy-pages@v5
