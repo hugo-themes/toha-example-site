@@ -4,5 +4,9 @@
 
 An example hugo static site with Toha theme.
 
+## Local development
+
+With Hugo Extended, Go, and the npm dependencies installed, run `hugo server` to preview the site locally.
+
 Attributions:
 - <a href='https://www.freepik.com/vectors/business'>Business vector created by studiogstock - www.freepik.com</a>
