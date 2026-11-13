@@ -13,46 +13,55 @@ section:
 buttons:
 - name: All
   filter: "all"
-- name: Basic
-  filter: "basic"
-- name: Language
-  filter: "language"
-- name: Container
-  filter: "container"
-- name: Others
-  filter: "others"
+- name: Programming
+  filter: "programming"
+- name: System
+  filter: "system"
+- name: Cloud
+  filter: "cloud"
+- name: DevOps
+  filter: "devops"
+- name: "AI / Data"
+  filter: "ai-data"
+- name: "Low-Code Tools"
+  filter: "low-code-tools"
 
 # Your Skills.
 # Give a summary of you each skill in the summary section.
 skills:
-- name: Kubernetes
-  logo: /images/sections/skills/kubernetes.png
-  summary: "Capable of deploying, managing application on Kubernetes. Experienced in writing Kubernetes controllers for CRDs."
-  categories: ["container"]
-  url: "https://kubernetes.io/"
-
 - name: Go Development
   logo: /images/sections/skills/go.png
-  summary: "Using as the main language for professional development. Capable of writing scalable, testable, and maintainable program."
-  categories: ["basic", "language"]
+  summary: "Experienced in backend development using Go and the Gin framework. Proficient in designing RESTful APIs and building high-performance concurrent applications with Goroutines and Channels."
+  categories: ["programming"]
   url: "https://golang.org/"
 
-- name: Cloud Computing
-  logo: /images/sections/skills/cloud.png
-  summary: "Worked with most of the major clouds such as GCP, AWS, Azure etc."
-  categories: ["others"]
+- name: SQL
+  logo: ""
+  summary: ""
+  categories: ["programming"]
+  url: ""
+
+- name: AWS Cloud Architecture
+  logo: /images/sections/skills/aws-logo.png
+  summary: "Experienced with AWS core services, including compute, networking, storage, and AI application deployment. Capable of designing scalable and reliable cloud architectures."
+  categories: ["cloud", "system"]
+  url: https://aws.amazon.com/cn/free/webapps/?trk=9d5c4709-8a98-47b7-ab9b-b09c92e9ee25&sc_channel=ps&ef_id=EAIaIQobChMImJbd26q5lQMVuOUWBR0lex6GEAAYASAAEgLLJvD_BwE&gads_camp=23533257979&gads_ag=198422390531&gads_ad=795925071305&gads_kw=aws%20cloud&gads_matchtype=e&gads_network=g&gads_device=c&gads_geo=9198554&gad_campaignid=23533257979&gbraid=0AAAAADjHtp8oDhkcEFLEVe_1huyOukYsL&gclid=EAIaIQobChMImJbd26q5lQMVuOUWBR0lex6GEAAYASAAEgLLJvD_BwE
+
+- name: Azure Cloud Architecture
+  logo: "/images/sections/skills/Microsoft_Azure.png"
+  summary: ""
+  categories: ["cloud", "system"]
 
 - name: Docker
   logo: /images/sections/skills/docker.svg
   summary: "Write most of the programs as dockerized container. Experienced with multi-stage, multi-arch build process."
-  categories: ["container"]
+  categories: ["devops"]
   url: "https://www.docker.com/"
 
-- name: Prometheus
-  logo: /images/sections/skills/prometheus.png
+- name: Statistical Analysis
+  logo: /images/sections/skills/statistical-logo.jpg
   summary: "Capable of setup, configure Prometheus metrics. Experienced with PromQL, AlertManager. Also, experienced with writing metric exporters."
-  categories: ["basic"]
-  url: "https://prometheus.io/"
+  categories: ["ai-data"]
 
 - name: Linux
   logo: /images/sections/skills/linux.png
@@ -62,10 +71,24 @@ skills:
 - name: Git
   logo: /images/sections/skills/git.png
   summary: "Experienced with git-based development. Mostly, use Github. Also, have experience in working with GitLab."
-  categories: ["basic"]
+  categories: ["devops"]
   url: "https://git-scm.com/"
 
-- name: C++
-  logo: /images/sections/skills/c++.png
-  summary: "Know basic C/C++ programming. Used for contest programming and problem solving."
-  categories: ["basic", "language"]
+- name: Python
+  logo: /images/sections/skills/python-logo.jpg
+  summary: "Python"
+  categories: ["programming"]
+
+- name: Systemic Design
+  summary: Systemic Design
+  categories: ["devops", "system"]
+
+- name: n8n
+  logo: /images/sections/skills/n8n-logo.png
+  summary: ""
+  categories: ["low-code-tools"]
+
+- name: Google Looker Studio
+  logo: /images/sections/skills/ic_data_studio.png
+  summary: 
+  categories: ["low-code-tools", "ai-data"]

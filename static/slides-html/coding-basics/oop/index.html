@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python OOP Interactive Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        warm: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                            950: '#451a03',
+                        },
+                        terracotta: {
+                            500: '#e07a5f',
+                            600: '#d1684c',
+                        },
+                        stone: {
+                            850: '#211e1c',
+                            925: '#131110',
+                            950: '#0c0a09',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #44403c;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 4px;
+        }
+        
+        .glow-warm-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+        }
+        .glow-warm-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+        .pulse-light {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4)); }
+        }
+    </style>
+</head>
+<body class="bg-amber-50/50 dark:bg-stone-950 text-stone-800 dark:text-stone-200 font-sans h-full overflow-hidden flex flex-col transition-colors duration-300 antialiased">
+
+    <header class="h-16 border-b border-amber-200/60 dark:border-stone-800 bg-white/80 dark:bg-stone-900/80 backdrop-blur shrink-0 px-4 md:px-6 flex justify-between items-center z-50">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-br from-amber-500 to-orange-500 text-white p-2.5 rounded-xl shadow-md shadow-amber-500/20 flex items-center justify-center">
+                <i class="fa-brands fa-python text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-bold text-stone-900 dark:text-stone-100 tracking-tight flex items-center gap-2">
+                    Python OOP 互動視覺化導覽
+                    <span class="text-xs bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium">暖色親和版</span>
+                </h1>
+                <p class="text-xs text-stone-500 dark:text-stone-400 hidden sm:block">看懂類別藍圖、物件實體化與記憶體狀態的白話教學工具</p>
+            </div>
+        </div>
+
+        <!-- Action Tools -->
+        <div class="flex items-center space-x-2">
+            <!-- Theme Toggle Button -->
+            <button onclick="toggleTheme()" class="bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                <i id="theme-icon" class="fa-solid fa-moon text-amber-500"></i>
+                <span id="theme-text" class="hidden md:inline">切換主題</span>
+            </button>
+
+            <!-- Reset Memory Button -->
+            <button onclick="resetAll()" class="bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-rotate-left"></i> 重置記憶體
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-3 md:p-5 overflow-y-auto lg:overflow-hidden h-[calc(100vh-4rem)]">
+
+        <!-- Left Column: Step-by-Step OOP Operations (5 Cols) -->
+        <div class="lg:col-span-5 h-full flex flex-col gap-4 min-h-0 overflow-y-auto pr-0 lg:pr-1">
+
+            <!-- Friendly Guided Steps Nav -->
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-3 shadow-sm flex items-center justify-between text-xs font-medium text-stone-600 dark:text-stone-400 shrink-0">
+                <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold">
+                    <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px]">1</span>
+                    <span>定義藍圖</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-stone-300 dark:text-stone-700"></i>
+                <div class="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-bold">
+                    <span class="w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 flex items-center justify-center text-[10px]">2</span>
+                    <span>實體化物件</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-stone-300 dark:text-stone-700"></i>
+                <div class="flex items-center gap-1.5 text-stone-700 dark:text-stone-300 font-bold">
+                    <span class="w-5 h-5 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 flex items-center justify-center text-[10px]">3</span>
+                    <span>呼叫方法</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Class Blueprint View -->
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-4 shadow-sm shrink-0">
+                <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-2.5 mb-3">
+                    <h2 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-compass-drafting text-amber-500"></i> 1. 類別藍圖 (`class Hero`)
+                    </h2>
+                    <span class="text-[10px] font-mono bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded-full">設計設計圖</span>
+                </div>
+                
+                <div class="font-mono text-xs bg-amber-50/40 dark:bg-stone-950 p-3 rounded-xl border border-amber-100 dark:border-stone-800/80 text-stone-800 dark:text-stone-300 leading-relaxed overflow-x-auto">
+                    <span class="text-purple-600 dark:text-purple-400 font-bold">class</span> <span class="text-amber-600 dark:text-amber-300 font-bold">Hero</span>:<br>
+                    &nbsp;&nbsp;<span class="text-purple-600 dark:text-purple-400">def</span> <span class="text-blue-600 dark:text-blue-400 font-bold">__init__</span>(<span class="text-orange-600 dark:text-orange-400">self</span>, name, hp, attack_power):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-orange-600 dark:text-orange-400">self</span>.name = name<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-orange-600 dark:text-orange-400">self</span>.hp = hp<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-orange-600 dark:text-orange-400">self</span>.max_hp = hp<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-orange-600 dark:text-orange-400">self</span>.attack_power = attack_power<br><br>
+                    &nbsp;&nbsp;<span class="text-purple-600 dark:text-purple-400">def</span> <span class="text-blue-600 dark:text-blue-400 font-bold">attack</span>(<span class="text-orange-600 dark:text-orange-400">self</span>, target):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;target.hp = max(<span class="text-emerald-600 dark:text-cyan-400">0</span>, target.hp - <span class="text-orange-600 dark:text-orange-400">self</span>.attack_power)<br><br>
+                    &nbsp;&nbsp;<span class="text-purple-600 dark:text-purple-400">def</span> <span class="text-blue-600 dark:text-blue-400 font-bold">heal</span>(<span class="text-orange-600 dark:text-orange-400">self</span>, amount):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-orange-600 dark:text-orange-400">self</span>.hp = min(<span class="text-orange-600 dark:text-orange-400">self</span>.max_hp, <span class="text-orange-600 dark:text-orange-400">self</span>.hp + amount)
+                </div>
+
+                <!-- Concept Helper Callout -->
+                <div class="mt-3 bg-amber-50/70 dark:bg-stone-950/60 p-2.5 rounded-xl border border-amber-200/50 dark:border-stone-800 text-[11px] text-stone-600 dark:text-stone-400 flex items-start gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5 shrink-0"></i>
+                    <span><strong>人性化筆記：</strong> Class 就像是建造英雄的「設計圖」，它定義了英雄擁有什麼特徵 (Attributes) 與技能 (Methods)，但尚未在記憶體中真正佔用空間。</span>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-4 shadow-sm shrink-0 space-y-3">
+                <div class="border-b border-stone-100 dark:border-stone-800 pb-2 flex items-center justify-between">
+                    <h2 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-wand-magic-sparkles text-orange-500"></i> 2. 實體化 (建構子 `__init__`)
+                    </h2>
+                    <span class="text-[10px] text-stone-500 dark:text-stone-400">造出真正的英雄物件</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Hero 1 Setup -->
+                    <div class="bg-amber-50/30 dark:bg-stone-950/70 p-3 rounded-xl border border-amber-200/50 dark:border-stone-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">hero_1</span>
+                            <span class="text-[10px] font-mono text-stone-400">實體 A</span>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">英雄名字 (name)</label>
+                            <input type="text" id="h1_name" value="亞瑟 (Arthur)" class="w-full bg-white dark:bg-stone-900 border border-amber-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">血量 (hp)</label>
+                                <input type="number" id="h1_hp" value="100" class="w-full bg-white dark:bg-stone-900 border border-amber-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">攻擊力 (atk)</label>
+                                <input type="number" id="h1_atk" value="25" class="w-full bg-white dark:bg-stone-900 border border-amber-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                            </div>
+                        </div>
+                        <button onclick="instantiate('hero_1')" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold py-1.5 rounded-lg text-xs transition shadow-sm flex items-center justify-center gap-1.5 mt-1">
+                            <i class="fa-solid fa-cube text-[10px]"></i> 誕生 hero_1
+                        </button>
+                    </div>
+
+                    <!-- Hero 2 Setup -->
+                    <div class="bg-emerald-50/30 dark:bg-stone-950/70 p-3 rounded-xl border border-emerald-200/50 dark:border-stone-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">hero_2</span>
+                            <span class="text-[10px] font-mono text-stone-400">實體 B</span>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">英雄名字 (name)</label>
+                            <input type="text" id="h2_name" value="蘭斯洛特" class="w-full bg-white dark:bg-stone-900 border border-emerald-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">血量 (hp)</label>
+                                <input type="number" id="h2_hp" value="120" class="w-full bg-white dark:bg-stone-900 border border-emerald-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">攻擊力 (atk)</label>
+                                <input type="number" id="h2_atk" value="18" class="w-full bg-white dark:bg-stone-900 border border-emerald-200 dark:border-stone-700 rounded-lg px-2.5 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                            </div>
+                        </div>
+                        <button onclick="instantiate('hero_2')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-1.5 rounded-lg text-xs transition shadow-sm flex items-center justify-center gap-1.5 mt-1">
+                            <i class="fa-solid fa-cube text-[10px]"></i> 誕生 hero_2
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-4 shadow-sm shrink-0 space-y-3">
+                <div class="border-b border-stone-100 dark:border-stone-800 pb-2 flex items-center justify-between">
+                    <h2 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-hand-pointer text-terracotta-500"></i> 3. 呼叫方法與 `self` 理解
+                    </h2>
+                    <span class="text-[10px] text-stone-500 dark:text-stone-400">觸發物件技能</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Attack Method Box -->
+                    <div class="bg-amber-50/40 dark:bg-stone-950/70 p-3 rounded-xl border border-amber-200/50 dark:border-stone-800 space-y-2.5">
+                        <span class="text-xs font-mono font-bold text-amber-700 dark:text-amber-400 block flex items-center gap-1">
+                            <i class="fa-solid fa-hand-fist text-amber-500"></i> .attack(target)
+                        </span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">發起者 (`self`)</label>
+                                <select id="atk_caller" class="w-full bg-white dark:bg-stone-900 border border-amber-200 dark:border-stone-700 rounded-lg px-2 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none">
+                                    <option value="hero_1">hero_1</option>
+                                    <option value="hero_2">hero_2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">目標 (`target`)</label>
+                                <select id="atk_target" class="w-full bg-white dark:bg-stone-900 border border-amber-200 dark:border-stone-700 rounded-lg px-2 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none">
+                                    <option value="hero_2">hero_2</option>
+                                    <option value="hero_1">hero_1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="executeAttack()" class="w-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700/50 font-semibold py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-burst text-[10px]"></i> 執行攻擊技能
+                        </button>
+                    </div>
+
+                    <!-- Heal Method Box -->
+                    <div class="bg-emerald-50/40 dark:bg-stone-950/70 p-3 rounded-xl border border-emerald-200/50 dark:border-stone-800 space-y-2.5">
+                        <span class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 block flex items-center gap-1">
+                            <i class="fa-solid fa-heart-pulse text-emerald-500"></i> .heal(amount)
+                        </span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">補血對象 (`self`)</label>
+                                <select id="heal_caller" class="w-full bg-white dark:bg-stone-900 border border-emerald-200 dark:border-stone-700 rounded-lg px-2 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none">
+                                    <option value="hero_1">hero_1</option>
+                                    <option value="hero_2">hero_2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-stone-500 dark:text-stone-400 block mb-0.5">治癒量 (amount)</label>
+                                <input type="number" id="heal_amount" value="20" class="w-full bg-white dark:bg-stone-900 border border-emerald-200 dark:border-stone-700 rounded-lg px-2 py-1 text-xs text-stone-800 dark:text-stone-200 focus:outline-none">
+                            </div>
+                        </div>
+                        <button onclick="executeHeal()" class="w-full bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 font-semibold py-1.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic text-[10px]"></i> 執行治癒技能
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Concept Helper Callout -->
+                <div class="bg-amber-50/70 dark:bg-stone-950/60 p-2.5 rounded-xl border border-amber-200/50 dark:border-stone-800 text-[11px] text-stone-600 dark:text-stone-400 flex items-start gap-2">
+                    <i class="fa-solid fa-circle-info text-orange-500 mt-0.5 shrink-0"></i>
+                    <span><strong>什麼是 `self`？</strong> `self` 代表「當前正在動作的這個英雄自己」。當呼叫 `hero_1.attack(hero_2)` 時，Python 會自動把 `hero_1` 帶入 `self` 中！</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-7 h-full flex flex-col gap-4 min-h-0">
+
+            <!-- RAM Memory Heap Inspector Card -->
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-4 shadow-sm flex-1 flex flex-col min-h-[220px] overflow-hidden">
+                <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-2.5 mb-3 shrink-0">
+                    <h2 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-microchip text-amber-500"></i> RAM 記憶體堆疊監視器 (Memory Heap)
+                    </h2>
+                    <span class="text-[10px] font-mono text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-md">`id(obj)` & `obj.__dict__`</span>
+                </div>
+
+                <!-- Dynamic Cards Container -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 overflow-y-auto pr-1" id="instances_container">
+                    <!-- Cards populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Execution Console Output Card -->
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-3.5 shadow-sm h-32 shrink-0 flex flex-col">
+                <div class="border-b border-stone-100 dark:border-stone-800 pb-2 mb-2 flex justify-between items-center shrink-0">
+                    <h2 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-solid fa-terminal text-emerald-500"></i> 程式執行輸出日誌 (Console Log)
+                    </h2>
+                    <span class="text-[10px] font-mono text-stone-400">stdout</span>
+                </div>
+                <div id="console_log" class="font-mono text-[11px] bg-amber-50/40 dark:bg-stone-950 p-2.5 rounded-xl border border-amber-100 dark:border-stone-800 text-emerald-700 dark:text-emerald-400 flex-1 overflow-y-auto space-y-1">
+                    <div class="text-stone-400 dark:text-stone-500">[系統通告] 系統已就緒，請點擊「誕生」來實體化您的第一位英雄！</div>
+                </div>
+            </div>
+
+            <!-- Python Source History Card -->
+            <div class="bg-white dark:bg-stone-900 border border-amber-200/60 dark:border-stone-800 rounded-2xl p-3.5 shadow-sm h-36 shrink-0 flex flex-col overflow-hidden">
+                <div class="border-b border-stone-100 dark:border-stone-800 pb-2 mb-2 flex justify-between items-center shrink-0">
+                    <h2 class="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2 uppercase tracking-wider">
+                        <i class="fa-brands fa-python text-amber-500"></i> 自動生成的 Python 原始碼歷程
+                    </h2>
+                    <button onclick="copyCode()" class="text-[10px] font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow-sm">
+                        <i class="fa-regular fa-copy"></i> 複製程式碼
+                    </button>
+                </div>
+                <pre id="python_code" class="font-mono text-[11px] bg-amber-50/40 dark:bg-stone-950 p-2.5 rounded-xl border border-amber-100 dark:border-stone-800/80 text-stone-700 dark:text-stone-300 flex-1 overflow-y-auto leading-relaxed"># Class Definition
+class Hero:
+    def __init__(self, name: str, hp: int, attack_power: int):
+        self.name = name
+        self.hp = hp
+        self.max_hp = hp
+        self.attack_power = attack_power
+
+    def attack(self, target: 'Hero'):
+        damage = self.attack_power
+        target.hp = max(0, target.hp - damage)
+
+    def heal(self, amount: int):
+        self.hp = min(self.max_hp, self.hp + amount)
+</pre>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        const instances = {
+            hero_1: null,
+            hero_2: null
+        };
+
+        const addresses = {
+            hero_1: null,
+            hero_2: null
+        };
+
+        let pythonHistory = [
+            "# Class Definition",
+            "class Hero:",
+            "    def __init__(self, name: str, hp: int, attack_power: int):",
+            "        self.name = name",
+            "        self.hp = hp",
+            "        self.max_hp = hp",
+            "        self.attack_power = attack_power",
+            "",
+            "    def attack(self, target: 'Hero'):",
+            "        damage = self.attack_power",
+            "        target.hp = max(0, target.hp - damage)",
+            "",
+            "    def heal(self, amount: int):",
+            "        self.hp = min(self.max_hp, self.hp + amount)",
+            ""
+        ];
+
+        function generateMemoryAddress() {
+            return '0x' + Array.from({length: 10}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        }
+
+        function instantiate(key) {
+            const isH1 = key === 'hero_1';
+            const nameInput = document.getElementById(isH1 ? 'h1_name' : 'h2_name').value.trim();
+            const hpInput = parseInt(document.getElementById(isH1 ? 'h1_hp' : 'h2_hp').value) || (isH1 ? 100 : 120);
+            const atkInput = parseInt(document.getElementById(isH1 ? 'h1_atk' : 'h2_atk').value) || (isH1 ? 25 : 18);
+
+            if (!nameInput) {
+                logConsole("⚠️ 請輸入有效的英雄名字！", true);
+                return;
+            }
+
+            instances[key] = {
+                name: nameInput,
+                hp: hpInput,
+                max_hp: hpInput,
+                attack_power: atkInput
+            };
+            addresses[key] = generateMemoryAddress();
+
+            const codeLine = `${key} = Hero(name='${nameInput}', hp=${hpInput}, attack_power=${atkInput})`;
+            pythonHistory.push(codeLine);
+
+            logConsole(`✨ [物件誕生] ${key} = Hero(name='${nameInput}', hp=${hpInput}, attack_power=${atkInput}) ➔ 記憶體已配置於 ${addresses[key]}`);
+            updateCodeOutput();
+            renderInspector();
+        }
+
+        function executeAttack() {
+            const callerKey = document.getElementById('atk_caller').value;
+            const targetKey = document.getElementById('atk_target').value;
+
+            const caller = instances[callerKey];
+            const target = instances[targetKey];
+
+            if (!caller) {
+                logConsole(`❌ 錯誤：發起者 '${callerKey}' 尚未誕生，請先點擊「誕生」實體化英雄！`, true);
+                return;
+            }
+            if (!target) {
+                logConsole(`❌ 錯誤：目標 '${targetKey}' 尚未誕生，請先點擊「誕生」實體化英雄！`, true);
+                return;
+            }
+
+            const damage = caller.attack_power;
+            target.hp = Math.max(0, target.hp - damage);
+
+            const codeLine = `${callerKey}.attack(${targetKey})`;
+            pythonHistory.push(codeLine);
+
+            logConsole(`⚔️ [技能觸發] ${callerKey}.attack(${targetKey}) ➔ [${caller.name}] 對 [${target.name}] 造成了 ${damage} 點傷害！目標剩餘 HP: ${target.hp}`);
+            updateCodeOutput();
+            renderInspector();
+        }
+
+        function executeHeal() {
+            const callerKey = document.getElementById('heal_caller').value;
+            const amount = parseInt(document.getElementById('heal_amount').value) || 20;
+            const caller = instances[callerKey];
+
+            if (!caller) {
+                logConsole(`❌ 錯誤：英雄 '${callerKey}' 尚未誕生，無法執行治癒！`, true);
+                return;
+            }
+
+            const oldHp = caller.hp;
+            caller.hp = Math.min(caller.max_hp, caller.hp + amount);
+            const healed = caller.hp - oldHp;
+
+            const codeLine = `${callerKey}.heal(${amount})`;
+            pythonHistory.push(codeLine);
+
+            logConsole(`💖 [技能觸發] ${callerKey}.heal(${amount}) ➔ [${caller.name}] 回復了 ${healed} 點血量！當前 HP: ${caller.hp}/${caller.max_hp}`);
+            updateCodeOutput();
+            renderInspector();
+        }
+
+        function renderInspector() {
+            const container = document.getElementById('instances_container');
+            container.innerHTML = '';
+
+            ['hero_1', 'hero_2'].forEach(key => {
+                const obj = instances[key];
+                const addr = addresses[key];
+                const isH1 = key === 'hero_1';
+                
+                const mainColorClass = isH1 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400';
+                const badgeBgClass = isH1 ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400' : 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400';
+                const glowClass = isH1 ? 'glow-warm-amber' : 'glow-warm-emerald';
+
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border transition-all flex flex-col justify-between ${
+                    obj 
+                    ? `bg-amber-50/50 dark:bg-stone-950/80 border-${isH1 ? 'amber' : 'emerald'}-300 dark:border-${isH1 ? 'amber' : 'emerald'}-500/40 ${glowClass}`
+                    : 'bg-stone-50/50 dark:bg-stone-950/40 border-stone-200 dark:border-stone-800 border-dashed'
+                }`;
+
+                if (!obj) {
+                    card.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-900 mx-auto flex items-center justify-center text-stone-400 mb-2">
+                                <i class="fa-regular fa-ghost text-base"></i>
+                            </div>
+                            <div class="font-mono text-xs font-bold ${mainColorClass}">${key}</div>
+                            <div class="text-xs text-stone-400 dark:text-stone-600 italic mt-1">尚未實體化 (None)</div>
+                        </div>
+                    `;
+                } else {
+                    const hpPercent = Math.max(0, Math.min(100, Math.floor((obj.hp / obj.max_hp) * 100)));
+                    const barColor = hpPercent < 30 ? 'bg-rose-500' : (isH1 ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-emerald-500 to-teal-500');
+
+                    const dictJson = JSON.stringify({
+                        name: obj.name,
+                        hp: obj.hp,
+                        max_hp: obj.max_hp,
+                        attack_power: obj.attack_power
+                    }, null, 2);
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center justify-between border-b border-stone-200/60 dark:border-stone-800 pb-2 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-bold text-xs ${mainColorClass}">${key}</span>
+                                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-full ${badgeBgClass}">class Hero</span>
+                                </div>
+                                <span class="font-mono text-[10px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 px-2 py-0.5 rounded-md text-stone-500 dark:text-stone-400" title="RAM 虛擬記憶體位址">
+                                    id: ${addr}
+                                </span>
+                            </div>
+
+                            <div class="mb-3 space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-stone-700 dark:text-stone-300">
+                                    <span class="font-medium">生命值 (hp)</span>
+                                    <span class="font-bold">${obj.hp} / ${obj.max_hp}</span>
+                                </div>
+                                <div class="w-full bg-stone-200 dark:bg-stone-900 h-2.5 rounded-full overflow-hidden p-0.5 border border-stone-300 dark:border-stone-800">
+                                    <div class="h-full rounded-full transition-all duration-500 ${barColor}" style="width: ${hpPercent}%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="font-mono text-[10px] text-stone-500 dark:text-stone-400 block mb-1">__dict__ (內部屬性字典):</span>
+                                <pre class="font-mono text-[10px] bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800/80 rounded-xl p-2.5 text-amber-700 dark:text-amber-300 overflow-x-auto leading-tight shadow-inner">${dictJson}</pre>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        function logConsole(msg, isError = false) {
+            const consoleEl = document.getElementById('console_log');
+            const entry = document.createElement('div');
+            entry.className = isError ? 'text-rose-600 dark:text-rose-400 font-medium' : 'text-emerald-700 dark:text-emerald-400';
+            entry.textContent = `> ${msg}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function updateCodeOutput() {
+            const codeEl = document.getElementById('python_code');
+            codeEl.textContent = pythonHistory.join('\n');
+            codeEl.scrollTop = codeEl.scrollHeight;
+        }
+
+        function resetAll() {
+            instances.hero_1 = null;
+            instances.hero_2 = null;
+            addresses.hero_1 = null;
+            addresses.hero_2 = null;
+            pythonHistory = pythonHistory.slice(0, 13);
+
+            updateCodeOutput();
+            document.getElementById('console_log').innerHTML = '<div class="text-stone-400 dark:text-stone-500">[系統通告] 記憶體已成功清空，所有實體變數歸零為 None。</div>';
+            renderInspector();
+        }
+
+        function copyCode() {
+            const code = document.getElementById('python_code').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    logConsole('📋 [系統] Python 程式碼已成功複製到剪貼簿！');
+                }).catch(() => {
+                    document.execCommand('copy');
+                });
+            } else {
+                document.execCommand('copy');
+                logConsole('📋 [系統] Python 程式碼已成功複製到剪貼簿！');
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-sun text-amber-500';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-moon text-amber-500';
+            }
+        }
+
+        window.onload = function() {
+            renderInspector();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奇幻分揀工廠 - 輕鬆學會 Switch 概念</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* Custom animation keyframes */
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6)); }
+            50% { filter: drop-shadow(0 0 18px rgba(129, 140, 248, 0.9)); }
+        }
+
+        .glow-active {
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes conveyor-move {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -40; }
+        }
+
+        .conveyor-belt {
+            stroke-dasharray: 10, 10;
+            animation: conveyor-move 1s linear infinite;
+        }
+
+        .conveyor-paused {
+            animation-play-state: paused;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen w-screen overflow-hidden flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Compact Header -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur shrink-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-gradient-to-tr from-indigo-500 to-purple-500 p-1.5 rounded-xl shadow-md shadow-indigo-500/20">
+                    <i data-lucide="git-fork" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 leading-tight">
+                        奇幻分揀工廠
+                    </h1>
+                    <p class="text-[10px] text-slate-400 hidden sm:block leading-none">零基礎 Switch 互動視覺樂園</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex bg-slate-800/80 p-0.5 rounded-lg border border-slate-700/50 text-xs font-medium">
+                <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn active px-3 py-1.5 rounded-md transition-all flex items-center space-x-1.5 bg-indigo-600 text-white shadow">
+                    <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
+                    <span>實機模擬器</span>
+                </button>
+                <button onclick="switchTab('concept')" id="tab-concept" class="tab-btn px-3 py-1.5 rounded-md transition-all flex items-center space-x-1.5 text-slate-400 hover:text-slate-200">
+                    <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+                    <span>圖解觀念</span>
+                </button>
+                <button onclick="switchTab('quests')" id="tab-quests" class="tab-btn px-3 py-1.5 rounded-md transition-all flex items-center space-x-1.5 text-slate-400 hover:text-slate-200">
+                    <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                    <span>觀念大挑戰</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area - Strictly constrained to remaining viewport height -->
+    <main class="max-w-7xl mx-auto px-4 py-2 w-full flex-1 min-h-0 flex flex-col overflow-hidden">
+
+        <!-- TAB 1: SIMULATOR SECTION -->
+        <section id="view-simulator" class="h-full flex flex-col gap-2 min-h-0">
+            
+            <!-- Compact Intro Banner -->
+            <div class="glass-panel py-1.5 px-3 rounded-xl flex items-center justify-between gap-2 border-l-4 border-l-indigo-500 shrink-0">
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="text-indigo-300 font-bold flex items-center gap-1 shrink-0">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+                        Switch 運作原理：
+                    </span>
+                    <span class="text-slate-300 truncate text-[11px] sm:text-xs">
+                        放入物品（<strong class="text-amber-300">目標值</strong>），中央掃描器直接把鐵軌切換到相符的通道（<strong class="text-emerald-300">Case</strong>）！
+                    </span>
+                </div>
+                <div class="hidden md:flex items-center gap-1 text-[11px] text-slate-400 shrink-0">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    點選下方水果投放包裹
+                </div>
+            </div>
+
+            <!-- Main Interactive Simulator Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
+                
+                <!-- Left Column: Visual Factory Canvas (7 cols) -->
+                <div class="lg:col-span-7 glass-panel rounded-2xl p-3 flex flex-col justify-between relative overflow-hidden h-full min-h-0">
+                    
+                    <!-- Canvas Top Bar -->
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-1.5 shrink-0">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                            <span class="text-[11px] font-mono text-slate-400 ml-1">Sorting_Factory_v1.0</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-[10px] text-slate-400">速度:</span>
+                            <button onclick="setSpeed(1.5)" id="speed-slow" class="px-1.5 py-0.5 text-[10px] rounded bg-slate-800 text-slate-300 hover:bg-slate-700">標準</button>
+                            <button onclick="setSpeed(0.8)" id="speed-fast" class="px-1.5 py-0.5 text-[10px] rounded bg-indigo-600 text-white font-bold">快速</button>
+                        </div>
+                    </div>
+
+                    <!-- SVG Animated Factory Tracks -->
+                    <div class="relative flex-1 min-h-0 flex items-center justify-center my-1 overflow-hidden">
+                        <svg id="factory-svg" viewBox="0 0 700 380" class="w-full h-full max-h-full" preserveAspectRatio="xMidYMid meet">
+                            <!-- Main Entry Conveyor -->
+                            <path d="M 60 45 L 220 45" stroke="#334155" stroke-width="14" stroke-linecap="round"/>
+                            <path d="M 60 45 L 220 45" stroke="#6366f1" stroke-width="5" class="conveyor-belt" id="belt-main"/>
+                            
+                            <!-- Scanner Station -->
+                            <g id="scanner-group" class="transition-transform duration-300">
+                                <rect x="220" y="15" width="80" height="55" rx="10" fill="#1e1b4b" stroke="#818cf8" stroke-width="2.5"/>
+                                <text x="260" y="38" font-size="11" fill="#c7d2fe" text-anchor="middle" font-weight="bold">中央檢測器</text>
+                                <text x="260" y="56" font-size="10" fill="#a5b4fc" text-anchor="middle" font-weight="bold" id="scanner-text">switch(?)</text>
+                                <line x1="260" y1="70" x2="260" y2="90" stroke="#818cf8" stroke-width="2.5" stroke-dasharray="4 4"/>
+                            </g>
+
+                            <!-- Branch Rails & Bins -->
+                            
+                            <!-- Case 1 Track (Apple - Red) -->
+                            <path d="M 260 90 Q 260 135 400 135 L 580 135" stroke="#334155" stroke-width="10" fill="none" id="rail-case1-bg"/>
+                            <path d="M 260 90 Q 260 135 400 135 L 580 135" stroke="#f43f5e" stroke-width="3.5" stroke-dasharray="6 6" fill="none" id="rail-case1"/>
+                            <rect x="520" y="112" width="120" height="44" rx="8" fill="#881337" stroke="#f43f5e" stroke-width="2"/>
+                            <text x="580" y="139" font-size="12" fill="#fecdd3" text-anchor="middle" font-weight="bold">🍎 蘋果專用區</text>
+                            <g id="gate-case1">
+                                <rect x="490" y="117" width="8" height="36" fill="#e11d48" rx="2" id="gate-bar-1"/>
+                                <circle cx="494" cy="112" r="7" fill="#fda4af" />
+                                <text x="494" y="99" font-size="9" fill="#fda4af" text-anchor="middle" font-weight="bold" id="gate-label-1">break (關閉)</text>
+                            </g>
+
+                            <!-- Case 2 Track (Banana - Yellow) -->
+                            <path d="M 260 90 Q 260 210 400 210 L 580 210" stroke="#334155" stroke-width="10" fill="none" id="rail-case2-bg"/>
+                            <path d="M 260 90 Q 260 210 400 210 L 580 210" stroke="#eab308" stroke-width="3.5" stroke-dasharray="6 6" fill="none" id="rail-case2"/>
+                            <rect x="520" y="187" width="120" height="44" rx="8" fill="#713f12" stroke="#eab308" stroke-width="2"/>
+                            <text x="580" y="214" font-size="12" fill="#fef08a" text-anchor="middle" font-weight="bold">🍌 香蕉專用區</text>
+                            <g id="gate-case2">
+                                <rect x="490" y="192" width="8" height="36" fill="#ca8a04" rx="2" id="gate-bar-2"/>
+                                <circle cx="494" cy="187" r="7" fill="#fef08a" />
+                                <text x="494" y="174" font-size="9" fill="#fef08a" text-anchor="middle" font-weight="bold" id="gate-label-2">break (關閉)</text>
+                            </g>
+
+                            <!-- Case 3 Track (Grape - Purple) -->
+                            <path d="M 260 90 Q 260 285 400 285 L 580 285" stroke="#334155" stroke-width="10" fill="none" id="rail-case3-bg"/>
+                            <path d="M 260 90 Q 260 285 400 285 L 580 285" stroke="#a855f7" stroke-width="3.5" stroke-dasharray="6 6" fill="none" id="rail-case3"/>
+                            <rect x="520" y="262" width="120" height="44" rx="8" fill="#581c87" stroke="#a855f7" stroke-width="2"/>
+                            <text x="580" y="289" font-size="12" fill="#f3e8ff" text-anchor="middle" font-weight="bold">🍇 葡萄專用區</text>
+                            <g id="gate-case3">
+                                <rect x="490" y="267" width="8" height="36" fill="#9333ea" rx="2" id="gate-bar-3"/>
+                                <circle cx="494" cy="262" r="7" fill="#f3e8ff" />
+                                <text x="494" y="249" font-size="9" fill="#e9d5ff" text-anchor="middle" font-weight="bold" id="gate-label-3">break (關閉)</text>
+                            </g>
+
+                            <!-- Default Track -->
+                            <path d="M 260 90 L 260 355 L 580 355" stroke="#334155" stroke-width="10" fill="none" id="rail-default-bg"/>
+                            <path d="M 260 90 L 260 355 L 580 355" stroke="#94a3b8" stroke-width="3.5" stroke-dasharray="6 6" fill="none" id="rail-default"/>
+                            <rect x="520" y="332" width="120" height="44" rx="8" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="580" y="359" font-size="12" fill="#cbd5e1" text-anchor="middle" font-weight="bold">❓ 預設/失物招領區</text>
+
+                            <!-- Chutes for Fall-through -->
+                            <path d="M 460 135 L 460 190" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="3 3" id="chute-1-2" opacity="0.3"/>
+                            <path d="M 460 210 L 460 265" stroke="#eab308" stroke-width="2.5" stroke-dasharray="3 3" id="chute-2-3" opacity="0.3"/>
+                            <path d="M 460 285 L 460 335" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="3 3" id="chute-3-def" opacity="0.3"/>
+
+                            <!-- Moving Parcel Element -->
+                            <g id="animated-parcel" opacity="0" transform="translate(0,0)">
+                                <circle cx="0" cy="0" r="18" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5"/>
+                                <text x="0" y="6" font-size="16" text-anchor="middle" id="parcel-emoji">🍎</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- Interactive Parcel Dispatcher Controls -->
+                    <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 space-y-1.5 shrink-0">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="package-plus" class="w-3.5 h-3.5 text-indigo-400"></i>
+                            選擇包裹投放（目標值 Input）：
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button onclick="dispatchParcel('apple')" class="parcel-select-btn p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/50 flex items-center space-x-1.5 transition-all text-left">
+                                <span class="text-xl shrink-0">🍎</span>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold text-rose-300 truncate">"蘋果"</div>
+                                    <div class="text-[9px] text-slate-400">Case 1</div>
+                                </div>
+                            </button>
+
+                            <button onclick="dispatchParcel('banana')" class="parcel-select-btn p-1.5 rounded-lg bg-slate-800 hover:bg-amber-950/60 border border-slate-700 hover:border-amber-500/50 flex items-center space-x-1.5 transition-all text-left">
+                                <span class="text-xl shrink-0">🍌</span>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold text-amber-300 truncate">"香蕉"</div>
+                                    <div class="text-[9px] text-slate-400">Case 2</div>
+                                </div>
+                            </button>
+
+                            <button onclick="dispatchParcel('grape')" class="parcel-select-btn p-1.5 rounded-lg bg-slate-800 hover:bg-purple-950/60 border border-slate-700 hover:border-purple-500/50 flex items-center space-x-1.5 transition-all text-left">
+                                <span class="text-xl shrink-0">🍇</span>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold text-purple-300 truncate">"葡萄"</div>
+                                    <div class="text-[9px] text-slate-400">Case 3</div>
+                                </div>
+                            </button>
+
+                            <button onclick="dispatchParcel('alien')" class="parcel-select-btn p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700/60 border border-slate-700 hover:border-slate-500 flex items-center space-x-1.5 transition-all text-left">
+                                <span class="text-xl shrink-0">👾</span>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold text-slate-300 truncate">"外星果"</div>
+                                    <div class="text-[9px] text-slate-400">Default</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Interactive Code Block & Config (5 cols) -->
+                <div class="lg:col-span-5 flex flex-col gap-2 h-full min-h-0">
+                    
+                    <!-- Break Switch Config Box -->
+                    <div class="glass-panel rounded-2xl p-2.5 border-l-4 border-l-amber-500 space-y-1.5 shrink-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-slate-200 text-xs flex items-center gap-1.5">
+                                <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+                                實驗：貫穿煞車閘門 (Break Controls)
+                            </h3>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded-full">關閉試試看</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-tight">
+                            `break` 是煞車閘門。若取消勾選，包裹會順著重力掉入下層（<strong class="text-rose-400">貫穿現象 Fall-through</strong>）！
+                        </p>
+                        
+                        <!-- Toggle Controls for Break -->
+                        <div class="grid grid-cols-3 gap-1.5 pt-0.5">
+                            <label class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-lg border border-slate-700/60 cursor-pointer hover:bg-slate-800">
+                                <span class="text-[11px] text-rose-300 font-medium">蘋果 Break</span>
+                                <input type="checkbox" id="toggle-break-1" checked onchange="updateBreakConfig()" class="w-3.5 h-3.5 accent-indigo-500 rounded cursor-pointer">
+                            </label>
+                            <label class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-lg border border-slate-700/60 cursor-pointer hover:bg-slate-800">
+                                <span class="text-[11px] text-amber-300 font-medium">香蕉 Break</span>
+                                <input type="checkbox" id="toggle-break-2" checked onchange="updateBreakConfig()" class="w-3.5 h-3.5 accent-indigo-500 rounded cursor-pointer">
+                            </label>
+                            <label class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-lg border border-slate-700/60 cursor-pointer hover:bg-slate-800">
+                                <span class="text-[11px] text-purple-300 font-medium">葡萄 Break</span>
+                                <input type="checkbox" id="toggle-break-3" checked onchange="updateBreakConfig()" class="w-3.5 h-3.5 accent-indigo-500 rounded cursor-pointer">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Synchronized Code Block -->
+                    <div class="glass-panel rounded-2xl p-3 flex-1 min-h-0 flex flex-col justify-between gap-2 overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-1.5 shrink-0">
+                            <div class="flex items-center space-x-1.5">
+                                <i data-lucide="code-2" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wide">同步語法藍圖 (Live Switch)</span>
+                            </div>
+                            <span id="step-badge" class="text-[9px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-mono">靜止待命中</span>
+                        </div>
+
+                        <!-- Pseudo Code Display -->
+                        <div class="bg-slate-950 rounded-xl p-2.5 font-mono text-[11px] space-y-0.5 text-slate-300 border border-slate-800 shadow-inner overflow-y-auto flex-1 min-h-0 leading-snug">
+                            
+                            <div id="code-line-switch" class="p-0.5 rounded transition-colors duration-200">
+                                <span class="text-purple-400 font-bold">switch</span> (<span id="code-var-item" class="text-amber-300 font-bold">目前物品</span>) {
+                            </div>
+
+                            <div id="code-line-case1" class="pl-3 p-0.5 rounded transition-colors duration-200">
+                                <span class="text-rose-400 font-bold">case</span> <span class="text-emerald-300">"蘋果"</span>:
+                                <span class="text-slate-500 text-[10px] ml-2">// 送往蘋果區 🍎</span>
+                            </div>
+                            <div id="code-line-break1" class="pl-6 p-0.5 rounded transition-colors duration-200 text-amber-400">
+                                <span id="code-break-1-text">break; // 煞車跳出</span>
+                            </div>
+
+                            <div id="code-line-case2" class="pl-3 p-0.5 rounded transition-colors duration-200">
+                                <span class="text-amber-400 font-bold">case</span> <span class="text-emerald-300">"香蕉"</span>:
+                                <span class="text-slate-500 text-[10px] ml-2">// 送往香蕉區 🍌</span>
+                            </div>
+                            <div id="code-line-break2" class="pl-6 p-0.5 rounded transition-colors duration-200 text-amber-400">
+                                <span id="code-break-2-text">break; // 煞車跳出</span>
+                            </div>
+
+                            <div id="code-line-case3" class="pl-3 p-0.5 rounded transition-colors duration-200">
+                                <span class="text-purple-400 font-bold">case</span> <span class="text-emerald-300">"葡萄"</span>:
+                                <span class="text-slate-500 text-[10px] ml-2">// 送往葡萄區 🍇</span>
+                            </div>
+                            <div id="code-line-break3" class="pl-6 p-0.5 rounded transition-colors duration-200 text-amber-400">
+                                <span id="code-break-3-text">break; // 煞車跳出</span>
+                            </div>
+
+                            <div id="code-line-default" class="pl-3 p-0.5 rounded transition-colors duration-200">
+                                <span class="text-sky-400 font-bold">default</span>:
+                                <span class="text-slate-500 text-[10px] ml-2">// 預設失物招領區 ❓</span>
+                            </div>
+
+                            <div class="text-purple-400 font-bold">}</div>
+                        </div>
+
+                        <!-- Realtime Explanation Text -->
+                        <div id="status-explanation" class="bg-indigo-950/40 p-2 rounded-xl border border-indigo-500/30 text-xs text-indigo-200 flex items-start space-x-2 shrink-0">
+                            <i data-lucide="message-square-text" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5"></i>
+                            <span id="explanation-text" class="text-[11px] sm:text-xs leading-tight">點擊左側的水果按鈕，觀察機器如何根據名稱自動選擇路徑！</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 2: CONCEPT STORY SECTION -->
+        <section id="view-concept" class="hidden h-full flex flex-col min-h-0 overflow-y-auto pr-1 space-y-4">
+            <div class="glass-panel p-4 rounded-2xl space-y-4">
+                <div class="space-y-1">
+                    <h2 class="text-xl font-black text-indigo-300 flex items-center gap-2">
+                        <i data-lucide="compass" class="w-5 h-5 text-indigo-400"></i>
+                        用白話文秒懂 Switch 核心概念
+                    </h2>
+                    <p class="text-slate-300 text-xs leading-relaxed">
+                        在程式世界裡，除了常見的 `if-else`（如果/否則），`switch` 是專門應對「多向選擇」的精準開關！
+                    </p>
+                </div>
+
+                <!-- Analogy Comparison Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- If-Else Analogy -->
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/80 space-y-2">
+                        <div class="bg-amber-500/20 text-amber-300 w-fit px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1">
+                            <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
+                            傳統模式：If - Else If
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-200">「逐一問話關卡」</h3>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            像逐一問哨兵：「你是蘋果嗎？」不是的話才走去問下一個哨兵：「你是香蕉嗎？」選項多時較費時。
+                        </p>
+                        <div class="bg-slate-950 p-2 rounded-lg text-[11px] font-mono text-slate-400 space-y-0.5 border border-slate-800">
+                            <div><span class="text-amber-400">if</span> (是蘋果嗎?) { 送蘋果區 }</div>
+                            <div><span class="text-amber-400">else if</span> (是香蕉嗎?) { 送香蕉區 }</div>
+                        </div>
+                    </div>
+
+                    <!-- Switch Analogy -->
+                    <div class="bg-indigo-950/40 p-4 rounded-xl border border-indigo-500/40 space-y-2">
+                        <div class="bg-indigo-500/20 text-indigo-300 w-fit px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1">
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-indigo-400"></i>
+                            Switch 模式：自動軌道分揀機
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-100">「直接轉接對應號碼」</h3>
+                        <p class="text-xs text-indigo-200/80 leading-relaxed">
+                            給中央控制器物品名稱，機器直接把鐵軌轉接到對應軌道，一步到位！
+                        </p>
+                        <div class="bg-slate-950 p-2 rounded-lg text-[11px] font-mono text-indigo-300 space-y-0.5 border border-indigo-900/50">
+                            <div><span class="text-purple-400 font-bold">switch</span> (物品標籤) {</div>
+                            <div class="pl-3"><span class="text-rose-400">case</span> "蘋果": 送蘋果區; <span class="text-amber-400">break;</span></div>
+                            <div>}</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Essential Terms Cards -->
+                <div class="pt-2 border-t border-slate-800">
+                    <h3 class="text-sm font-bold text-slate-200 mb-2 flex items-center gap-1.5">
+                        <i data-lucide="book-open-check" class="w-4 h-4 text-emerald-400"></i>
+                         Switch 家族四大核心元件
+                    </h3>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="text-purple-400 font-mono font-bold text-xs">1. switch (目標)</div>
+                            <p class="text-[11px] text-slate-400">放入你要比對的物品或狀態變數。</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="text-rose-400 font-mono font-bold text-xs">2. case "數值":</div>
+                            <p class="text-[11px] text-slate-400">預期的可能性。若吻合就執行該軌道的指令。</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="text-amber-400 font-mono font-bold text-xs">3. break;</div>
+                            <p class="text-[11px] text-slate-400">煞車閘門！告訴程式「任務完成，跳出 switch」。</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <div class="text-sky-400 font-mono font-bold text-xs">4. default:</div>
+                            <p class="text-[11px] text-slate-400">當全部 case 都不符合時的備用招領箱。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 3: QUESTS / MINI-GAMES SECTION -->
+        <section id="view-quests" class="hidden h-full flex flex-col min-h-0 overflow-y-auto pr-1 space-y-3">
+            <div class="glass-panel p-4 rounded-2xl space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2">
+                    <div>
+                        <h2 class="text-lg font-black text-amber-300 flex items-center gap-2">
+                            <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i>
+                            Switch 觀念大挑戰
+                        </h2>
+                        <p class="text-[11px] text-slate-400">透過小測驗檢驗你對分揀機原理與 Break 機制的理解！</p>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-slate-900 px-3 py-1 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400">目前得分:</span>
+                        <span id="quiz-score" class="text-base font-bold text-amber-400 font-mono">0</span>
+                        <span class="text-xs text-slate-400">/ 3</span>
+                    </div>
+                </div>
+
+                <!-- Quiz Cards Container -->
+                <div class="space-y-3">
+                    
+                    <!-- Question 1 -->
+                    <div id="quiz-card-1" class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-indigo-400">題目 1 / 3</span>
+                            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">基礎題</span>
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-200">
+                            在 Switch 結構中，如果放入一個完全沒有在 `case` 中列出的新物品（例如：🤖 機器人），程式會走到哪裡？
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="q1-options">
+                            <button onclick="checkAnswer(1, 'A', false)" class="q-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-left text-slate-300 border border-slate-700 transition-all">
+                                A. 程式會當機直接爆炸
+                            </button>
+                            <button onclick="checkAnswer(1, 'B', true)" class="q-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-left text-slate-300 border border-slate-700 transition-all">
+                                B. 會走到 `default` 預設分揀區
+                            </button>
+                        </div>
+                        <div id="q1-feedback" class="hidden text-xs p-2 rounded-lg mt-1 font-medium"></div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div id="quiz-card-2" class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-indigo-400">題目 2 / 3</span>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded">陷阱題</span>
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-200">
+                            如果在 `case "蘋果":` 的程式碼最後<strong class="text-rose-400">忘記寫 `break;`</strong>，會發生什麼神奇的事？
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="q2-options">
+                            <button onclick="checkAnswer(2, 'A', false)" class="q-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-left text-slate-300 border border-slate-700 transition-all">
+                                A. 沒事，程式會正常結束
+                            </button>
+                            <button onclick="checkAnswer(2, 'C', true)" class="q-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-left text-slate-300 border border-slate-700 transition-all">
+                                C. 會一路貫穿下去，把下一個 case（香蕉）也順便執行了！
+                            </button>
+                        </div>
+                        <div id="q2-feedback" class="hidden text-xs p-2 rounded-lg mt-1 font-medium"></div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div id="quiz-card-3" class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-indigo-400">題目 3 / 3</span>
+                            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded">觀念題</span>
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-200">
+                            什麼時候最適合使用 `switch` 而不是 `if-else` 呢？
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="q3-options">
+                            <button onclick="checkAnswer(3, 'A', true)" class="q-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-left text-slate-300 border border-slate-700 transition-all">
+                                A. 當你有一個明確變數，要與多個固定數值（如：星期一~星期七）做一對一比對時
+                            </button>
+                            <button onclick="checkAnswer(3, 'B', false)" class="q-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-left text-slate-300 border border-slate-700 transition-all">
+                                B. 當需要判斷「身高 > 170 且 體重 < 60」這種複雜區間時
+                            </button>
+                        </div>
+                        <div id="q3-feedback" class="hidden text-xs p-2 rounded-lg mt-1 font-medium"></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Compact Single-Line Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/80 py-1 px-4 text-center text-[10px] text-slate-500 shrink-0">
+        🎓 互動式 Switch 程式體驗課 · 專為零基礎打造 · 單頁互動無須滾動
+    </footer>
+
+    <script>
+        // Lucide Icons Initialization
+        lucide.createIcons();
+
+        // State variables
+        let isAnimating = false;
+        let animSpeed = 1.0;
+        let score = 0;
+        let quizAnswered = { 1: false, 2: false, 3: false };
+
+        let breaks = {
+            case1: true,
+            case2: true,
+            case3: true
+        };
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms / animSpeed));
+        }
+
+        function setExplanation(msg) {
+            document.getElementById('explanation-text').innerText = msg;
+        }
+
+        function highlightCodeLine(lineId, isWarning = false) {
+            const lines = ['switch', 'case1', 'break1', 'case2', 'break2', 'case3', 'break3', 'default'];
+            lines.forEach(id => {
+                const el = document.getElementById(`code-line-${id}`);
+                if (el) {
+                    el.classList.remove('bg-indigo-600/50', 'bg-rose-600/50', 'text-white', 'font-bold');
+                }
+            });
+
+            if (lineId) {
+                const target = document.getElementById(`code-line-${lineId}`);
+                if (target) {
+                    if (isWarning) {
+                        target.classList.add('bg-rose-600/50', 'text-white', 'font-bold');
+                    } else {
+                        target.classList.add('bg-indigo-600/50', 'text-white', 'font-bold');
+                    }
+                }
+            }
+        }
+
+        function animateMove(element, startX, startY, endX, endY, duration) {
+            return new Promise(resolve => {
+                const startTime = performance.now();
+                const actualDuration = duration * animSpeed;
+
+                function step(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / actualDuration, 1);
+                    const currentX = startX + (endX - startX) * progress;
+                    const currentY = startY + (endY - startY) * progress;
+
+                    element.setAttribute('transform', `translate(${currentX}, ${currentY})`);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        resolve();
+                    }
+                }
+
+                requestAnimationFrame(step);
+            });
+        }
+
+        async function dispatchParcel(itemType) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const buttons = document.querySelectorAll('.parcel-select-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const parcelEl = document.getElementById('animated-parcel');
+            const parcelEmoji = document.getElementById('parcel-emoji');
+            const varText = document.getElementById('code-var-item');
+            const scannerText = document.getElementById('scanner-text');
+            const stepBadge = document.getElementById('step-badge');
+
+            let emoji = "🍎";
+            let itemName = "蘋果";
+            if (itemType === 'apple') { emoji = "🍎"; itemName = "蘋果"; }
+            else if (itemType === 'banana') { emoji = "🍌"; itemName = "香蕉"; }
+            else if (itemType === 'grape') { emoji = "🍇"; itemName = "葡萄"; }
+            else if (itemType === 'alien') { emoji = "👾"; itemName = "外星果"; }
+
+            parcelEmoji.textContent = emoji;
+            varText.textContent = `"${itemName}"`;
+            scannerText.textContent = `switch("${itemName}")`;
+            stepBadge.textContent = "運作中...";
+            stepBadge.className = "text-[9px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-mono animate-pulse";
+
+            parcelEl.setAttribute('opacity', '1');
+            parcelEl.setAttribute('transform', 'translate(60, 45)');
+
+            highlightCodeLine('switch');
+            setExplanation(`包裹【${emoji} ${itemName}】進入傳送帶，前往中央檢測器...`);
+
+            await animateMove(parcelEl, 60, 45, 260, 45, 800);
+
+            setExplanation(`中央檢測器對【${emoji} ${itemName}】進行判斷：switch("${itemName}")`);
+            await sleep(500);
+
+            if (itemType === 'apple') {
+                await processCase1(parcelEl);
+            } else if (itemType === 'banana') {
+                await processCase2(parcelEl);
+            } else if (itemType === 'grape') {
+                await processCase3(parcelEl);
+            } else {
+                await processDefault(parcelEl);
+            }
+
+            stepBadge.textContent = "任務完成";
+            stepBadge.className = "text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-mono";
+            await sleep(800);
+
+            parcelEl.setAttribute('opacity', '0');
+            highlightCodeLine(null);
+            setExplanation("點擊左側的水果按鈕，觀察機器如何根據名稱自動選擇路徑！");
+
+            buttons.forEach(btn => btn.disabled = false);
+            isAnimating = false;
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.add('bg-indigo-600', 'text-white', 'shadow');
+            document.getElementById(`tab-${tabName}`).classList.remove('text-slate-400');
+
+            document.getElementById('view-simulator').classList.add('hidden');
+            document.getElementById('view-concept').classList.add('hidden');
+            document.getElementById('view-quests').classList.add('hidden');
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+        }
+
+        function setSpeed(speedVal) {
+            animSpeed = speedVal;
+            document.getElementById('speed-slow').className = speedVal === 1.5 ? "px-1.5 py-0.5 text-[10px] rounded bg-indigo-600 text-white font-bold" : "px-1.5 py-0.5 text-[10px] rounded bg-slate-800 text-slate-300 hover:bg-slate-700";
+            document.getElementById('speed-fast').className = speedVal === 0.8 ? "px-1.5 py-0.5 text-[10px] rounded bg-indigo-600 text-white font-bold" : "px-1.5 py-0.5 text-[10px] rounded bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+
+        function updateBreakConfig() {
+            breaks.case1 = document.getElementById('toggle-break-1').checked;
+            breaks.case2 = document.getElementById('toggle-break-2').checked;
+            breaks.case3 = document.getElementById('toggle-break-3').checked;
+
+            updateGateVisual(1, breaks.case1);
+            updateGateVisual(2, breaks.case2);
+            updateGateVisual(3, breaks.case3);
+
+            document.getElementById('code-break-1-text').innerText = breaks.case1 ? "break; // 煞車跳出" : "// (缺少 break 引發貫穿！)";
+            document.getElementById('code-line-break1').className = breaks.case1 ? "pl-6 p-0.5 rounded text-amber-400" : "pl-6 p-0.5 rounded text-rose-400 font-bold bg-rose-950/40";
+
+            document.getElementById('code-break-2-text').innerText = breaks.case2 ? "break; // 煞車跳出" : "// (缺少 break 引發貫穿！)";
+            document.getElementById('code-line-break2').className = breaks.case2 ? "pl-6 p-0.5 rounded text-amber-400" : "pl-6 p-0.5 rounded text-rose-400 font-bold bg-rose-950/40";
+
+            document.getElementById('code-break-3-text').innerText = breaks.case3 ? "break; // 煞車跳出" : "// (缺少 break 引發貫穿！)";
+            document.getElementById('code-line-break3').className = breaks.case3 ? "pl-6 p-0.5 rounded text-amber-400" : "pl-6 p-0.5 rounded text-rose-400 font-bold bg-rose-950/40";
+        }
+
+        function updateGateVisual(gateNum, isClosed) {
+            const gateBar = document.getElementById(`gate-bar-${gateNum}`);
+            const gateLabel = document.getElementById(`gate-label-${gateNum}`);
+            const pivotY = gateNum === 1 ? 112 : (gateNum === 2 ? 187 : 262);
+            if (isClosed) {
+                gateBar.setAttribute('transform', `rotate(0, 494, ${pivotY})`);
+                gateBar.setAttribute('fill', gateNum === 1 ? '#e11d48' : (gateNum === 2 ? '#ca8a04' : '#9333ea'));
+                gateLabel.textContent = "break (關閉)";
+                gateLabel.setAttribute('fill', gateNum === 1 ? '#fda4af' : (gateNum === 2 ? '#fef08a' : '#e9d5ff'));
+            } else {
+                gateBar.setAttribute('transform', `rotate(-60, 494, ${pivotY})`);
+                gateBar.setAttribute('fill', '#475569');
+                gateLabel.textContent = "無 break (開啟)";
+                gateLabel.setAttribute('fill', '#f43f5e');
+            }
+        }
+
+        // Calculate point along SVG path corresponding to target X coordinate
+        function getLengthAtX(pathEl, targetX) {
+            const totalLen = pathEl.getTotalLength();
+            let low = 0, high = totalLen;
+            for (let i = 0; i < 25; i++) {
+                const mid = (low + high) / 2;
+                const pt = pathEl.getPointAtLength(mid);
+                if (pt.x < targetX) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            return (low + high) / 2;
+        }
+
+        function animateAlongPath(element, pathEl, startLen, endLen, duration) {
+            return new Promise(resolve => {
+                const startTime = performance.now();
+                const actualDuration = duration * animSpeed;
+
+                function step(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / actualDuration, 1);
+                    const currentLen = startLen + (endLen - startLen) * progress;
+                    const point = pathEl.getPointAtLength(currentLen);
+
+                    element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        resolve();
+                    }
+                }
+
+                requestAnimationFrame(step);
+            });
+        }
+
+        function animateAlongPathByX(element, pathEl, startX, targetX, duration) {
+            const startLen = getLengthAtX(pathEl, startX);
+            const endLen = getLengthAtX(pathEl, targetX);
+            return animateAlongPath(element, pathEl, startLen, endLen, duration);
+        }
+
+        async function processCase1(parcelEl) {
+            highlightCodeLine('case1');
+            setExplanation(`匹配成功！「蘋果」符合 case "蘋果":，鐵軌切換至 Track 1！`);
+            
+            const railPath = document.getElementById('rail-case1');
+            await animateMove(parcelEl, 260, 45, 260, 90, 180);
+            await animateAlongPathByX(parcelEl, railPath, 260, 460, 600);
+
+            if (breaks.case1) {
+                highlightCodeLine('break1');
+                setExplanation(`遇上 break; 煞車閘門！包裹安全進入 🍎 蘋果區，Switch 結束。`);
+                await animateAlongPathByX(parcelEl, railPath, 460, 580, 350);
+            } else {
+                highlightCodeLine('break1', true);
+                setExplanation(`⚠️ 警告：沒有 break! 閘門沒關，包裹掉入下層 (貫穿現象)！`);
+                await sleep(400);
+                await animateMove(parcelEl, 460, 135, 460, 210, 350);
+                await processCase2Fallthrough(parcelEl);
+            }
+        }
+
+        async function processCase2(parcelEl) {
+            highlightCodeLine('case2');
+            setExplanation(`匹配成功！「香蕉」符合 case "香蕉":，鐵軌切換至 Track 2！`);
+
+            const railPath = document.getElementById('rail-case2');
+            await animateMove(parcelEl, 260, 45, 260, 90, 180);
+            await animateAlongPathByX(parcelEl, railPath, 260, 460, 600);
+
+            if (breaks.case2) {
+                highlightCodeLine('break2');
+                setExplanation(`遇上 break; 煞車閘門！包裹安全進入 🍌 香蕉區，Switch 結束。`);
+                await animateAlongPathByX(parcelEl, railPath, 460, 580, 350);
+            } else {
+                highlightCodeLine('break2', true);
+                setExplanation(`⚠️ 警告：缺少 break! 包裹繼續掉落貫穿至下層！`);
+                await sleep(400);
+                await animateMove(parcelEl, 460, 210, 460, 285, 350);
+                await processCase3Fallthrough(parcelEl);
+            }
+        }
+
+        async function processCase2Fallthrough(parcelEl) {
+            highlightCodeLine('case2');
+            setExplanation(`⚡ 貫穿發生：未經比對，直接強制執行 case "香蕉" 的內容！`);
+            await sleep(500);
+
+            const railPath = document.getElementById('rail-case2');
+            if (breaks.case2) {
+                highlightCodeLine('break2');
+                setExplanation(`幸好在第 2 層碰到了 break; 閘門，包裹被截停在 🍌 香蕉區！`);
+                await animateAlongPathByX(parcelEl, railPath, 460, 580, 350);
+            } else {
+                highlightCodeLine('break2', true);
+                setExplanation(`⚠️ 還是沒有 break! 包裹繼續向下滑落！`);
+                await sleep(400);
+                await animateMove(parcelEl, 460, 210, 460, 285, 350);
+                await processCase3Fallthrough(parcelEl);
+            }
+        }
+
+        async function processCase3(parcelEl) {
+            highlightCodeLine('case3');
+            setExplanation(`匹配成功！「葡萄」符合 case "葡萄":，鐵軌切換至 Track 3！`);
+
+            const railPath = document.getElementById('rail-case3');
+            await animateMove(parcelEl, 260, 45, 260, 90, 180);
+            await animateAlongPathByX(parcelEl, railPath, 260, 460, 600);
+
+            if (breaks.case3) {
+                highlightCodeLine('break3');
+                setExplanation(`遇上 break; 煞車閘門！包裹安全進入 🍇 葡萄區，Switch 結束。`);
+                await animateAlongPathByX(parcelEl, railPath, 460, 580, 350);
+            } else {
+                highlightCodeLine('break3', true);
+                setExplanation(`⚠️ 警告：缺少 break! 包裹繼續向下掉落！`);
+                await sleep(400);
+                await animateMove(parcelEl, 460, 285, 460, 355, 350);
+                await processDefaultFallthrough(parcelEl);
+            }
+        }
+
+        async function processCase3Fallthrough(parcelEl) {
+            highlightCodeLine('case3');
+            setExplanation(`⚡ 貫穿發生：繼續執行 case "葡萄" 的內容！`);
+            await sleep(500);
+
+            const railPath = document.getElementById('rail-case3');
+            if (breaks.case3) {
+                highlightCodeLine('break3');
+                setExplanation(`被第 3 層的 break; 閘門截停在 🍇 葡萄區！`);
+                await animateAlongPathByX(parcelEl, railPath, 460, 580, 350);
+            } else {
+                highlightCodeLine('break3', true);
+                setExplanation(`一路貫穿到底！繼續掉落至預設區...`);
+                await sleep(400);
+                await animateMove(parcelEl, 460, 285, 460, 355, 350);
+                await processDefaultFallthrough(parcelEl);
+            }
+        }
+
+        async function processDefault(parcelEl) {
+            highlightCodeLine('default');
+            setExplanation(`比對完成：都不符合！啟動兜底機制 (default)。`);
+
+            await animateMove(parcelEl, 260, 45, 260, 355, 700);
+            await animateMove(parcelEl, 260, 355, 580, 355, 400);
+            setExplanation(`包裹【👾 外星果】進入 ❓ 預設/失物招領區！`);
+        }
+
+        async function processDefaultFallthrough(parcelEl) {
+            highlightCodeLine('default');
+            setExplanation(`貫穿到底！包裹最終落入 ❓ 預設區！這就是忘記寫 break 的下場。`);
+            await animateMove(parcelEl, 460, 355, 580, 355, 400);
+        }
+
+        function checkAnswer(qNum, option, isCorrect) {
+            if (quizAnswered[qNum]) return;
+            quizAnswered[qNum] = true;
+
+            const feedbackEl = document.getElementById(`q${qNum}-feedback`);
+            feedbackEl.classList.remove('hidden');
+
+            if (isCorrect) {
+                score += 1;
+                document.getElementById('quiz-score').textContent = score;
+                feedbackEl.className = "text-xs p-2 rounded-lg mt-1 font-medium bg-emerald-950/60 border border-emerald-500/40 text-emerald-200";
+                feedbackEl.innerHTML = "🎉 <strong>答對了！</strong> 太棒了，完全掌握了這個概念！";
+            } else {
+                feedbackEl.className = "text-xs p-2 rounded-lg mt-1 font-medium bg-rose-950/60 border border-rose-500/40 text-rose-200";
+                feedbackEl.innerHTML = "❌ <strong>差一點點！</strong> 可以去實機模擬器上嘗試看看喔！";
+            }
+        }
+
+        window.onload = function() {
+            updateBreakConfig();
+        };
+    </script>
+</body>
+</html>

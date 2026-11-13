@@ -12,71 +12,19 @@ section:
 buttons:
 - name: All
   filter: "all"
-- name: "Machine Learning"
-  filter: "machinelearning"
-- name: "Image Processing"
-  filter: "image-processing"
-- name: Security
-  filter: "security"
 
 # your publications
 publications:
-- title: An Example Paper on Machine Learning
+- title: "Data Integration and Knowledge Graph Visualization for the Dispersion of Financial Data: A Case Study in Taiwan"
   publishedIn:
-    name: 2020 IEEE Region Symposium (TENSYMP)
-    date: 7 June 2020
-    url: https://example.com
+    name: "2025 10th International Conference on Big Data Analytics (ICBDA)"
+    date: 2025
+    url: https://www.icbda.org/html/2025.html
   authors:
-  - name: Dr. Madman
-    url: https://example.com
-  - name: Dr. Lessmad
-    url: https://example.com
-  - name: Dr. Moremad
-    url: https://example.com
-  - name: Dr. Goodman
-    url: https://example.com
+  - name: Chien, Yin-Ying
+  - name: Wang, Jian-An
+    url: https://orcid.org/0009-0003-5230-2713
   paper:
-    summary: Voluptate in id id voluptate laboris. Minim mollit aliquip sit aliqua ut exercitation voluptate eiusmod consequat pariatur sunt enim veniam. Velit esse tempor laboris anim tempor officia. Magna non labore duis do esse sit do ipsum culpa. Officia consequat id non duis culpa dolor. Excepteur magna non nostrud cupidatat aute aliqua aliquip.
-    url: https://example.com
-  categories: ["machinelearning","image-processing"]
-  tags: ["Machine Learning", "Autonomous Driving", "Computer Vision"]
-
-- title: An Sample Paper on Image Processing
-  publishedIn:
-    name: 2020 IEEE Region Symposium (TENSYMP)
-    date: 7 June 2020
-    url: https://example.com
-  authors:
-  - name: Dr. Madman
-    url: https://example.com
-  - name: Dr. Lessmad
-    url: https://example.com
-  - name: Dr. Moremad
-    url: https://example.com
-  - name: Dr. Goodman
-    url: https://example.com
-  paper:
-    summary: Ullamco magna minim cupidatat Lorem ea ex aliqua fugiat et. Dolor quis cillum ea duis irure et commodo aliquip consectetur ullamco labore ut anim nisi. Commodo reprehenderit est consectetur tempor adipisicing occaecat exercitation amet do aliquip dolor do irure. Labore officia ut magna pariatur reprehenderit et ex sit sunt. Magna proident ullamco adipisicing sit.
-    url: https://example.com
-  categories: ["image-processing"]
-  tags: ["Image Processing", "Computer Vision"]
-
-- title: An Example Paper on Security
-  publishedIn:
-    name: 2020 IEEE Region Symposium (TENSYMP)
-    date: 7 June 2020
-    url: https://example.com
-  authors:
-  - name: Dr. Madman
-    url: https://example.com
-  - name: Dr. Lessmad
-    url: https://example.com
-  - name: Dr. Moremad
-    url: https://example.com
-  - name: Dr. Goodman
-    url: https://example.com
-  paper:
-    summary: Dolor ad cupidatat pariatur nulla ipsum ex ullamco nisi anim ullamco. Dolore elit esse in exercitation minim aliqua. Amet velit incididunt magna laboris. Proident reprehenderit deserunt ad officia duis dolor. Tempor nostrud ullamco ullamco sint deserunt cupidatat irure minim consectetur nulla adipisicing sunt.
-    url: https://example.com
-  categories: ["security"]
-  tags: ["Machine Learning", "Autonomous Driving", "Machine Vision"]
+    summary: "Financial data is crucial for many stakeholders as it provides insights into business operations. The eXtensible Business Reporting Language (XBRL) has become a global standard for data reporting. Despite these standards, issues such as data dispersion remain prevalent; stakeholders often spend considerable time integrating information from various tables and financial reports. To address these challenges, we propose two main research directions: a financial data integration module and a knowledge graph visualization platform. The former automates the processes of data collection, cleaning, and consolidation, while the latter enables stakeholders to more easily view and interpret financial information through knowledge graphs. This study focuses on financial data in Taiwan, illustrating how to integrate dispersed data and enhance visualization with knowledge graphs. Our approach provides a convenient and practical platform that is expected to save significant time and resources, thus maximizing efficiency and value."
+    url: https://doi.org/10.1109/icbda65366.2025.11211488
+  tags: ["Data visualization", "Data integration", "Knowledge graphs", "Big Data", "Cleaning", "Stakeholders", "Standards", "Dispersion", "Investment", "Business", "knowledge graph", "investment relationship", "Market Observation Post System(MOPS)", "corporate development"]

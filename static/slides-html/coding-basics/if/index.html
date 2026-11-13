@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>If 條件判斷語法與動畫互動學習館</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .font-mono {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Custom animations and scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .pulse-glow-green {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+    .pulse-glow-red {
+      box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
+    }
+    .pulse-glow-blue {
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen max-h-screen flex flex-col overflow-hidden selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur shrink-0 z-50 py-2">
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-base shadow-md shadow-sky-500/30 text-white font-bold">
+          <i class="fa-solid fa-code-merge"></i>
+        </div>
+        <div>
+          <h1 class="font-black text-base sm:text-lg tracking-wide bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent leading-tight">
+            If 條件判斷動畫互動館
+          </h1>
+          <p class="text-[10px] text-slate-400">一頁式視覺化決策課堂</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
+        <button id="tab-sim" onclick="switchTab('sim')" class="px-3 py-1 rounded-lg font-medium transition flex items-center gap-1.5 bg-sky-600 text-white shadow">
+          <i class="fa-solid fa-gamepad"></i> 閘門模擬器
+        </button>
+        <button id="tab-concepts" onclick="switchTab('concepts')" class="px-3 py-1 rounded-lg font-medium text-slate-300 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-lightbulb"></i> 白話圖解觀念
+        </button>
+        <button id="tab-quiz" onclick="switchTab('quiz')" class="px-3 py-1 rounded-lg font-medium text-slate-300 hover:text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-question"></i> 除錯關卡挑戰
+        </button>
+      </div>
+
+      <!-- Audio Toggle Button -->
+      <button id="btn-audio" onclick="toggleAudio()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700 flex items-center gap-1.5">
+        <i class="fa-solid fa-volume-high" id="audio-icon"></i> <span id="audio-text">音效: 開</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto w-full px-4 py-2.5 flex-1 min-h-0 overflow-hidden">
+
+    <!-- TAB 1: SIMULATOR & ANIMATION CANVAS -->
+    <div id="view-sim" class="h-full flex flex-col gap-2.5 overflow-hidden">
+      
+      <!-- Top Control Bar -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-lg shrink-0">
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          
+          <!-- Scenario & Input Controls -->
+          <div class="space-y-1.5 w-full lg:w-auto">
+            <div class="flex items-center justify-between gap-3">
+              <label class="text-[11px] font-bold text-sky-400 tracking-wider uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders"></i> 情境選擇與條件變數 (Inputs)
+              </label>
+              <!-- Scenario Selector -->
+              <select id="scenario-select" onchange="changeScenario()" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-lg px-2 py-1 outline-none font-bold">
+                <option value="park">🎡 情境 1：主題樂園入場身高與 VIP 檢查</option>
+                <option value="weather">🌤️ 情境 2：智慧氣溫與天氣穿搭建議</option>
+                <option value="grade">🎓 情境 3：學生考試成績等級評定</option>
+              </select>
+            </div>
+
+            <!-- Dynamic Input Sliders/Toggles Container -->
+            <div id="input-controls-container" class="flex flex-wrap items-center gap-3 bg-slate-950/80 p-2 rounded-lg border border-slate-800 text-xs">
+              <!-- Injected dynamically based on selected scenario -->
+            </div>
+          </div>
+
+          <!-- Feature Toggles & Speed -->
+          <div class="flex flex-wrap items-center gap-3 bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 w-full lg:w-auto justify-between lg:justify-start text-xs">
+            
+            <!-- Structure Mode Toggle -->
+            <div class="space-y-0.5">
+              <span class="text-[10px] font-bold text-slate-400 block">判斷結構模式：</span>
+              <div class="flex bg-slate-800 p-0.5 rounded-lg text-xs font-medium border border-slate-700">
+                <button id="mode-ladder" onclick="setStructureMode('ladder')" class="px-2 py-0.5 rounded bg-sky-600 text-white font-bold text-[11px]">
+                  if...else if...else (梯次過濾)
+                </button>
+                <button id="mode-multi" onclick="setStructureMode('multi')" class="px-2 py-0.5 rounded text-slate-300 hover:text-white text-[11px]">
+                  多個獨立 if (全部檢查)
+                </button>
+              </div>
+            </div>
+
+            <div class="h-6 w-px bg-slate-800 hidden sm:block"></div>
+
+            <!-- Animation Speed -->
+            <div class="space-y-0.5">
+              <span class="text-[10px] font-bold text-slate-400 block">模擬速度：</span>
+              <div class="flex items-center space-x-1 text-xs">
+                <button onclick="setSpeed(1.5)" class="btn-speed px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px]">慢</button>
+                <button onclick="setSpeed(1.0)" class="btn-speed px-2 py-0.5 rounded bg-sky-600 text-white font-bold text-[11px]">正常</button>
+                <button onclick="setSpeed(0.5)" class="btn-speed px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-[11px]">快</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Run Action Button -->
+          <div class="w-full lg:w-auto flex items-center gap-2">
+            <button id="btn-run" onclick="runSimulation()" class="flex-1 lg:flex-initial px-5 py-2.5 rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 font-bold text-xs text-white shadow-md shadow-sky-500/25 transition active:scale-95 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-play"></i> 啟動條件檢測
+            </button>
+            <button onclick="resetSimulation()" class="px-3 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs" title="重設">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Interactive Grid: Left Canvas Animation, Right Live Code -->
+      <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3">
+        
+        <!-- Left: Animation Stage (Canvas) -->
+        <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between relative overflow-hidden shadow-xl min-h-0">
+          <div class="flex items-center justify-between mb-2 shrink-0">
+            <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-diagram-project"></i> 條件閘門流程圖 (Decision Pipeline)
+            </h2>
+            <div id="sim-status" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700">
+              狀態：等待測試
+            </div>
+          </div>
+
+          <!-- Narrative Status Banner (Placed completely OUTSIDE the canvas container) -->
+          <div id="canvas-toast" class="mb-2 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 transition-all duration-200 flex items-center gap-2 shrink-0 min-h-[36px]">
+            <div id="toast-icon" class="w-5 h-5 rounded bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs shrink-0">
+              <i class="fa-solid fa-info"></i>
+            </div>
+            <div id="toast-text" class="flex-1 font-medium text-[11px] leading-tight">調整上方數值後，按下「啟動條件檢測」觀察流程！</div>
+          </div>
+
+          <!-- Pure Canvas Container (No floating overlays inside) -->
+          <div class="relative flex-1 min-h-0 w-full bg-slate-950 rounded-lg border border-slate-800 overflow-hidden flex items-center justify-center">
+            <canvas id="sim-canvas" class="w-full h-full block absolute inset-0"></canvas>
+          </div>
+
+          <!-- Output Tray Result Box -->
+          <div class="mt-2 p-2 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between shrink-0">
+            <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-flag-checkered text-emerald-400"></i> 最終執行結果:
+            </span>
+            <div id="output-items" class="flex items-center gap-1.5 min-h-[24px] text-xs font-bold text-emerald-400">
+              <span class="text-slate-600 text-[11px] font-normal">尚未過閘門</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Code Viewer & Step Explainer -->
+        <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between shadow-xl min-h-0">
+          <div class="flex flex-col h-full min-h-0">
+            <div class="flex items-center justify-between mb-2 shrink-0">
+              <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-code"></i> 同步執行程式碼 (Live Code)
+              </h2>
+              <!-- Syntax Switcher -->
+              <select id="code-style-select" onchange="updateCodeDisplay()" class="bg-slate-800 border border-slate-700 text-[11px] text-slate-200 rounded-md px-2 py-0.5 outline-none">
+                <option value="js">JavaScript 語法</option>
+                <option value="python">Python 語法</option>
+                <option value="story">白話故事對照</option>
+              </select>
+            </div>
+
+            <!-- Code Box with vertical scrolling if screen height is very small -->
+            <div class="flex-1 min-h-0 bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs leading-relaxed overflow-y-auto select-none shadow-inner">
+              <div id="code-lines-container" class="space-y-1">
+                <!-- Lines injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Pedagogical Note Cards below code -->
+            <div class="mt-2 p-2.5 rounded-lg bg-sky-950/30 border border-sky-900/50 space-y-1 shrink-0">
+              <h3 class="text-[11px] font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap"></i> 初學者學習筆記
+              </h3>
+              <p id="pedagogy-tip" class="text-[11px] text-slate-300 leading-normal">
+                `if` 就像是安全檢查哨。當括號裡面的條件算出為 **True（真）** 時，門才會開啟並執行裡面的程式碼！
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: WHITEBOARD CONCEPTS -->
+    <div id="view-concepts" class="hidden h-full flex-col justify-between overflow-y-auto lg:overflow-hidden space-y-2 py-1">
+      
+      <!-- Banner -->
+      <div class="text-center space-y-1 shrink-0">
+        <h2 class="text-base sm:text-xl font-black bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
+          徹底弄懂 If 條件判斷的 4 大核心法則
+        </h2>
+        <p class="text-slate-400 text-xs max-w-2xl mx-auto">
+          透過日常生活中的「安檢分流」與「邏輯問答」，一分鐘掌握程式如何做決策。
+        </p>
+      </div>
+
+      <!-- 4 Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 flex-1 min-h-0">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1 hover:border-sky-500/50 transition shadow-lg flex flex-col justify-center">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-bold shrink-0">1</div>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-1.5">
+              <span>if ( 條件問答 )</span>
+              <span class="text-[10px] bg-sky-950 text-sky-300 px-1.5 py-0.5 rounded border border-sky-800">單向檢查</span>
+            </h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-snug">
+            最基本的判斷：「如果條件成立（True），就執行對應動作」。條件不成立（False），電腦會直接無視該區塊。
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1 hover:border-indigo-500/50 transition shadow-lg flex flex-col justify-center">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0">2</div>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-1.5">
+              <span>else if ( 備案條件 )</span>
+              <span class="text-[10px] bg-indigo-950 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-800">梯次銜接</span>
+            </h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-snug">
+            「如果不符合上方條件，那檢查這個看看？」。只要上面已有條件成立，後續 `else if` 將完全被跳過！
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1 hover:border-emerald-500/50 transition shadow-lg flex flex-col justify-center">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">3</div>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-1.5">
+              <span>else { 預設兜底 }</span>
+              <span class="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800">最後防線</span>
+            </h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-snug">
+            「如果前面所有條件全都不符合，那就做這件事」。`else` 不用加條件，永遠放在整個判斷鏈的最末端。
+          </p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1 hover:border-rose-500/50 transition shadow-lg flex flex-col justify-center">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold shrink-0">4</div>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-1.5">
+              <span>多個 if vs if...else if</span>
+              <span class="text-[10px] bg-rose-950 text-rose-300 px-1.5 py-0.5 rounded border border-rose-800">初學者陷阱</span>
+            </h3>
+          </div>
+          <p class="text-xs text-slate-300 leading-snug">
+            • 獨立 `if`：每一個都檢查，可能同時觸發多個結果。<br>
+            • `if...else if` 鏈：具有互斥性，一個成立就立刻跳出鏈條。
+          </p>
+        </div>
+      </div>
+
+      <!-- Logic Operators Visual Guide -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 space-y-1.5 shrink-0">
+        <h3 class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-calculator"></i> 雙重條件的組合工具（邏輯運算子）
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+            <div class="font-bold text-emerald-400 font-mono">&& (AND 並且)</div>
+            <p class="text-[11px] text-slate-300">兩邊條件都為真才是 True！</p>
+          </div>
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+            <div class="font-bold text-amber-400 font-mono">|| (OR 或者)</div>
+            <p class="text-[11px] text-slate-300">其中一個條件為真就是 True！</p>
+          </div>
+          <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+            <div class="font-bold text-rose-400 font-mono">! (NOT 反轉)</div>
+            <p class="text-[11px] text-slate-300">將真變假、假變真！</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: QUIZ & DEBUG CHALLENGE -->
+    <div id="view-quiz" class="hidden h-full flex-col justify-between max-w-3xl mx-auto py-1 min-h-0">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-xl flex flex-col justify-between h-full min-h-0">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 shrink-0">
+          <div>
+            <h2 class="text-sm sm:text-base font-black text-sky-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-bug"></i> 初學者 If 邏輯除錯大挑戰
+            </h2>
+            <p class="text-[10px] text-slate-400">預測程式的執行結果，找出藏在判斷式中的邏輯陷阱！</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 block">目前得分</span>
+            <span id="quiz-score" class="text-lg font-black text-emerald-400">0 / 5</span>
+          </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-card" class="flex-1 min-h-0 overflow-y-auto py-2.5 space-y-2">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800 shrink-0">
+          <button id="btn-quiz-prev" onclick="prevQuiz()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition disabled:opacity-40">
+            <i class="fa-solid fa-arrow-left"></i> 上一題
+          </button>
+          <span id="quiz-progress" class="text-xs font-mono text-slate-400">第 1 / 5 題</span>
+          <button id="btn-quiz-next" onclick="nextQuiz()" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition">
+            下一題 <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950 py-1 text-center text-[10px] text-slate-500 shrink-0">
+    <p>If 條件判斷動畫互動館 • 一頁式單頁即時響應學習版</p>
+  </footer>
+
+  <script>
+    /* Global Application State */
+    let currentTab = 'sim';
+    let soundEnabled = true;
+    let animSpeed = 1.0;
+    let isRunning = false;
+    let currentScenarioKey = 'park';
+    let structureMode = 'ladder'; // 'ladder' or 'multi'
+    let currentCodeStyle = 'js';
+
+    // Inputs state
+    let scenarioInputs = {
+      park: { height: 135, hasVIP: false },
+      weather: { temp: 12, isRaining: true },
+      grade: { score: 85 }
+    };
+
+    /* Scenario Definitions */
+    const scenarios = {
+      park: {
+        title: "🎡 主題樂園過山車閘門",
+        inputsConfig: [
+          { type: 'toggle', key: 'hasVIP', label: '🌟 持有 VIP 快速通關券' },
+          { type: 'slider', key: 'height', label: '📏 身高 (cm)', min: 90, max: 180, step: 1, unit: 'cm' }
+        ],
+        gates: [
+          {
+            id: 'g1',
+            label: 'if ( 擁有 VIP 券 )',
+            conditionFn: (inp) => inp.hasVIP,
+            condStrJS: (inp) => `hasVIP === true`,
+            condStrPy: (inp) => `has_vip == True`,
+            condStrStory: (inp) => `貴賓卡 === 有`,
+            evalText: (inp) => `VIP券: ${inp.hasVIP ? '有 (True)' : '無 (False)'}`,
+            actionText: "🌟 進入 VIP 專屬快速通道！",
+            icon: "fa-star"
+          },
+          {
+            id: 'g2',
+            label: 'else if ( 身高 < 110cm )',
+            conditionFn: (inp) => inp.height < 110,
+            condStrJS: (inp) => `${inp.height} < 110`,
+            condStrPy: (inp) => `${inp.height} < 110`,
+            condStrStory: (inp) => `身高 ${inp.height}cm < 110cm`,
+            evalText: (inp) => `${inp.height} < 110 ➜ ${inp.height < 110 ? 'True' : 'False'}`,
+            actionText: "👶 歡樂兒童城堡：免費入場！",
+            icon: "fa-baby"
+          },
+          {
+            id: 'g3',
+            label: 'else if ( 身高 < 150cm )',
+            conditionFn: (inp) => inp.height < 150,
+            condStrJS: (inp) => `${inp.height} < 150`,
+            condStrPy: (inp) => `${inp.height} < 150`,
+            condStrStory: (inp) => `身高 ${inp.height}cm < 150cm`,
+            evalText: (inp) => `${inp.height} < 150 ➜ ${inp.height < 150 ? 'True' : 'False'}`,
+            actionText: "🧒 溫和版過山車：家長陪同入場！",
+            icon: "fa-child"
+          },
+          {
+            id: 'gElse',
+            isElse: true,
+            label: 'else ( 其他情況 )',
+            actionText: "🎢 終極黑洞過山車：獨自挑戰！",
+            icon: "fa-rocket"
+          }
+        ],
+        tip: "在樂園檢查哨中，一旦工作人員確認你是 VIP（第一個 if 為 True），就會直接放行，完全不需要量身高（後續 else if 直接被跳過）！"
+      },
+      weather: {
+        title: "🌤️ 智慧氣溫與天氣穿搭",
+        inputsConfig: [
+          { type: 'toggle', key: 'isRaining', label: '🌧️ 外面正在下雨' },
+          { type: 'slider', key: 'temp', label: '🌡️ 目前氣溫 (°C)', min: 5, max: 35, step: 1, unit: '°C' }
+        ],
+        gates: [
+          {
+            id: 'g1',
+            label: 'if ( 正在下雨 )',
+            conditionFn: (inp) => inp.isRaining,
+            condStrJS: (inp) => `isRaining === true`,
+            condStrPy: (inp) => `is_raining == True`,
+            condStrStory: (inp) => `天氣 === 下雨`,
+            evalText: (inp) => `下雨: ${inp.isRaining ? '有 (True)' : '無 (False)'}`,
+            actionText: "☔ 帶大雨傘 + 穿防水雨鞋",
+            icon: "fa-umbrella"
+          },
+          {
+            id: 'g2',
+            label: 'else if ( 氣溫 < 15°C )',
+            conditionFn: (inp) => inp.temp < 15,
+            condStrJS: (inp) => `${inp.temp} < 15`,
+            condStrPy: (inp) => `${inp.temp} < 15`,
+            condStrStory: (inp) => `氣溫 ${inp.temp}°C < 15°C`,
+            evalText: (inp) => `${inp.temp} < 15 ➜ ${inp.temp < 15 ? 'True' : 'False'}`,
+            actionText: "🧥 穿厚羽絨外套 + 圍巾",
+            icon: "fa-mitten"
+          },
+          {
+            id: 'g3',
+            label: 'else if ( 氣溫 < 25°C )',
+            conditionFn: (inp) => inp.temp < 25,
+            condStrJS: (inp) => `${inp.temp} < 25`,
+            condStrPy: (inp) => `${inp.temp} < 25`,
+            condStrStory: (inp) => `氣溫 ${inp.temp}°C < 25°C`,
+            evalText: (inp) => `${inp.temp} < 25 ➜ ${inp.temp < 25 ? 'True' : 'False'}`,
+            actionText: "👔 穿舒服長袖薄外套",
+            icon: "fa-shirt"
+          },
+          {
+            id: 'gElse',
+            isElse: true,
+            label: 'else ( 其他情況 )',
+            actionText: "👕 穿涼爽短袖 T-shirt + 戴墨鏡",
+            icon: "fa-glasses"
+          }
+        ],
+        tip: "穿搭機器人會先看有沒有下雨。如果有下雨，就會立刻建議帶傘，不再重複檢查氣溫囉！"
+      },
+      grade: {
+        title: "🎓 學生成績等級評定",
+        inputsConfig: [
+          { type: 'slider', key: 'score', label: '💯 考試分數', min: 40, max: 100, step: 1, unit: '分' }
+        ],
+        gates: [
+          {
+            id: 'g1',
+            label: 'if ( 分數 >= 90 )',
+            conditionFn: (inp) => inp.score >= 90,
+            condStrJS: (inp) => `${inp.score} >= 90`,
+            condStrPy: (inp) => `${inp.score} >= 90`,
+            condStrStory: (inp) => `分數 ${inp.score} >= 90分`,
+            evalText: (inp) => `${inp.score} >= 90 ➜ ${inp.score >= 90 ? 'True' : 'False'}`,
+            actionText: "🏆 獲得 A 級優等獎狀！",
+            icon: "fa-trophy"
+          },
+          {
+            id: 'g2',
+            label: 'else if ( 分數 >= 80 )',
+            conditionFn: (inp) => inp.score >= 80,
+            condStrJS: (inp) => `${inp.score} >= 80`,
+            condStrPy: (inp) => `${inp.score} >= 80`,
+            condStrStory: (inp) => `分數 ${inp.score} >= 80分`,
+            evalText: (inp) => `${inp.score} >= 80 ➜ ${inp.score >= 80 ? 'True' : 'False'}`,
+            actionText: "🥇 獲得 B 級良好成績！",
+            icon: "fa-award"
+          },
+          {
+            id: 'g3',
+            label: 'else if ( 分數 >= 60 )',
+            conditionFn: (inp) => inp.score >= 60,
+            condStrJS: (inp) => `${inp.score} >= 60`,
+            condStrPy: (inp) => `${inp.score} >= 60`,
+            condStrStory: (inp) => `分數 ${inp.score} >= 60分`,
+            evalText: (inp) => `${inp.score} >= 60 ➜ ${inp.score >= 60 ? 'True' : 'False'}`,
+            actionText: "合格：順利通過考試！",
+            icon: "fa-thumbs-up"
+          },
+          {
+            id: 'gElse',
+            isElse: true,
+            label: 'else ( 其他情況 )',
+            actionText: "📚 需要加油：準備補考！",
+            icon: "fa-book-open"
+          }
+        ],
+        tip: "條件順序非常重要！由高到低（90 -> 80 -> 60）進行階梯式過濾，確保高分者不會被後方的低標準提前攔截。"
+      }
+    };
+
+    /* Web Audio Sound Synthesizer */
+    let audioCtx = null;
+    function playTone(freq, type, duration) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.log("Audio not supported or blocked");
+      }
+    }
+
+    function playSound(name) {
+      if (name === 'check') playTone(440, 'triangle', 0.1);
+      if (name === 'pass') {
+        playTone(523.25, 'sine', 0.15);
+        setTimeout(() => playTone(659.25, 'sine', 0.25), 100);
+      }
+      if (name === 'fail') playTone(220, 'sawtooth', 0.2);
+      if (name === 'win') {
+        playTone(523.25, 'triangle', 0.1);
+        setTimeout(() => playTone(659.25, 'triangle', 0.1), 100);
+        setTimeout(() => playTone(783.99, 'triangle', 0.3), 200);
+      }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('audio-icon').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+      document.getElementById('audio-text').textContent = soundEnabled ? '音效: 開' : '音效: 關';
+    }
+
+    /* Navigation Tabs */
+    function switchTab(tab) {
+      currentTab = tab;
+      ['sim', 'concepts', 'quiz'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const view = document.getElementById(`view-${t}`);
+        if (t === tab) {
+          btn.className = "px-3 py-1 rounded-lg font-medium transition flex items-center gap-1.5 bg-sky-600 text-white shadow";
+          view.classList.remove('hidden');
+          if (t === 'concepts' || t === 'quiz') view.classList.add('flex');
+        } else {
+          btn.className = "px-3 py-1 rounded-lg font-medium text-slate-300 hover:text-white transition flex items-center gap-1.5";
+          view.classList.add('hidden');
+          view.classList.remove('flex');
+        }
+      });
+      if (tab === 'sim') {
+        setTimeout(drawPipeline, 50);
+      }
+    }
+
+    /* UI Inputs Generator */
+    function renderInputControls() {
+      const container = document.getElementById('input-controls-container');
+      container.innerHTML = '';
+      const sc = scenarios[currentScenarioKey];
+      const curInputs = scenarioInputs[currentScenarioKey];
+
+      sc.inputsConfig.forEach(conf => {
+        const div = document.createElement('div');
+        div.className = "flex items-center gap-3";
+
+        if (conf.type === 'slider') {
+          div.innerHTML = `
+            <span class="text-xs font-bold text-slate-300 min-w-[90px]">${conf.label}:</span>
+            <input type="range" min="${conf.min}" max="${conf.max}" step="${conf.step}" value="${curInputs[conf.key]}" 
+                   oninput="updateInputValue('${conf.key}', this.value)" 
+                   class="w-32 accent-sky-500 cursor-pointer">
+            <span class="text-xs font-mono font-bold text-sky-400 min-w-[45px]">${curInputs[conf.key]} ${conf.unit || ''}</span>
+          `;
+        } else if (conf.type === 'toggle') {
+          div.innerHTML = `
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" ${curInputs[conf.key] ? 'checked' : ''} 
+                     onchange="updateInputValue('${conf.key}', this.checked)"
+                     class="w-4 h-4 accent-sky-500 rounded cursor-pointer">
+              <span class="text-xs font-bold text-slate-300">${conf.label}</span>
+            </label>
+          `;
+        }
+        container.appendChild(div);
+      });
+    }
+
+    function updateInputValue(key, val) {
+      if (typeof val === 'string' && !isNaN(val)) val = Number(val);
+      scenarioInputs[currentScenarioKey][key] = val;
+      renderInputControls();
+      updateCodeDisplay();
+      drawPipeline();
+    }
+
+    function changeScenario() {
+      currentScenarioKey = document.getElementById('scenario-select').value;
+      renderInputControls();
+      updateCodeDisplay();
+      document.getElementById('pedagogy-tip').textContent = scenarios[currentScenarioKey].tip;
+      resetSimulation();
+    }
+
+    function setStructureMode(mode) {
+      structureMode = mode;
+      document.getElementById('mode-ladder').className = mode === 'ladder' ? "px-2.5 py-1 rounded bg-sky-600 text-white font-bold" : "px-2.5 py-1 rounded text-slate-300 hover:text-white";
+      document.getElementById('mode-multi').className = mode === 'multi' ? "px-2.5 py-1 rounded bg-sky-600 text-white font-bold" : "px-2.5 py-1 rounded text-slate-300 hover:text-white";
+      updateCodeDisplay();
+      drawPipeline();
+    }
+
+    function setSpeed(sp) {
+      animSpeed = sp;
+      document.querySelectorAll('.btn-speed').forEach(b => {
+        b.className = "btn-speed px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700";
+      });
+      event.target.className = "btn-speed px-2.5 py-1 rounded-md bg-sky-600 text-white font-bold";
+    }
+
+    /* Live Code Sync Display */
+    function updateCodeDisplay() {
+      const container = document.getElementById('code-lines-container');
+      container.innerHTML = '';
+      const sc = scenarios[currentScenarioKey];
+      const curInputs = scenarioInputs[currentScenarioKey];
+      const style = document.getElementById('code-style-select').value;
+
+      let html = '';
+
+      if (structureMode === 'ladder') {
+        sc.gates.forEach((g, idx) => {
+          if (!g.isElse) {
+            const condStr = style === 'js' ? g.condStrJS(curInputs) : (style === 'python' ? g.condStrPy(curInputs) : g.condStrStory(curInputs));
+            const kw = idx === 0 ? (style === 'python' ? 'if' : 'if') : (style === 'python' ? 'elif' : 'else if');
+            
+            html += `
+              <div id="code-line-${g.id}" class="code-line p-1.5 rounded transition duration-200 flex items-center justify-between">
+                <div>
+                  <span class="text-rose-400 font-bold">${kw}</span> 
+                  <span class="text-slate-300">(</span><span class="text-amber-300 font-bold">${condStr}</span><span class="text-slate-300">) ${style === 'python' ? ':' : '{'}</span>
+                </div>
+                <span id="badge-${g.id}" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-slate-800 text-slate-500">待檢測</span>
+              </div>
+              <div id="code-line-act-${g.id}" class="code-line pl-6 p-1.5 rounded transition duration-200 text-sky-300">
+                &nbsp;&nbsp;${style === 'python' ? '#' : '//'} ${g.actionText}
+                ${style !== 'python' ? '<br>&nbsp;&nbsp;}' : ''}
+              </div>
+            `;
+          } else {
+            html += `
+              <div id="code-line-${g.id}" class="code-line p-1.5 rounded transition duration-200 flex items-center justify-between">
+                <div>
+                  <span class="text-rose-400 font-bold">else</span> ${style === 'python' ? ':' : '{'}
+                </div>
+                <span id="badge-${g.id}" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-slate-800 text-slate-500">兜底預設</span>
+              </div>
+              <div id="code-line-act-${g.id}" class="code-line pl-6 p-1.5 rounded transition duration-200 text-sky-300">
+                &nbsp;&nbsp;${style === 'python' ? '#' : '//'} ${g.actionText}
+                ${style !== 'python' ? '<br>}' : ''}
+              </div>
+            `;
+          }
+        });
+      } else {
+        // Multi IF Mode
+        sc.gates.forEach((g, idx) => {
+          if (!g.isElse) {
+            const condStr = style === 'js' ? g.condStrJS(curInputs) : (style === 'python' ? g.condStrPy(curInputs) : g.condStrStory(curInputs));
+            html += `
+              <div id="code-line-${g.id}" class="code-line p-1.5 rounded transition duration-200 flex items-center justify-between">
+                <div>
+                  <span class="text-rose-400 font-bold">if</span> 
+                  <span class="text-slate-300">(</span><span class="text-amber-300 font-bold">${condStr}</span><span class="text-slate-300">) ${style === 'python' ? ':' : '{'}</span>
+                </div>
+                <span id="badge-${g.id}" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-slate-800 text-slate-500">獨立檢查</span>
+              </div>
+              <div id="code-line-act-${g.id}" class="code-line pl-6 p-1.5 rounded transition duration-200 text-sky-300">
+                &nbsp;&nbsp;${style === 'python' ? '#' : '//'} ${g.actionText}
+                ${style !== 'python' ? '<br>}' : ''}
+              </div>
+            `;
+          }
+        });
+      }
+
+      container.innerHTML = html;
+    }
+
+    /* Canvas Decision Pipeline Engine */
+    let activeGateId = null;
+    let gateResults = {};
+
+    function drawPipeline() {
+      const canvas = document.getElementById('sim-canvas');
+      if (!canvas) return;
+      const parent = canvas.parentElement;
+      if (!parent) return;
+
+      const rect = parent.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      const W = rect.width;
+      const H = rect.height;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const sc = scenarios[currentScenarioKey];
+      const gates = structureMode === 'ladder' ? sc.gates : sc.gates.filter(g => !g.isElse);
+      const count = gates.length;
+
+      // Optimizing Y padding so all nodes (including else) fit with generous margins
+      const paddingY = Math.max(22, H * 0.12);
+      const startY = paddingY;
+      const stepY = count > 1 ? (H - paddingY * 2) / (count - 1) : H / 2;
+
+      // Draw vertical backbone track
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(W * 0.38, startY);
+      ctx.lineTo(W * 0.38, startY + stepY * (count - 1));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Gate Nodes
+      gates.forEach((g, i) => {
+        const ny = count === 1 ? H / 2 : startY + i * stepY;
+        const nx = W * 0.38;
+        const res = gateResults[g.id];
+
+        // Draw side branch line to action box
+        ctx.strokeStyle = res === true ? '#10b981' : '#1e293b';
+        ctx.lineWidth = res === true ? 3 : 2;
+        ctx.beginPath();
+        ctx.moveTo(nx, ny);
+        ctx.lineTo(W * 0.65, ny);
+        ctx.stroke();
+
+        // Node circle
+        const nodeRadius = Math.min(12, H * 0.04);
+        ctx.beginPath();
+        ctx.arc(nx, ny, nodeRadius, 0, Math.PI * 2);
+        
+        if (activeGateId === g.id) {
+          ctx.fillStyle = '#0284c7';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 12;
+        } else if (res === true) {
+          ctx.fillStyle = '#10b981';
+          ctx.shadowColor = '#10b981';
+          ctx.shadowBlur = 10;
+        } else if (res === false) {
+          ctx.fillStyle = '#f43f5e';
+          ctx.shadowColor = 'transparent';
+        } else {
+          ctx.fillStyle = '#1e293b';
+          ctx.shadowColor = 'transparent';
+        }
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Node text label
+        ctx.fillStyle = activeGateId === g.id ? '#38bdf8' : (res === true ? '#34d399' : '#94a3b8');
+        ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(g.label, nx - nodeRadius - 6, ny + 4);
+
+        // Action Box on right
+        const boxW = Math.min(130, W * 0.3);
+        const boxH = Math.min(26, H * 0.11);
+        const bx = W * 0.65;
+        const by = ny - boxH / 2;
+
+        ctx.fillStyle = res === true ? '#064e3b' : '#0f172a';
+        ctx.strokeStyle = res === true ? '#10b981' : '#334155';
+        ctx.lineWidth = 1.5;
+        
+        ctx.beginPath();
+        ctx.roundRect(bx, by, boxW, boxH, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = res === true ? '#a7f3d0' : '#64748b';
+        ctx.font = '10px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'left';
+        
+        const shortAct = g.actionText.length > 10 ? g.actionText.substring(0, 9) + '…' : g.actionText;
+        ctx.fillText(shortAct, bx + 8, ny + 3.5);
+      });
+    }
+
+    /* Simulation Execution Routine */
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms / animSpeed));
+
+    function showToast(text, type = 'info') {
+      const toast = document.getElementById('canvas-toast');
+      const toastText = document.getElementById('toast-text');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastText.textContent = text;
+      if (type === 'pass') {
+        toast.className = "mb-1.5 bg-emerald-950/60 border border-emerald-500/50 rounded-lg px-2.5 py-1.5 text-xs text-emerald-200 transition-all duration-200 flex items-center gap-2 shrink-0 min-h-[32px]";
+        toastIcon.className = "w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0";
+        toastIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+      } else if (type === 'fail') {
+        toast.className = "mb-1.5 bg-rose-950/60 border border-rose-500/50 rounded-lg px-2.5 py-1.5 text-xs text-rose-200 transition-all duration-200 flex items-center gap-2 shrink-0 min-h-[32px]";
+        toastIcon.className = "w-5 h-5 rounded bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs shrink-0";
+        toastIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+      } else {
+        toast.className = "mb-1.5 bg-sky-950/60 border border-sky-500/50 rounded-lg px-2.5 py-1.5 text-xs text-sky-200 transition-all duration-200 flex items-center gap-2 shrink-0 min-h-[32px]";
+        toastIcon.className = "w-5 h-5 rounded bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs shrink-0";
+        toastIcon.innerHTML = '<i class="fa-solid fa-info"></i>';
+      }
+    }
+
+    function resetSimulation() {
+      isRunning = false;
+      activeGateId = null;
+      gateResults = {};
+      document.getElementById('sim-status').textContent = '狀態：等待測試';
+      document.getElementById('sim-status').className = 'px-3 py-1 rounded-full bg-slate-800 text-xs font-mono text-slate-300 border border-slate-700';
+      document.getElementById('output-items').innerHTML = '<span class="text-slate-600 text-xs font-normal">尚未過閘門</span>';
+      
+      const toast = document.getElementById('canvas-toast');
+      const toastText = document.getElementById('toast-text');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toast.className = "mb-1.5 bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 transition-all duration-200 flex items-center gap-2 shrink-0 min-h-[32px]";
+      toastIcon.className = "w-5 h-5 rounded bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs shrink-0";
+      toastIcon.innerHTML = '<i class="fa-solid fa-info"></i>';
+      toastText.textContent = "調整上方數值後，按下「啟動條件檢測」觀察流程！";
+
+      updateCodeDisplay();
+      drawPipeline();
+    }
+
+    async function runSimulation() {
+      if (isRunning) return;
+      isRunning = true;
+
+      resetSimulation();
+      isRunning = true; // reset turns it off
+
+      document.getElementById('sim-status').textContent = '狀態：條件判斷中...';
+      document.getElementById('sim-status').className = 'px-3 py-1 rounded-full bg-sky-950 text-xs font-mono text-sky-300 border border-sky-700 pulse-glow-blue';
+
+      const sc = scenarios[currentScenarioKey];
+      const curInputs = scenarioInputs[currentScenarioKey];
+      const gates = structureMode === 'ladder' ? sc.gates : sc.gates.filter(g => !g.isElse);
+
+      let executedOutputs = [];
+
+      for (let g of gates) {
+        activeGateId = g.id;
+        drawPipeline();
+
+        const lineElem = document.getElementById(`code-line-${g.id}`);
+        const badgeElem = document.getElementById(`badge-${g.id}`);
+        if (lineElem) lineElem.classList.add('bg-sky-900/60', 'border-l-4', 'border-sky-400');
+
+        playSound('check');
+
+        if (!g.isElse) {
+          const pass = g.conditionFn(curInputs);
+          gateResults[g.id] = pass;
+
+          showToast(`進行比較：${g.evalText(curInputs)}`, pass ? 'pass' : 'fail');
+          
+          if (badgeElem) {
+            badgeElem.textContent = pass ? '✅ TRUE (成立)' : '❌ FALSE (不成立)';
+            badgeElem.className = pass ? 'text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-700' : 'text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-rose-950 text-rose-300 border border-rose-800';
+          }
+
+          await sleep(900);
+
+          if (pass) {
+            playSound('pass');
+            const actElem = document.getElementById(`code-line-act-${g.id}`);
+            if (actElem) actElem.classList.add('bg-emerald-950/80', 'font-bold', 'text-emerald-300');
+
+            executedOutputs.push(g.actionText);
+            document.getElementById('output-items').innerHTML = executedOutputs.map(o => `<span class="bg-emerald-950 border border-emerald-800 text-emerald-300 px-3 py-1 rounded-lg text-xs flex items-center gap-1.5"><i class="fa-solid ${g.icon}"></i> ${o}</span>`).join('');
+
+            drawPipeline();
+            await sleep(800);
+
+            if (structureMode === 'ladder') {
+              showToast(`🎉 條件成立！執行【${g.actionText}】，並跳出整個 if...else 鏈條！`, 'pass');
+              playSound('win');
+              confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+              break; // EXIT THE LADDER!
+            }
+          } else {
+            playSound('fail');
+          }
+        } else {
+          // Else Block
+          gateResults[g.id] = true;
+          showToast(`前面條件皆不成立，自動進入 else 預設處置！`, 'pass');
+          playSound('pass');
+
+          if (badgeElem) {
+            badgeElem.textContent = '⚡ 觸發預設';
+            badgeElem.className = 'text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-700';
+          }
+
+          const actElem = document.getElementById(`code-line-act-${g.id}`);
+          if (actElem) actElem.classList.add('bg-emerald-950/80', 'font-bold', 'text-emerald-300');
+
+          executedOutputs.push(g.actionText);
+          document.getElementById('output-items').innerHTML = `<span class="bg-emerald-950 border border-emerald-800 text-emerald-300 px-3 py-1 rounded-lg text-xs flex items-center gap-1.5"><i class="fa-solid ${g.icon}"></i> ${g.actionText}</span>`;
+
+          drawPipeline();
+          await sleep(800);
+          playSound('win');
+          confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+        }
+
+        if (lineElem) lineElem.classList.remove('bg-sky-900/60', 'border-l-4', 'border-sky-400');
+        activeGateId = null;
+        drawPipeline();
+        await sleep(300);
+      }
+
+      document.getElementById('sim-status').textContent = '狀態：測試完成';
+      document.getElementById('sim-status').className = 'px-3 py-1 rounded-full bg-emerald-950 text-xs font-mono text-emerald-300 border border-emerald-700';
+      isRunning = false;
+    }
+
+    /* Quiz System Data */
+    const quizData = [
+      {
+        question: "1. 請問下方程式中，小明身高 130cm，最終會印出什麼結果？",
+        code: `let height = 130;\nif (height < 110) {\n  console.log("兒童票");\n} else if (height < 150) {\n  console.log("少年票");\n} else {\n  console.log("成人票");\n}`,
+        options: ["兒童票", "少年票", "成人票", "少年票 與 成人票 都會印出"],
+        ans: 1,
+        explain: "因為 130 < 110 為 False，接著檢查 130 < 150 為 True！觸發『少年票』後便直接跳出，不會進入 else。"
+      },
+      {
+        question: "2. 如果將上題的邏輯改寫為 3 個獨立的 `if`，小明 100cm 時會發生什麼事？",
+        code: `let height = 100;\nif (height < 110) console.log("兒童票");\nif (height < 150) console.log("少年票");\nif (height < 200) console.log("普通票");`,
+        options: ["只印出 兒童票", "同時印出 兒童票、少年票、普通票", "什麼都不會印出", "程式會產生錯誤報錯"],
+        ans: 1,
+        explain: "因為是獨立的 3 個 if，電腦會每一個都檢查！100 同時滿足 <110、<150 與 <200，所以 3 個訊息都會被印出來！這就是為什麼需要 else if 來做互斥分流。"
+      },
+      {
+        question: "3. 請問哪一個運算子代表「兩個條件都必須同時成立（AND）」？",
+        code: `if (hasTicket _____ isAdult) {\n  console.log("允許入場");\n}`,
+        options: ["||", "&&", "!", "=="],
+        ans: 1,
+        explain: "`&&` 代表「並且 / AND」，只有當左右兩邊條件都是 True 時，整體才會通過。"
+      },
+      {
+        question: "4. 下方評分程式碼有一個嚴重的 Bug！如果學生考了 95 分，會拿到什麼評語？",
+        code: `let score = 95;\nif (score >= 60) {\n  console.log("及格");\n} else if (score >= 90) {\n  console.log("神童優等！");\n}`,
+        options: ["神童優等！", "及格", "及格 與 神童優等！", "什麼都沒印出"],
+        ans: 1,
+        explain: "Bug 在於順序寫反了！因為 95 >= 60 第一關就成立了，直接印出『及格』並跳出，導致後面的『神童優等！』永遠不可能被執行！寫 if 判斷時，範圍較嚴格的要放前面。"
+      },
+      {
+        question: "5. 關於 `else` 的敘述，下列何者「不正確」？",
+        code: `else {\n  // 預設處置\n}`,
+        options: [
+          "else 必須放在整個判斷鏈的最末端",
+          "else 括號內不需要填寫任何條件式",
+          "即使前面有 if 成立，else 還是會執行一次",
+          "else 是當前面條件全不符合時的防禦兜底"
+        ],
+        ans: 2,
+        explain: "選項 3 是錯誤的！只有在前面所有 if / else if 全部為 False 時，else 才會被執行。"
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizUserAnswers = Array(quizData.length).fill(null);
+
+    function renderQuiz() {
+      const q = quizData[currentQuizIndex];
+      const card = document.getElementById('quiz-card');
+      const userAns = quizUserAnswers[currentQuizIndex];
+
+      let optionsHtml = q.options.map((opt, idx) => {
+        let btnStyle = "bg-slate-950 hover:bg-slate-800 border-slate-800 text-slate-200";
+        let icon = `<span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 text-xs flex items-center justify-center font-mono font-bold">${String.fromCharCode(65 + idx)}</span>`;
+        
+        if (userAns !== null) {
+          if (idx === q.ans) {
+            btnStyle = "bg-emerald-950/80 border-emerald-600 text-emerald-200 font-bold";
+            icon = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>`;
+          } else if (userAns === idx) {
+            btnStyle = "bg-rose-950/80 border-rose-600 text-rose-200";
+            icon = `<i class="fa-solid fa-circle-xmark text-rose-400 text-lg"></i>`;
+          }
+        }
+
+        return `
+          <button onclick="selectQuizAns(${idx})" ${userAns !== null ? 'disabled' : ''} 
+                  class="w-full p-3.5 rounded-xl border text-left text-xs sm:text-sm transition flex items-center gap-3 ${btnStyle}">
+            ${icon}
+            <span class="flex-1">${opt}</span>
+          </button>
+        `;
+      }).join('');
+
+      let explainHtml = '';
+      if (userAns !== null) {
+        explainHtml = `
+          <div class="mt-4 p-4 rounded-xl ${userAns === q.ans ? 'bg-emerald-950/40 border border-emerald-800/60' : 'bg-rose-950/40 border border-rose-800/60'} space-y-1">
+            <div class="text-xs font-bold ${userAns === q.ans ? 'text-emerald-400' : 'text-rose-400'} flex items-center gap-2">
+              <i class="fa-solid ${userAns === q.ans ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> 
+              ${userAns === q.ans ? '回答正確！' : '回答錯誤，再來想想看！'}
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">${q.explain}</p>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="space-y-3">
+          <h3 class="text-sm sm:text-base font-bold text-slate-100 leading-snug">${q.question}</h3>
+          ${q.code ? `<pre class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs font-mono text-amber-300 overflow-x-auto">${q.code}</pre>` : ''}
+          <div class="space-y-2 pt-2">
+            ${optionsHtml}
+          </div>
+          ${explainHtml}
+        </div>
+      `;
+
+      document.getElementById('quiz-progress').textContent = `第 ${currentQuizIndex + 1} / ${quizData.length} 題`;
+      document.getElementById('btn-quiz-prev').disabled = currentQuizIndex === 0;
+      document.getElementById('btn-quiz-next').disabled = currentQuizIndex === quizData.length - 1;
+
+      // Calculate total score
+      const score = quizUserAnswers.reduce((acc, cur, i) => cur === quizData[i].ans ? acc + 1 : acc, 0);
+      document.getElementById('quiz-score').textContent = `${score} / ${quizData.length}`;
+    }
+
+    function selectQuizAns(idx) {
+      quizUserAnswers[currentQuizIndex] = idx;
+      if (idx === quizData[currentQuizIndex].ans) {
+        playSound('pass');
+      } else {
+        playSound('fail');
+      }
+      renderQuiz();
+    }
+
+    function prevQuiz() {
+      if (currentQuizIndex > 0) {
+        currentQuizIndex--;
+        renderQuiz();
+      }
+    }
+
+    function nextQuiz() {
+      if (currentQuizIndex < quizData.length - 1) {
+        currentQuizIndex++;
+        renderQuiz();
+      }
+    }
+
+    /* Window Initialization */
+    window.onload = function() {
+      renderInputControls();
+      updateCodeDisplay();
+      renderQuiz();
+      
+      // Resize Canvas Handler
+      window.addEventListener('resize', () => {
+        drawPipeline();
+      });
+
+      setTimeout(drawPipeline, 100);
+    };
+  </script>
+</body>
+</html>

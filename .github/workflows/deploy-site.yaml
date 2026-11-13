@@ -1,0 +1,120 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: latest
+          extended: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Update Hugo Modules
+        run: hugo mod tidy
+
+      - name: Install Node modules
+        run: |
+          hugo mod npm pack
+          npm ci
+
+      - name: Build site
+        run: hugo --minify
+
+      - name: Encrypt private slides with Staticrypt
+        env:
+          STATICRYPT_PASSWORD: ${{ secrets.SLIDES_PASSWORD }}
+        run: |
+          # Shared salt ensures all pages use the same localStorage hash
+          # so iframe auto-decrypts after parent page is unlocked
+          SALT="cd5edeb37d30a951d73b7f8eef871654"
+          
+          # Find all HTML files under public/ that are slide pages marked as private (all languages)
+          PRIVATE_FILES=$(find public -path "*/slides/*" -name "*.html" -exec grep -l 'data-access="private"' {} + || true)
+          echo "Found private slide pages:"
+          echo "$PRIVATE_FILES"
+          
+          for file in $PRIVATE_FILES; do
+            echo "Encrypting: $file"
+            dir=$(dirname "$file")
+            npx staticrypt "$file" \
+              --short \
+              --config false \
+              --remember 1 \
+              -s "$SALT" \
+              -d "$dir" \
+              --template-title "🔒 Protected Content" \
+              --template-instructions "Please enter the password to access this slide." \
+              --template-color-primary "#4a90d9" \
+              --template-color-secondary "#e8f0fe"
+          done
+
+          # Also encrypt iframe HTML files referenced by private slides
+          IFRAME_PATHS=$(grep -rl "^access: private" content/slides/ | xargs grep -h "^iframe:" | sed 's/iframe: *"//;s/"//' | sort -u || true)
+          echo "Found private iframe paths:"
+          echo "$IFRAME_PATHS"
+          
+          for iframe_path in $IFRAME_PATHS; do
+            target="public${iframe_path}"
+            if [ -f "$target" ]; then
+              echo "Encrypting iframe: $target"
+              dir=$(dirname "$target")
+              npx staticrypt "$target" \
+                --short \
+                --config false \
+                --remember 1 \
+                -s "$SALT" \
+                -d "$dir" \
+                --template-title "🔒 Protected Content" \
+                --template-instructions "Please enter the password to access this slide." \
+                --template-color-primary "#4a90d9" \
+                --template-color-secondary "#e8f0fe"
+            fi
+          done
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./public
+
+  deploy:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

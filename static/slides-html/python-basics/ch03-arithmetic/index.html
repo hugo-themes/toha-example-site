@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 3：算術運算子與數值計算 - 聯成電腦 Python 基礎程式</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* -------------------------------------------------------------------------
+           1. 基礎排版與色彩系統 (Warm Editorial Theme)
+           ------------------------------------------------------------------------- */
+        :root {
+            --bg-page: #fbf9f4;
+            --bg-card: #ffffff;
+            --bg-card-subtle: #f6f3eb;
+            --bg-code: #1e1e24;
+            --text-primary: #2d2926;
+            --text-secondary: #5e5850;
+            --text-muted: #8c8275;
+            --border-color: #e5dfd3;
+            --border-dark: #3c3730;
+            
+            /* 語意標記色系 (自然大地典雅色) */
+            --terracotta: #c2410c;
+            --terracotta-light: #ffedd5;
+            --amber: #b45309;
+            --amber-light: #fef3c7;
+            --sage: #0d9488;
+            --sage-light: #ccfbf1;
+            --navy: #1e3a8a;
+            --navy-light: #dbeafe;
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --shadow-sm: 0 2px 6px rgba(45, 41, 38, 0.05);
+            --shadow-md: 0 8px 24px rgba(45, 41, 38, 0.08);
+            --shadow-lg: 0 16px 36px rgba(45, 41, 38, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.7;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 寬螢幕自適應容器 (嚴格禁止紙張 A4 模擬) */
+        .handout-container {
+            width: 100%;
+            max-width: 1160px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+        }
+
+        /* 標題 Typography */
+        h1, h2, h3, h4 {
+            font-family: 'Noto Serif TC', Georgia, serif;
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.85rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 .section-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            background-color: var(--text-primary);
+            color: #ffffff;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            margin: 28px 0 14px 0;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            margin: 18px 0 10px 0;
+            color: var(--terracotta);
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* -------------------------------------------------------------------------
+           2. 模組與卡片組件
+           ------------------------------------------------------------------------- */
+        .hero-banner {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 44px 40px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--terracotta), var(--amber));
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--navy-light);
+            color: var(--navy);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 900px;
+            margin-bottom: 24px;
+        }
+
+        .prereq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .prereq-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .prereq-item i {
+            color: var(--sage);
+            margin-top: 3px;
+        }
+
+        .section-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 38px 36px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* -------------------------------------------------------------------------
+           3. 程式碼區塊與規格表格 (Code Blocks & Tables)
+           ------------------------------------------------------------------------- */
+        .code-block-wrapper {
+            background-color: var(--bg-code);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin: 18px 0 24px 0;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #33333d;
+        }
+
+        .code-header {
+            background-color: #17171c;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d2d38;
+        }
+
+        .code-lang {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .code-copy-btn {
+            background: #2a2a34;
+            border: 1px solid #3e3e4f;
+            color: #e5e7eb;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .code-copy-btn:hover {
+            background: #3b3b4a;
+            color: #ffffff;
+        }
+
+        pre {
+            padding: 18px 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #f3f4f6;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .inline-code {
+            background-color: var(--bg-card-subtle);
+            color: var(--terracotta);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            border: 1px solid var(--border-color);
+        }
+
+        /* 語法著色微調 (用於靜態範例) */
+        .hl-kwd { color: #f472b6; font-weight: 600; }
+        .hl-func { color: #60a5fa; }
+        .hl-num { color: #fb923c; }
+        .hl-str { color: #4ade80; }
+        .hl-op { color: #38bdf8; }
+        .hl-cmt { color: #9ca3af; font-style: italic; }
+
+        /* 規格表格 */
+        .spec-table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0 28px 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+            background-color: var(--bg-card);
+        }
+
+        .spec-table th {
+            background-color: var(--bg-card-subtle);
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 14px 18px;
+            border-bottom: 2px solid var(--border-color);
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        .spec-table td {
+            padding: 13px 18px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .spec-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .spec-table tr:hover td {
+            background-color: #faf8f2;
+        }
+
+        /* 提示與警示區塊 (Callout Box) */
+        .callout {
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            margin: 22px 0;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .callout-info {
+            background-color: var(--navy-light);
+            border-left: 5px solid var(--navy);
+        }
+
+        .callout-warning {
+            background-color: var(--amber-light);
+            border-left: 5px solid var(--amber);
+        }
+
+        .callout-danger {
+            background-color: var(--terracotta-light);
+            border-left: 5px solid var(--terracotta);
+        }
+
+        .callout-icon {
+            font-size: 1.4rem;
+            margin-top: 2px;
+        }
+
+        .callout-info .callout-icon { color: var(--navy); }
+        .callout-warning .callout-icon { color: var(--amber); }
+        .callout-danger .callout-icon { color: var(--terracotta); }
+
+        .callout-body h5 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .callout-body p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+
+        /* -------------------------------------------------------------------------
+           4. 動態互動管線與直譯器模擬器 (Three-Stage Interactive Pipelines)
+           ------------------------------------------------------------------------- */
+        .interactive-lab {
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin: 28px 0;
+            box-shadow: var(--shadow-md);
+        }
+
+        .lab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .lab-title-group h4 {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lab-badge {
+            background-color: var(--terracotta);
+            color: #ffffff;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        /* 三階段管線佈局 (Three-Stage Pipeline Layout) */
+        .pipeline-container {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr 0.9fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 960px) {
+            .pipeline-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pipeline-stage {
+            background-color: var(--bg-card-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stage-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stage-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* 互動控制器 */
+        .ctrl-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ctrl-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .ctrl-select, .ctrl-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .ctrl-btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: var(--text-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: var(--terracotta);
+        }
+
+        .btn-action.secondary {
+            background-color: #ffffff;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-action.secondary:hover {
+            background-color: var(--bg-card-subtle);
+        }
+
+        /* 堆疊與視覺化節點 */
+        .stack-display {
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            background-color: #ffffff;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            position: relative;
+        }
+
+        .expr-token-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .expr-token {
+            padding: 6px 12px;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #334155;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .expr-token.active {
+            background-color: var(--amber-light);
+            border-color: var(--amber);
+            color: var(--amber);
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.18);
+        }
+
+        .expr-token.evaluating {
+            background-color: var(--terracotta-light);
+            border-color: var(--terracotta);
+            color: var(--terracotta);
+            animation: pulse 1s infinite alternate;
+        }
+
+        .expr-token.reduced {
+            background-color: var(--sage-light);
+            border-color: var(--sage);
+            color: var(--sage);
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1.05); }
+            to { transform: scale(1.15); }
+        }
+
+        .stack-explanation {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            background-color: var(--bg-card-subtle);
+            padding: 6px 12px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        /* 終端機模擬器 */
+        .terminal-box {
+            background-color: #121214;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #22c55e;
+            font-size: 0.85rem;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        .term-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .term-prompt {
+            color: #94a3b8;
+        }
+
+        .term-val {
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .term-type {
+            color: #eab308;
+            font-size: 0.75rem;
+        }
+
+        /* 商餘分解視覺條 */
+        .division-visual-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .visual-bar-container {
+            display: flex;
+            height: 36px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background-color: #f1f5f9;
+        }
+
+        .visual-chunk {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--navy);
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            transition: width 0.4s ease;
+        }
+
+        .visual-remainder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--terracotta);
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: width 0.4s ease;
+        }
+
+        /* -------------------------------------------------------------------------
+           5. 實作習題區塊 (Hands-on Practice)
+           ------------------------------------------------------------------------- */
+        .exercise-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--sage);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .exercise-tag {
+            background-color: var(--sage-light);
+            color: var(--sage);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        .io-spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 14px;
+            background-color: var(--bg-card-subtle);
+            padding: 14px;
+            border-radius: var(--radius-sm);
+        }
+
+        .io-spec-col h6 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .io-spec-col pre {
+            background-color: #ffffff;
+            color: var(--text-primary);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* -------------------------------------------------------------------------
+           6. 頁尾版權與免責聲明
+           ------------------------------------------------------------------------- */
+        .footer-disclaimer {
+            margin-top: 60px;
+            padding: 30px;
+            background-color: #f2eee5;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer-disclaimer strong {
+            display: block;
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="handout-container">
+    <!-- 一、 核心觀念解析 -->
+    <section class="section-card">
+        <h2><span class="section-num">01</span> 一、 核心觀念解析</h2>
+        
+        <p>
+            在 Python 直譯器中，數值計算並非單純的文字代入，而是透過<strong>運算式（Expression）</strong>、<strong>運算元（Operand）</strong>與<strong>運算子（Operator）</strong>構成語法樹求值。直譯器在執行算術指令時，嚴格遵循底層資料型態規則與記憶體數值表示法。
+        </p>
+
+        <h3>1. 運算式與型態提升規則 (Type Promotion)</h3>
+        <p>
+            當不同型態的數值進行算術運算時，Python 直譯器會依據<strong>隱式型態轉換（Implicit Type Conversion）</strong>法則，自動將精確度較窄的型態（如整數 <code>int</code>）提升至精確度較廣的型態（如浮點數 <code>float</code>），以避免小數資訊在計算過程中遺失：
+        </p>
+
+        <div class="spec-table-wrapper">
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>運算元 A 型態</th>
+                        <th>運算子</th>
+                        <th>運算元 B 型態</th>
+                        <th>求值結果型態</th>
+                        <th>直譯器機制解析</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>int (5)</code></td>
+                        <td><code>+</code>, <code>-</code>, <code>*</code></td>
+                        <td><code>int (2)</code></td>
+                        <td><code>int</code></td>
+                        <td>兩整數相加減乘，結果仍為封閉之整數型態。</td>
+                    </tr>
+                    <tr>
+                        <td><code>int (5)</code></td>
+                        <td><code>/</code> (真除法)</td>
+                        <td><code>int (2)</code></td>
+                        <td><code>float (2.5)</code></td>
+                        <td><strong>強制規則</strong>：真除法 <code>/</code> 無論能否整除，結果一律為 <code>float</code>。</td>
+                    </tr>
+                    <tr>
+                        <td><code>int (4)</code></td>
+                        <td><code>/</code> (真除法)</td>
+                        <td><code>int (2)</code></td>
+                        <td><code>float (2.0)</code></td>
+                        <td>即使完全整除，亦回傳浮點數 <code>2.0</code>。</td>
+                    </tr>
+                    <tr>
+                        <td><code>int (5)</code></td>
+                        <td><code>+</code>, <code>-</code>, <code>*</code>, <code>//</code></td>
+                        <td><code>float (2.0)</code></td>
+                        <td><code>float</code></td>
+                        <td><strong>型態提升</strong>：整數與浮點數混合運算，結果必定提升為 <code>float</code>。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout callout-info">
+            <div class="callout-icon"><i class="fa-solid fa-lightbulb"></i></div>
+            <div class="callout-body">
+                <h5>直譯器視角：為什麼 4 / 2 不是整數 2？</h5>
+                <p>
+                    在 Python 3 中，設計者將 <code>/</code> 定義為「真除法（True Division）」，其設計哲學是確保除法運算在數學意義上的連續性與型態穩定性，因此傳回值統一以雙精度浮點數（IEEE 754 <code>float</code>）封裝。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 二、 基礎語法與範例展示 -->
+    <section class="section-card">
+        <h2><span class="section-num">02</span> 二、 基礎語法與範例展示</h2>
+        
+        <p>
+            Python 提供了完整的算術運算子家族，包含四則運算、整數除法與餘數、次方計算，以及簡化賦值操作的複合運算子。
+        </p>
+
+        <h3>1. 算術運算子規格總覽</h3>
+
+        <div class="spec-table-wrapper">
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>運算子</th>
+                        <th>官方名稱</th>
+                        <th>數學意義</th>
+                        <th>程式碼範例</th>
+                        <th>求值結果</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>+</code></td>
+                        <td>加法 (Addition)</td>
+                        <td>$a + b$</td>
+                        <td><code>3 + 2</code></td>
+                        <td><code>5</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>-</code></td>
+                        <td>減法 (Subtraction)</td>
+                        <td>$a - b$</td>
+                        <td><code>5 - 2</code></td>
+                        <td><code>3</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>*</code></td>
+                        <td>乘法 (Multiplication)</td>
+                        <td>$a \times b$</td>
+                        <td><code>4 * 2</code></td>
+                        <td><code>8</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>/</code></td>
+                        <td>真除法 (True Division)</td>
+                        <td>$a \div b$</td>
+                        <td><code>9 / 2</code></td>
+                        <td><code>4.5</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>//</code></td>
+                        <td>地板除法 (Floor Division)</td>
+                        <td>$\lfloor a \div b \rfloor$</td>
+                        <td><code>9 // 2</code></td>
+                        <td><code>4</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>%</code></td>
+                        <td>取餘數 (Modulo)</td>
+                        <td>$a - (b \times \lfloor a \div b \rfloor)$</td>
+                        <td><code>9 % 2</code></td>
+                        <td><code>1</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>**</code></td>
+                        <td>次方 (Exponentiation)</td>
+                        <td>$a^b$</td>
+                        <td><code>3 ** 2</code></td>
+                        <td><code>9</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-lang"><i class="fa-brands fa-python"></i> 基礎算術運算標準示範 (arithmetic_basic.py)</span>
+                <button class="code-copy-btn" onclick="copyCode(this)"><i class="fa-regular fa-copy"></i> 複製代碼</button>
+            </div>
+            <pre><code><span class="hl-cmt"># 基礎四則運算示範</span>
+add_result = <span class="hl-num">3</span> <span class="hl-op">+</span> <span class="hl-num">2</span>
+sub_result = <span class="hl-num">5</span> <span class="hl-op">-</span> <span class="hl-num">2</span>
+mul_result = <span class="hl-num">4</span> <span class="hl-op">*</span> <span class="hl-num">2</span>
+div_result = <span class="hl-num">9</span> <span class="hl-op">/</span> <span class="hl-num">2</span>
+
+<span class="hl-func">print</span>(<span class="hl-str">f"3 + 2 = {add_result}"</span>)        <span class="hl-cmt"># 輸出: 5</span>
+<span class="hl-func">print</span>(<span class="hl-str">f"5 - 2 = {sub_result}"</span>)        <span class="hl-cmt"># 輸出: 3</span>
+<span class="hl-func">print</span>(<span class="hl-str">f"4 * 2 = {mul_result}"</span>)        <span class="hl-cmt"># 輸出: 8</span>
+<span class="hl-func">print</span>(<span class="hl-str">f"9 / 2 = {div_result}"</span>)        <span class="hl-cmt"># 輸出: 4.5 (型態為 float)</span>
+
+<span class="hl-cmt"># 整數商與餘數計算</span>
+floor_div = <span class="hl-num">9</span> <span class="hl-op">//</span> <span class="hl-num">2</span>
+mod_val = <span class="hl-num">9</span> <span class="hl-op">%</span> <span class="hl-num">2</span>
+
+<span class="hl-func">print</span>(<span class="hl-str">f"9 // 2 (商數) = {floor_div}"</span>)  <span class="hl-cmt"># 輸出: 4</span>
+<span class="hl-func">print</span>(<span class="hl-str">f"9 % 2  (餘數) = {mod_val}"</span>)    <span class="hl-cmt"># 輸出: 1</span>
+
+<span class="hl-cmt"># 次方與開根號 (次方 0.5 等價於平方根)</span>
+power_val = <span class="hl-num">3</span> <span class="hl-op">**</span> <span class="hl-num">2</span>
+sqrt_val = <span class="hl-num">9</span> <span class="hl-op">**</span> <span class="hl-num">0.5</span>
+
+<span class="hl-func">print</span>(<span class="hl-str">f"3 ** 2  = {power_val}"</span>)       <span class="hl-cmt"># 輸出: 9</span>
+<span class="hl-func">print</span>(<span class="hl-str">f"9 ** 0.5 = {sqrt_val}"</span>)       <span class="hl-cmt"># 輸出: 3.0</span></code></pre>
+        </div>
+
+        <h3>2. 複合賦值運算子 (Augmented Assignment)</h3>
+        <p>
+            複合賦值運算子將「算術運算」與「變數賦值」合而為一。其精神為讀取原變數之值、執行運算後，將新值原地寫回該變數名稱：
+        </p>
+
+        <div class="spec-table-wrapper">
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>複合語法</th>
+                        <th>等價完整語法</th>
+                        <th>執行機制解析</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>x += 5</code></td>
+                        <td><code>x = x + 5</code></td>
+                        <td>將 <code>x</code> 增加 5 後存回 <code>x</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>x -= 3</code></td>
+                        <td><code>x = x - 3</code></td>
+                        <td>將 <code>x</code> 減少 3 後存回 <code>x</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>x *= 2</code></td>
+                        <td><code>x = x * 2</code></td>
+                        <td>將 <code>x</code> 乘以 2 後存回 <code>x</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>x /= 4</code></td>
+                        <td><code>x = x / 4</code></td>
+                        <td>將 <code>x</code> 除以 4 後存回 <code>x</code>（此時 <code>x</code> 轉為 <code>float</code>）</td>
+                    </tr>
+                    <tr>
+                        <td><code>x //= 2</code></td>
+                        <td><code>x = x // 2</code></td>
+                        <td>將 <code>x</code> 地板除以 2 後存回 <code>x</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>x %= 3</code></td>
+                        <td><code>x = x % 3</code></td>
+                        <td>將 <code>x</code> 對 3 取餘數後存回 <code>x</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>x **= 3</code></td>
+                        <td><code>x = x ** 3</code></td>
+                        <td>將 <code>x</code> 計算 3 次方後存回 <code>x</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>3. 運算子優先順序 (Operator Precedence)</h3>
+        <p>
+            當一個運算式中包含多個運算子時，直譯器依據嚴格的優先等級依序求值。若要打破預設優先順序，必須使用圓括號 <code>()</code> 強制包覆：
+        </p>
+
+        <div class="spec-table-wrapper">
+            <table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>優先等級</th>
+                        <th>運算子類別</th>
+                        <th>符號</th>
+                        <th>結合方向 (Associativity)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>最高 (Level 1)</strong></td>
+                        <td>括號分組</td>
+                        <td><code>()</code></td>
+                        <td>由內而外</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Level 2</strong></td>
+                        <td>次方運算</td>
+                        <td><code>**</code></td>
+                        <td><strong>由右至左 (Right-to-Left)</strong>（如 <code>2**3**2 = 2**9 = 512</code>）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Level 3</strong></td>
+                        <td>正負號</td>
+                        <td><code>+x</code>, <code>-x</code></td>
+                        <td>由右至左</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Level 4</strong></td>
+                        <td>乘除家族</td>
+                        <td><code>*</code>, <code>/</code>, <code>//</code>, <code>%</code></td>
+                        <td>由左至右 (Left-to-Right)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Level 5</strong></td>
+                        <td>加減家族</td>
+                        <td><code>+</code>, <code>-</code></td>
+                        <td>由左至右 (Left-to-Right)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>最低 (Level 6)</strong></td>
+                        <td>賦值家族</td>
+                        <td><code>=</code>, <code>+=</code>, <code>-=</code>, <code>*=</code> ...</td>
+                        <td>由右至左</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 三、 動態流程與底層運作模擬 (Three-Stage Interactive Pipelines) -->
+    <section class="section-card">
+        <h2><span class="section-num">03</span> 三、 動態流程與底層運作模擬</h2>
+        
+        <p>
+            本節提供講師於課堂投影演示專用之動態模擬實驗室。透過三階段管線（語法輸入 $\rightarrow$ 機制求值 $\rightarrow$ 狀態輸出），直觀呈現直譯器內部運算堆疊與商餘拆解。
+        </p>
+
+        <!-- 實驗室 1：運算式計算堆疊求值器 -->
+        <div class="interactive-lab" id="lab-stack-evaluator">
+            <div class="lab-header">
+                <div class="lab-title-group">
+                    <h4><i class="fa-solid fa-layer-group"></i> 運算式求值堆疊逐步演示 (Expression Stack Evaluator)</h4>
+                </div>
+                <span class="lab-badge">三階段動態管線</span>
+            </div>
+
+            <div class="pipeline-container">
+                <!-- 階段 1：輸入語法 -->
+                <div class="pipeline-stage">
+                    <div class="stage-tag">
+                        <span>Stage 1</span>
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div class="stage-title">選擇或輸入運算式</div>
+                    
+                    <div class="ctrl-group">
+                        <label class="ctrl-label">內建典型教學範例：</label>
+                        <select class="ctrl-select" id="stack-preset-select">
+                            <option value="ex1">範例 A：3 + 4 * 2 (先乘除後加減)</option>
+                            <option value="ex2">範例 B：(3 + 4) * 2 (括號強制優先)</option>
+                            <option value="ex3">範例 C：2 ** 3 * 2 + 10 // 3 (多重混合運算)</option>
+                            <option value="ex4">範例 D：100 - 20 * 3 + 18 % 4 (同級左至右結合)</option>
+                        </select>
+                    </div>
+
+                    <div class="ctrl-btn-row">
+                        <button class="btn-action" id="btn-stack-step"><i class="fa-solid fa-forward-step"></i> 單步執行</button>
+                        <button class="btn-action secondary" id="btn-stack-reset"><i class="fa-solid fa-rotate-left"></i> 重置</button>
+                    </div>
+                </div>
+
+                <!-- 階段 2：直譯器求值機制 -->
+                <div class="pipeline-stage">
+                    <div class="stage-tag">
+                        <span>Stage 2</span>
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <div class="stage-title">直譯器求值步驟 (AST Tree)</div>
+
+                    <div class="stack-display" id="stack-visual-canvas">
+                        <div class="expr-token-row" id="token-container">
+                            <!-- JS 動態生成 token -->
+                        </div>
+                        <div class="stack-explanation" id="stack-step-desc">
+                            點擊「單步執行」觀察直譯器如何鎖定高優先級運算子。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 階段 3：最終狀態與終端輸出 -->
+                <div class="pipeline-stage">
+                    <div class="stage-tag">
+                        <span>Stage 3</span>
+                        <i class="fa-solid fa-terminal"></i>
+                    </div>
+                    <div class="stage-title">符號狀態與終端輸出</div>
+
+                    <div class="terminal-box" id="stack-terminal-output">
+                        <div class="term-line term-prompt">>>> python arithmetic_demo.py</div>
+                        <div class="term-line" id="term-status-line">等待執行中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 實驗室 2：除法家族與商餘分解器 -->
+        <div class="interactive-lab" id="lab-division-visualizer">
+            <div class="lab-header">
+                <div class="lab-title-group">
+                    <h4><i class="fa-solid fa-chart-pie"></i> 地板除法與取餘數動態拆解器 (Division & Modulo Lab)</h4>
+                </div>
+                <span class="lab-badge">幾何拆解</span>
+            </div>
+
+            <div class="pipeline-container">
+                <!-- 階段 1：參數調整 -->
+                <div class="pipeline-stage">
+                    <div class="stage-tag">
+                        <span>Stage 1</span>
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div class="stage-title">被除數與除數輸入</div>
+
+                    <div class="ctrl-group">
+                        <label class="ctrl-label">被除數 a (Dividend): <span id="val-a-lbl" class="inline-code">17</span></label>
+                        <input type="range" class="ctrl-input" id="slider-a" min="1" max="50" value="17">
+                    </div>
+
+                    <div class="ctrl-group" style="margin-top: 8px;">
+                        <label class="ctrl-label">除數 b (Divisor): <span id="val-b-lbl" class="inline-code">5</span></label>
+                        <input type="range" class="ctrl-input" id="slider-b" min="1" max="12" value="5">
+                    </div>
+                </div>
+
+                <!-- 階段 2：幾何區塊拆解 -->
+                <div class="pipeline-stage">
+                    <div class="stage-tag">
+                        <span>Stage 2</span>
+                        <i class="fa-solid fa-shapes"></i>
+                    </div>
+                    <div class="stage-title">商數區塊與餘數分配</div>
+
+                    <div class="stack-display">
+                        <div class="division-visual-box">
+                            <div class="ctrl-label">完整長度 a = <span id="disp-total-a">17</span></div>
+                            <div class="visual-bar-container" id="division-bar-container">
+                                <!-- JS 動態產生藍色商數塊與橘色餘數塊 -->
+                            </div>
+                            <div class="stack-explanation" id="division-math-formula">
+                                17 = 5 × 3 + 2
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 階段 3：Python 對照成果 -->
+                <div class="pipeline-stage">
+                    <div class="stage-tag">
+                        <span>Stage 3</span>
+                        <i class="fa-brands fa-python"></i>
+                    </div>
+                    <div class="stage-title">Python 運算子計算輸出</div>
+
+                    <div class="terminal-box">
+                        <div class="term-line"><span class="term-prompt">a = </span><span id="term-a-val" class="term-val">17</span></div>
+                        <div class="term-line"><span class="term-prompt">b = </span><span id="term-b-val" class="term-val">5</span></div>
+                        <div class="term-line">------------------------</div>
+                        <div class="term-line">a / b  = <span id="out-true-div" class="term-val">3.4</span> <span class="term-type">(float)</span></div>
+                        <div class="term-line">a // b = <span id="out-floor-div" class="term-val">3</span> <span class="term-type">(int)</span></div>
+                        <div class="term-line">a % b  = <span id="out-mod-val" class="term-val">2</span> <span class="term-type">(int)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- 四、 常見陷阱與除錯心法 -->
+    <section class="section-card">
+        <h2><span class="section-num">04</span> 四、 常見陷阱與除錯心法</h2>
+        
+        <p>
+            初學者在進行數值運算時，最常因型態誤解、運算邊界或未轉型導致邏輯錯誤或程式中斷。以下列舉四大必備除錯重點：
+        </p>
+
+        <h3>1. 陷阱一：除以零引發 <code>ZeroDivisionError</code></h3>
+        <p>
+            數學上除數不可為零。在 Python 中，無論是真除法 <code>/</code>、地板除法 <code>//</code> 或取餘數 <code>%</code>，只要除數為 <code>0</code>，直譯器均會立即拋出 <code>ZeroDivisionError</code> 例外中斷程式：
+        </p>
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-lang"><i class="fa-solid fa-triangle-exclamation"></i> 錯誤示範 (ZeroDivisionError)</span>
+            </div>
+            <pre><code><span class="hl-cmt"># 錯誤代碼：除數為 0</span>
+total_score = <span class="hl-num">100</span>
+student_count = <span class="hl-num">0</span>
+average = total_score <span class="hl-op">/</span> student_count
+
+<span class="hl-cmt"># 終端機報錯訊息：</span>
+<span class="hl-cmt"># ZeroDivisionError: division by zero</span></code></pre>
+        </div>
+
+        <h3>2. 陷阱二：<code>input()</code> 數值未強制轉型導致字串拼接</h3>
+        <p>
+            在 Lesson 1 中已知 <code>input()</code> 接收的所有輸入一律為<strong>字串（str）</strong>。若未經 <code>int()</code> 或 <code>float()</code> 轉換即使用 <code>+</code>，直譯器會執行「字串串接（String Concatenation）」而非數值加法：
+        </p>
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-lang"><i class="fa-solid fa-bug"></i> 邏輯錯誤示範 (型態未轉型)</span>
+            </div>
+            <pre><code>num1 = <span class="hl-func">input</span>(<span class="hl-str">"請輸入第一個數字: "</span>)  <span class="hl-cmt"># 使用者輸入: 25 -> 得到字串 "25"</span>
+num2 = <span class="hl-func">input</span>(<span class="hl-str">"請輸入第二個數字: "</span>)  <span class="hl-cmt"># 使用者輸入: 30 -> 得到字串 "30"</span>
+
+total = num1 <span class="hl-op">+</span> num2
+<span class="hl-func">print</span>(<span class="hl-str">f"兩數總和為: {total}"</span>)        <span class="hl-cmt"># 輸出: "2530" (邏輯嚴重錯誤！)</span>
+
+<span class="hl-cmt"># 正確寫法：使用 int() 或 float() 包覆</span>
+correct_total = <span class="hl-func">float</span>(num1) <span class="hl-op">+</span> <span class="hl-func">float</span>(num2)
+<span class="hl-func">print</span>(<span class="hl-str">f"正確總和為: {correct_total}"</span>) <span class="hl-cmt"># 輸出: 55.0</span></code></pre>
+        </div>
+
+        <h3>3. 陷阱三：浮點數二進位精度微差 (Floating Point Precision)</h3>
+        <p>
+            現代電腦底層使用二進位（IEEE 754）存儲浮點數，某些十進位小數（如 0.1 與 0.2）無法精確化為有限二進位小數，計算時會產生極小微差。在輸出時應善用 <code>f"{val:.2f}"</code> 進行位數格式化：
+        </p>
+        <div class="code-block-wrapper">
+            <div class="code-header">
+                <span class="code-lang"><i class="fa-brands fa-python"></i> 浮點數精度控制示範</span>
+            </div>
+            <pre><code>raw_val = <span class="hl-num">0.1</span> <span class="hl-op">+</span> <span class="hl-num">0.2</span>
+<span class="hl-func">print</span>(raw_val)               <span class="hl-cmt"># 輸出: 0.30000000000000004</span>
+
+<span class="hl-cmt"># 使用 f-string 格式化控制顯示精確度至小數點後兩位</span>
+<span class="hl-func">print</span>(<span class="hl-str">f"格式化輸出: {raw_val:.2f}"</span>)  <span class="hl-cmt"># 輸出: 0.30</span></code></pre>
+        </div>
+    </section>
+
+    <!-- 五、 課堂實作挑戰 -->
+    <section class="section-card">
+        <h2><span class="section-num">05</span> 五、 課堂實作挑戰</h2>
+        
+        <p>
+            以下三道課堂實作題目，緊扣本單元算術運算子、優先順序與 <code>input()</code> 型態轉換，請引導學生於課堂獨立完成。
+        </p>
+
+        <!-- 練習 1 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <h4>實作題一：兩數四則運算與商餘綜合計算器</h4>
+                <span class="exercise-tag">基礎算術驗證</span>
+            </div>
+            <p>
+                <strong>題目需求</strong>：請撰寫一支程式，接收使用者輸入的兩個正整數 <code>a</code> 與 <code>b</code>，分別計算並輸出其加、減、乘、真除法、商數（地板除法）、餘數與次方結果。
+            </p>
+            <div class="io-spec-grid">
+                <div class="io-spec-col">
+                    <h6>範例輸入 (stdin)</h6>
+                    <pre>請輸入第一個整數 a: 9
+請輸入第二個整數 b: 2</pre>
+                </div>
+                <div class="io-spec-col">
+                    <h6>範例輸出 (stdout)</h6>
+                    <pre>9 + 2 = 11
+9 - 2 = 7
+9 * 2 = 18
+9 / 2 = 4.5
+9 // 2 = 4
+9 % 2 = 1
+9 ** 2 = 81</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 練習 2 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <h4>實作題二：攝氏溫度轉華氏溫度換算系統</h4>
+                <span class="exercise-tag">運算優先級應用</span>
+            </div>
+            <p>
+                <strong>題目需求</strong>：請撰寫一支程式，讓使用者輸入攝氏溫度（<code>celsius</code>，允許小數），程式將其轉換為華氏溫度（<code>fahrenheit</code>）。轉換公式為：$\text{華氏} = \text{攝氏} \times \frac{9}{5} + 32$。輸出結果需保留小數點後一位。
+            </p>
+            <div class="io-spec-grid">
+                <div class="io-spec-col">
+                    <h6>範例輸入 (stdin)</h6>
+                    <pre>請輸入攝氏溫度: 25</pre>
+                </div>
+                <div class="io-spec-col">
+                    <h6>範例輸出 (stdout)</h6>
+                    <pre>攝氏 25.0 度 = 華氏 77.0 度</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 練習 3 -->
+        <div class="exercise-card">
+            <div class="exercise-header">
+                <h4>實作題三：BMI 身體質量指數計算器</h4>
+                <span class="exercise-tag">次方與格式化輸出</span>
+            </div>
+            <p>
+                <strong>題目需求</strong>：接收使用者輸入的身高（公分 <code>cm</code>）與體重（公斤 <code>kg</code>）。程式需先將身高換算為公尺（$m = cm / 100$），再依公式計算 BMI：$\text{BMI} = \frac{\text{體重}(kg)}{\text{身高}(m)^2}$。最後使用 f-string 格式化輸出 BMI 數值至小數點後兩位。
+            </p>
+            <div class="io-spec-grid">
+                <div class="io-spec-col">
+                    <h6>範例輸入 (stdin)</h6>
+                    <pre>請輸入身高 (公分): 175
+請輸入體重 (公斤): 68</pre>
+                </div>
+                <div class="io-spec-col">
+                    <h6>範例輸出 (stdout)</h6>
+                    <pre>身高: 175.0 cm | 體重: 68.0 kg
+計算所得 BMI 數值為: 22.20</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾與官方版權宣告 -->
+    <footer class="footer-disclaimer">
+        <strong>免責聲明與權益宣示</strong>
+        本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+        如有授權需求，請以 Email 聯繫至：<a href="mailto:andywangkenichi@gmail.com" style="color: var(--navy); text-decoration: none; font-weight: 600;">andywangkenichi@gmail.com</a>。敬請尊重智慧財產權，避免不當使用。
+    </footer>
+
+</div>
+
+<!-- -------------------------------------------------------------------------
+     互動管線腳本 (IIFE 作用域封裝)
+     ------------------------------------------------------------------------- -->
+<script>
+(function() {
+    "use strict";
+
+    // 複製代碼小工具
+    window.copyCode = function(btn) {
+        const pre = btn.closest('.code-block-wrapper').querySelector('pre code');
+        if (!pre) return;
+        navigator.clipboard.writeText(pre.innerText).then(() => {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> 已複製';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        });
+    };
+
+    /* -------------------------------------------------------------------------
+       模組 A：運算式計算堆疊求值器 (Stack Evaluator)
+       ------------------------------------------------------------------------- */
+    const STACK_PRESETS = {
+        ex1: {
+            tokens: ["3", "+", "4", "*", "2"],
+            steps: [
+                {
+                    activeIdxs: [2, 3, 4],
+                    desc: "步驟 1：乘法 (*) 優先於加法 (+)，先計算 4 * 2 = 8",
+                    newTokens: ["3", "+", "8"],
+                    termLog: "計算運算子: 4 * 2 -> 8"
+                },
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 2：執行加法 3 + 8 = 11",
+                    newTokens: ["11"],
+                    termLog: "計算運算子: 3 + 8 -> 11\n>>> 最終結果 = 11 (int)"
+                }
+            ]
+        },
+        ex2: {
+            tokens: ["(", "3", "+", "4", ")", "*", "2"],
+            steps: [
+                {
+                    activeIdxs: [0, 1, 2, 3, 4],
+                    desc: "步驟 1：括號 () 擁有最高優先權，先計算 (3 + 4) = 7",
+                    newTokens: ["7", "*", "2"],
+                    termLog: "括號優先計算: (3 + 4) -> 7"
+                },
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 2：執行乘法 7 * 2 = 14",
+                    newTokens: ["14"],
+                    termLog: "計算運算子: 7 * 2 -> 14\n>>> 最終結果 = 14 (int)"
+                }
+            ]
+        },
+        ex3: {
+            tokens: ["2", "**", "3", "*", "2", "+", "10", "//", "3"],
+            steps: [
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 1：次方 (**) 優先權最高，先計算 2 ** 3 = 8",
+                    newTokens: ["8", "*", "2", "+", "10", "//", "3"],
+                    termLog: "計算次方: 2 ** 3 -> 8"
+                },
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 2：由左至右評估乘除家族，計算 8 * 2 = 16",
+                    newTokens: ["16", "+", "10", "//", "3"],
+                    termLog: "計算乘法: 8 * 2 -> 16"
+                },
+                {
+                    activeIdxs: [2, 3, 4],
+                    desc: "步驟 3：地板除法 (//) 優先於加法 (+)，計算 10 // 3 = 3",
+                    newTokens: ["16", "+", "3"],
+                    termLog: "計算地板除: 10 // 3 -> 3"
+                },
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 4：最後執行加法 16 + 3 = 19",
+                    newTokens: ["19"],
+                    termLog: "計算加法: 16 + 3 -> 19\n>>> 最終結果 = 19 (int)"
+                }
+            ]
+        },
+        ex4: {
+            tokens: ["100", "-", "20", "*", "3", "+", "18", "%", "4"],
+            steps: [
+                {
+                    activeIdxs: [2, 3, 4],
+                    desc: "步驟 1：乘法 (*) 優先計算 20 * 3 = 60",
+                    newTokens: ["100", "-", "60", "+", "18", "%", "4"],
+                    termLog: "計算乘法: 20 * 3 -> 60"
+                },
+                {
+                    activeIdxs: [4, 5, 6],
+                    desc: "步驟 2：取餘數 (%) 優先於加減，計算 18 % 4 = 2",
+                    newTokens: ["100", "-", "60", "+", "2"],
+                    termLog: "計算餘數: 18 % 4 -> 2"
+                },
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 3：加減法同級，由左至右結合，計算 100 - 60 = 40",
+                    newTokens: ["40", "+", "2"],
+                    termLog: "計算減法: 100 - 60 -> 40"
+                },
+                {
+                    activeIdxs: [0, 1, 2],
+                    desc: "步驟 4：執行最後加法 40 + 2 = 42",
+                    newTokens: ["42"],
+                    termLog: "計算加法: 40 + 2 -> 42\n>>> 最終結果 = 42 (int)"
+                }
+            ]
+        }
+    };
+
+    let currentPresetKey = "ex1";
+    let currentStepIdx = -1;
+    let currentTokens = [];
+
+    const presetSelect = document.getElementById("stack-preset-select");
+    const tokenContainer = document.getElementById("token-container");
+    const stepDesc = document.getElementById("stack-step-desc");
+    const termLine = document.getElementById("term-status-line");
+    const btnStep = document.getElementById("btn-stack-step");
+    const btnReset = document.getElementById("btn-stack-reset");
+
+    function renderTokens(tokens, activeIndices = []) {
+        tokenContainer.innerHTML = "";
+        tokens.forEach((t, idx) => {
+            const span = document.createElement("span");
+            span.className = "expr-token";
+            span.textContent = t;
+            if (activeIndices.includes(idx)) {
+                span.classList.add("active");
+            }
+            tokenContainer.appendChild(span);
+        });
+    }
+
+    function resetStackLab() {
+        currentPresetKey = presetSelect.value;
+        currentStepIdx = -1;
+        currentTokens = [...STACK_PRESETS[currentPresetKey].tokens];
+        renderTokens(currentTokens);
+        stepDesc.textContent = "點擊「單步執行」觀察直譯器如何鎖定高優先級運算子。";
+        termLine.innerHTML = `<span class="term-prompt">>>> 載入算式: </span>${currentTokens.join(" ")}`;
+        btnStep.disabled = false;
+        btnStep.innerHTML = '<i class="fa-solid fa-forward-step"></i> 單步執行';
+    }
+
+    function stepForwardStack() {
+        const preset = STACK_PRESETS[currentPresetKey];
+        if (currentStepIdx < preset.steps.length - 1) {
+            currentStepIdx++;
+            const step = preset.steps[currentStepIdx];
+            
+            // 高亮當前計算 token
+            renderTokens(currentTokens, step.activeIdxs);
+            stepDesc.textContent = step.desc;
+            termLine.innerHTML = `<span class="term-prompt">>>> </span>${step.termLog.replace(/\n/g, "<br>>>> ")}`;
+            
+            // 延遲更新折疊 token
+            setTimeout(() => {
+                currentTokens = [...step.newTokens];
+                renderTokens(currentTokens, [0]);
+                if (currentStepIdx === preset.steps.length - 1) {
+                    btnStep.disabled = true;
+                    btnStep.innerHTML = '<i class="fa-solid fa-check"></i> 求值完成';
+                }
+            }, 600);
+        }
+    }
+
+    presetSelect.addEventListener("change", resetStackLab);
+    btnReset.addEventListener("click", resetStackLab);
+    btnStep.addEventListener("click", stepForwardStack);
+
+    // 初始化實驗室 1
+    resetStackLab();
+
+    /* -------------------------------------------------------------------------
+       模組 B：除法家族與商餘分解器 (Division & Modulo Lab)
+       ------------------------------------------------------------------------- */
+    const sliderA = document.getElementById("slider-a");
+    const sliderB = document.getElementById("slider-b");
+    const lblA = document.getElementById("val-a-lbl");
+    const lblB = document.getElementById("val-b-lbl");
+    const dispTotalA = document.getElementById("disp-total-a");
+    const barContainer = document.getElementById("division-bar-container");
+    const formulaText = document.getElementById("division-math-formula");
+
+    const termA = document.getElementById("term-a-val");
+    const termB = document.getElementById("term-b-val");
+    const outTrueDiv = document.getElementById("out-true-div");
+    const outFloorDiv = document.getElementById("out-floor-div");
+    const outModVal = document.getElementById("out-mod-val");
+
+    function updateDivisionLab() {
+        const a = parseInt(sliderA.value, 10);
+        const b = parseInt(sliderB.value, 10);
+
+        lblA.textContent = a;
+        lblB.textContent = b;
+        dispTotalA.textContent = a;
+
+        const quotient = Math.floor(a / b);
+        const remainder = a % b;
+        const trueDiv = (a / b).toFixed(2);
+
+        // 更新終端機
+        termA.textContent = a;
+        termB.textContent = b;
+        outTrueDiv.textContent = trueDiv;
+        outFloorDiv.textContent = quotient;
+        outModVal.textContent = remainder;
+
+        // 更新數學公式
+        formulaText.textContent = `${a} = ${b} × ${quotient} + ${remainder}  (被除數 = 除數 × 商數 + 餘數)`;
+
+        // 更新視覺長條圖
+        barContainer.innerHTML = "";
+        const total = a;
+
+        for (let i = 0; i < quotient; i++) {
+            const chunk = document.createElement("div");
+            chunk.className = "visual-chunk";
+            const chunkWidth = (b / total) * 100;
+            chunk.style.width = `${chunkWidth}%`;
+            chunk.textContent = `${b}`;
+            chunk.title = `商數區塊 #${i+1} (大小: ${b})`;
+            barContainer.appendChild(chunk);
+        }
+
+        if (remainder > 0) {
+            const remChunk = document.createElement("div");
+            remChunk.className = "visual-remainder";
+            const remWidth = (remainder / total) * 100;
+            remChunk.style.width = `${remWidth}%`;
+            remChunk.textContent = `餘 ${remainder}`;
+            remChunk.title = `餘數: ${remainder}`;
+            barContainer.appendChild(remChunk);
+        }
+    }
+
+    sliderA.addEventListener("input", updateDivisionLab);
+    sliderB.addEventListener("input", updateDivisionLab);
+
+    // 初始化實驗室 2
+    updateDivisionLab();
+
+})();
+</script>
+</body>
+</html>

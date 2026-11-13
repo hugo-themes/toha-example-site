@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>單元 1：變數定義與基礎 I/O (Variables, Input & Output) - 教師互動講義</title>
+  <style>
+    /* ==========================================================================
+       溫暖出版品風格 (Warm Editorial Style) 核心設計系統
+       ========================================================================== */
+    :root {
+      --bg-warm: #fbf9f4;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f4efe6;
+      --border-soft: #e2dbcd;
+      --border-accent: #c2b7a3;
+      --text-main: #2d2926;
+      --text-muted: #6b645c;
+      --accent-terracotta: #c2410c;
+      --accent-amber: #b45309;
+      --accent-blue: #1e3a8a;
+      --accent-teal: #0f766e;
+      --accent-green: #15803d;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --terminal-header: #334155;
+      --font-serif: "Noto Serif TC", Georgia, "Times New Roman", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.75;
+      padding: 40px 20px;
+    }
+
+    .editorial-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      background-color: var(--bg-surface);
+      padding: 56px 52px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 4px 24px rgba(45, 41, 38, 0.05);
+      border-radius: 8px;
+    }
+
+    /* 講義標頭區 */
+    header.unit-header {
+      border-bottom: 2px solid var(--border-accent);
+      padding-bottom: 28px;
+      margin-bottom: 48px;
+    }
+
+    .unit-badge {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-terracotta);
+      background-color: #ffedd5;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    h1.unit-title {
+      font-family: var(--font-serif);
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .unit-meta {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+    }
+
+    /* 章節標題與內文層級 */
+    h2.chapter-title {
+      font-family: var(--font-serif);
+      font-size: 1.65rem;
+      color: var(--accent-blue);
+      border-left: 4px solid var(--accent-terracotta);
+      padding-left: 14px;
+      margin: 52px 0 20px 0;
+      line-height: 1.4;
+    }
+
+    h3.section-title {
+      font-size: 1.22rem;
+      color: var(--text-main);
+      margin: 30px 0 14px 0;
+      font-weight: 600;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: var(--text-main);
+    }
+
+    ul, ol {
+      margin-bottom: 18px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    /* 程式碼呈現規範（嚴格無手動行號，PEP 8 標準） */
+    pre.code-block {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      font-family: var(--font-mono);
+      font-size: 0.94rem;
+      padding: 20px 24px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 20px 0;
+      line-height: 1.65;
+      border: 1px solid #0f172a;
+      white-space: pre;
+    }
+
+    code.inline-code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background-color: var(--bg-subtle);
+      color: var(--accent-terracotta);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--border-soft);
+    }
+
+    /* 表格規格排版 */
+    table.spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 22px 0;
+      font-size: 0.95rem;
+    }
+
+    table.spec-table th {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      text-align: left;
+      padding: 12px 16px;
+      border: 1px solid var(--border-soft);
+      font-weight: 600;
+    }
+
+    table.spec-table td {
+      padding: 12px 16px;
+      border: 1px solid var(--border-soft);
+      vertical-align: top;
+    }
+
+    table.spec-table tr:nth-child(even) {
+      background-color: #fcfbfa;
+    }
+
+    /* 觀念重點與警示外框 */
+    .note-box {
+      background-color: #f8fafc;
+      border-left: 4px solid var(--accent-blue);
+      padding: 18px 22px;
+      margin: 24px 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .note-box.alert {
+      background-color: #fff7ed;
+      border-left-color: var(--accent-amber);
+    }
+
+    /* ==========================================================================
+       動態教具專屬外框 (三層分離：第二層標籤 + 第三層具象畫布)
+       ========================================================================== */
+    .widget-container {
+      background-color: #faf8f5;
+      border: 1px solid var(--border-accent);
+      border-radius: 8px;
+      margin: 36px 0 44px 0;
+      overflow: hidden;
+      box-shadow: 0 3px 14px rgba(45, 41, 38, 0.06);
+    }
+
+    .widget-header {
+      background-color: #efe9de;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .widget-title-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .widget-status-badge {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      background-color: #e2e8f0;
+      color: #334155;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .widget-body {
+      padding: 26px;
+    }
+
+    .widget-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px dashed var(--border-soft);
+    }
+
+    .ctrl-btn {
+      background-color: #ffffff;
+      border: 1px solid var(--border-accent);
+      color: var(--text-main);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .ctrl-btn:hover {
+      background-color: #ebe5d8;
+      border-color: #a89a80;
+    }
+
+    .ctrl-btn.active {
+      background-color: var(--accent-terracotta);
+      border-color: var(--accent-terracotta);
+      color: #ffffff;
+    }
+
+    .ctrl-input {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 7px 12px;
+      border: 1px solid var(--border-accent);
+      border-radius: 4px;
+      background-color: #ffffff;
+      color: var(--text-main);
+    }
+
+    /* 模擬終端機樣式 */
+    .terminal-box {
+      background-color: var(--code-bg);
+      border-radius: 6px;
+      overflow: hidden;
+      font-family: var(--font-mono);
+      border: 1px solid #0f172a;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+
+    .terminal-bar {
+      background-color: var(--terminal-header);
+      padding: 7px 14px;
+      font-size: 0.76rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .circle-red { background-color: #ef4444; }
+    .circle-yellow { background-color: #f59e0b; }
+    .circle-green { background-color: #10b981; }
+
+    .terminal-screen {
+      padding: 16px 20px;
+      color: #38bdf8;
+      font-size: 0.92rem;
+      min-height: 80px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1.15em;
+      background-color: #38bdf8;
+      vertical-align: text-bottom;
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* ==========================================================================
+       專屬動態元件：實體記憶體網格與磁吸名牌槽位樣式 (教具二)
+       ========================================================================== */
+    .memory-grid-wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .memory-cell {
+      background-color: #ffffff;
+      border: 2px solid #d1d5db;
+      border-radius: 6px;
+      padding: 12px;
+      min-height: 155px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.35s ease;
+    }
+
+    .memory-cell.occupied {
+      border-color: #3b82f6;
+      background-color: #f8fafc;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+    }
+
+    .memory-cell.highlight-new {
+      border-color: var(--accent-green);
+      background-color: #f0fdf4;
+      animation: cellPulse 0.8s ease;
+    }
+
+    .memory-cell.gc-target {
+      border-color: #94a3b8;
+      background-color: #f1f5f9;
+      opacity: 0.55;
+      border-style: dashed;
+    }
+
+    @keyframes cellPulse {
+      0% { transform: scale(0.98); box-shadow: 0 0 0 rgba(22, 163, 74, 0.4); }
+      50% { transform: scale(1.02); box-shadow: 0 0 16px rgba(22, 163, 74, 0.3); }
+      100% { transform: scale(1); }
+    }
+
+    .cell-doorplate {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+
+    .cell-address {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* 名牌吊牌軌道（置於格子門牌外側） */
+    .cell-tag-rail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 28px;
+      margin: 8px 0 4px 0;
+      align-items: center;
+    }
+
+    /* 實體磁吸吊牌變數標籤 */
+    .variable-tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, #b45309, #d97706);
+      color: #ffffff;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: 0 2px 5px rgba(180, 83, 9, 0.35);
+      border: 1px solid #92400e;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: top center;
+    }
+
+    .variable-tag-badge::before {
+      content: "🏷️";
+      font-size: 0.75rem;
+    }
+
+    .variable-tag-badge.snap-in {
+      animation: snapWiggle 0.4s ease;
+    }
+
+    @keyframes snapWiggle {
+      0% { transform: scale(0.7) translateY(-8px); opacity: 0; }
+      60% { transform: scale(1.08) translateY(2px) rotate(-3deg); opacity: 1; }
+      100% { transform: scale(1) translateY(0) rotate(0); }
+    }
+
+    /* 槽位內物件實體盒子 */
+    .cell-object-payload {
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 8px 10px;
+      text-align: center;
+      margin-top: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .cell-object-type {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .cell-object-value {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+
+    .cell-empty-text {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-style: italic;
+      text-align: center;
+      padding: 16px 0;
+    }
+
+    .gc-badge-flag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #dc2626;
+      background-color: #fee2e2;
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid #fca5a5;
+      margin-top: 4px;
+    }
+
+    footer.disclaimer-box {
+      margin-top: 64px;
+      padding: 24px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-soft);
+      border-radius: 6px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+  </style>
+</head>
+<body>
+
+<div class="editorial-container">
+  <!-- ==========================================================================
+       第 1 章：標準輸出機制與 print() 函式規格
+       ========================================================================== -->
+  <h2 class="chapter-title">第 1 章：標準輸出機制與 print() 函式規格</h2>
+
+  <h3 class="section-title">1.1 print() 函式簽名與參數規格</h3>
+  <p>
+    在 Python 直譯器中，<code class="inline-code">print()</code> 是核心的內建輸出函式，負責將傳入之物件序列序列化為字元資料流，並寫入標準輸出串流（<code class="inline-code">sys.stdout</code>）。
+  </p>
+
+  <pre class="code-block">print(*objects, sep=' ', end='\n', file=None, flush=False)</pre>
+
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>參數名稱</th>
+        <th>預設值</th>
+        <th>型態約束</th>
+        <th>直譯器底層行為與職責說明</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code class="inline-code">*objects</code></td>
+        <td>無（可變長度）</td>
+        <td>任意物件序列</td>
+        <td>接收零個或多個欲輸出的物件。直譯器會依序呼叫各物件之文字轉換協定。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">sep</code></td>
+        <td><code class="inline-code">' '</code>（單一空格）</td>
+        <td><code class="inline-code">str</code> 或 <code class="inline-code">None</code></td>
+        <td>分隔字元（Separator）。當輸出多個物件時，直譯器在相鄰物件輸出流之間主動注入此字串。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">end</code></td>
+        <td><code class="inline-code">'\n'</code>（換行字元）</td>
+        <td><code class="inline-code">str</code> 或 <code class="inline-code">None</code></td>
+        <td>行尾終結符號（End）。直譯器完成所有物件輸出後，最後附加寫入標準輸出的字串。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">file</code></td>
+        <td><code class="inline-code">None</code></td>
+        <td>檔案物件</td>
+        <td>指定輸出目標資料流，預設為系統終端機標準輸出 <code class="inline-code">sys.stdout</code>。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">flush</code></td>
+        <td><code class="inline-code">False</code></td>
+        <td><code class="inline-code">bool</code></td>
+        <td>是否強制清空輸出緩衝區（Buffer）。若為 <code class="inline-code">True</code>，直譯器立即將緩衝資料推入終端。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="section-title">1.2 字面常值輸出與轉義字元</h3>
+  <p>
+    純字串常值以成對的單引號（<code class="inline-code">'...'</code>）或雙引號（<code class="inline-code">"..."</code>）界定。當字串內部包含特殊控制字元時，需使用反斜線（<code class="inline-code">\</code>）進行轉義：
+  </p>
+  <ul>
+    <li><code class="inline-code">\n</code>（Newline）：強制換行，將標準輸出游標移至下一列開頭。</li>
+    <li><code class="inline-code">\t</code>（Horizontal Tab）：水平跳格，將游標對齊至下一組定位點（預設多為 4 或 8 個字元寬度）。</li>
+    <li><code class="inline-code">\\</code> 與 <code class="inline-code">\"</code>：印出反斜線與引號本身，避免解析器提早截斷字串常值。</li>
+  </ul>
+
+  <h3 class="section-title">1.3 終端機 stdout 緩衝區與換行控制</h3>
+  <p>
+    初學者常見之誤區在於將「多個引數」與「多個 <code class="inline-code">print()</code> 呼叫」混淆。連續兩次呼叫 <code class="inline-code">print()</code> 之所以自動分成兩列，完全是由預設之 <code class="inline-code">end='\n'</code> 所驅動；若覆寫 <code class="inline-code">end=""</code>，游標便會駐留在同一列尾端。
+  </p>
+
+  <pre class="code-block">print("System", "Online", sep="-")
+print("Loading", end="...")
+print("Ready")</pre>
+
+  <!-- 動態教具 1 -->
+  <div class="widget-container" id="widget-print-pipeline">
+    <div class="widget-header">
+      <span class="widget-title-label">
+        <span>⚙️</span>
+        <span>【直譯器機制標註：stdout 排版參數與緩衝區管線模擬器】</span>
+      </span>
+      <span class="widget-status-badge">sys.stdout Pipeline</span>
+    </div>
+    <div class="widget-body">
+      <div class="widget-controls">
+        <label style="font-size: 0.88rem; font-weight: 600;">情境切換：</label>
+        <button class="ctrl-btn active" data-scenario="default">標準預設 (sep=' ', end='\n')</button>
+        <button class="ctrl-btn" data-scenario="path">目錄路徑格式化 (sep='/')</button>
+        <button class="ctrl-btn" data-scenario="no-newline">連續輸出不換列 (end='...')</button>
+        <button class="ctrl-btn" data-scenario="compact">完全緊密 (sep='', end='')</button>
+      </div>
+
+      <div style="background-color: #ffffff; border: 1px solid var(--border-soft); border-radius: 6px; padding: 16px; margin-bottom: 16px;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">當前呼叫之 Python 程式碼陳述句：</div>
+        <div id="print-code-preview" style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent-blue); font-weight: 600;">
+          print("Alpha", "Beta", "Gamma", sep=" ", end="\n")
+        </div>
+      </div>
+
+      <!-- 輸送管線畫布 -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">標準輸出流注入管線時序示意：</div>
+        <div id="pipeline-track" style="display: flex; align-items: center; gap: 6px; background-color: var(--bg-subtle); padding: 14px; border-radius: 6px; border: 1px dashed var(--border-accent); min-height: 54px; overflow-x: auto;">
+          <!-- 動態注入原料區塊 -->
+        </div>
+      </div>
+
+      <!-- 模擬終端機面板 -->
+      <div class="terminal-box">
+        <div class="terminal-bar">
+          <span class="terminal-circle circle-red"></span>
+          <span class="terminal-circle circle-yellow"></span>
+          <span class="terminal-circle circle-green"></span>
+          <span>Terminal (sys.stdout)</span>
+        </div>
+        <div class="terminal-screen" id="print-terminal-screen">Alpha Beta Gamma
+<span class="terminal-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>異常現象與錯誤訊息</th>
+        <th>引發錯誤之程式碼</th>
+        <th>直譯器底層根因分析</th>
+        <th>標準防範與修復方案</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code class="inline-code">SyntaxError: unterminated string literal</code></td>
+        <td><code class="inline-code">print("System)</code></td>
+        <td>字串常值之引號未成對閉合，直譯器詞法分析器掃描至行尾中斷。</td>
+        <td>補齊成對之對稱單引號或雙引號。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">TypeError: print() got an unexpected keyword argument</code></td>
+        <td><code class="inline-code">print("A", endChar="\n")</code></td>
+        <td>引數關鍵字拼寫錯誤，非內建簽名定義之參數名稱。</td>
+        <td>校準為官方參數標準關鍵字 <code class="inline-code">end</code> 或 <code class="inline-code">sep</code>。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==========================================================================
+       第 2 章：變數機制、符號表與賦值運算
+       ========================================================================== -->
+  <h2 class="chapter-title">第 2 章：變數機制、符號表與賦值運算</h2>
+
+  <h3 class="section-title">2.1 變數本質：識別碼（Identifier）與物件繫結</h3>
+  <p>
+    在 Python 的記憶體架構中，<strong>變數絕對不是裝載資料的實體置物盒子</strong>。Python 變數的本質是<strong>「可隨時撕拔掛上的磁吸名牌（Name Tag）」</strong>，透過記憶體位址（指標）繫結至存在於堆積記憶體（Heap Memory）實體槽位中的物件。
+  </p>
+  <div class="note-box">
+    <strong>核心心智模型：常值輸出 vs 識別碼取值</strong><br>
+    當直譯器執行 <code class="inline-code">print("status")</code> 時，雙引號告知直譯器這是一個純文字常值，直接傳入標準輸出管道；<br>
+    當執行 <code class="inline-code">print(status)</code> 時，無引號告知直譯器這是一個「變數識別碼」，直譯器必須主動查詢「符號表（Symbol Table）」，順著位址指標找到對應記憶體格位中的字串內容，再提取送入終端機。
+  </div>
+
+  <h3 class="section-title">2.2 PEP 8 命名規格、保留字限制與大小寫敏感性</h3>
+  <p>
+    Python 變數宣告必須遵循官方規範與語法約束：
+  </p>
+  <ul>
+    <li><strong>字元組成限制</strong>：僅能包含大小寫英文字母（<code class="inline-code">a-z</code>, <code class="inline-code">A-Z</code>）、數字（<code class="inline-code">0-9</code>）與底線（<code class="inline-code">_</code>）。</li>
+    <li><strong>開頭字元禁制</strong>：識別碼<strong>嚴格禁止以數字開頭</strong>（例如 <code class="inline-code">1st_token</code> 為非法語法）。</li>
+    <li><strong>大小寫精確區分（Case-Sensitive）</strong>：<code class="inline-code">username</code>、<code class="inline-code">UserName</code> 與 <code class="inline-code">USERNAME</code> 代表符號表中三個完全獨立的鍵。</li>
+    <li><strong>保留字不可覆蓋（Keywords）</strong>：嚴禁使用 Python 內建關鍵字作為變數名稱（如 <code class="inline-code">if</code>, <code class="inline-code">for</code>, <code class="inline-code">class</code>, <code class="inline-code">True</code>, <code class="inline-code">None</code>）。</li>
+    <li><strong>PEP 8 命名慣例</strong>：通用變數推薦採用<strong>蛇形命名法（snake_case）</strong>，全小寫字母並以底線分隔單字（例如 <code class="inline-code">server_host</code>）。</li>
+  </ul>
+
+  <h3 class="section-title">2.3 單一賦值、鏈式賦值與多重解構賦值</h3>
+  <p>
+    賦值運算子（<code class="inline-code">=</code>）的執行順序永遠是<strong>「先評估等號右側運算式以配置記憶體物件，再將左側識別碼名牌繫結至該位址」</strong>。
+  </p>
+
+  <pre class="code-block"># 單一賦值：配置物件並掛上標籤
+server_name = "web-prod-01"
+
+# 鏈式賦值：兩個名牌同時繫結至同一個記憶體位址
+primary_env = current_env = "production"
+
+# 多重賦值：解構對齊
+host_ip, port_num = "192.168.1.1", "8080"</pre>
+
+  <!-- 動態教具 2：實體記憶體網格與名牌掛載模擬器 -->
+  <div class="widget-container" id="widget-memory-grid">
+    <div class="widget-header">
+      <span class="widget-title-label">
+        <span>🏷️</span>
+        <span>【直譯器機制標註：實體記憶體槽位網格與磁吸名牌繫結器】</span>
+      </span>
+      <span class="widget-status-badge">Heap Memory Grid & GC Engine</span>
+    </div>
+    <div class="widget-body">
+      <div class="widget-controls">
+        <button class="ctrl-btn active" id="btn-grid-step1">步驟 1：執行 host = "Alpha"</button>
+        <button class="ctrl-btn" id="btn-grid-step2">步驟 2：執行 backup = host</button>
+        <button class="ctrl-btn" id="btn-grid-step3">步驟 3：重新賦值 host = "Beta"</button>
+        <button class="ctrl-btn" id="btn-grid-step4">步驟 4：轉移 backup = "Gamma"（觀察 0x10A 參照歸零與 GC）</button>
+        <button class="ctrl-btn" id="btn-grid-reset">重設記憶體</button>
+      </div>
+
+      <!-- 程式碼同步展示窗 -->
+      <div style="background-color: #ffffff; border: 1px solid var(--border-soft); border-radius: 6px; padding: 14px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">當前執行的 Python 陳述句：</span>
+          <div id="grid-code-preview" style="font-family: var(--font-mono); font-size: 1.02rem; font-weight: 700; color: var(--accent-blue); margin-top: 3px;">
+            host = "Alpha"
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">符號表記錄 (Symbol Table)：</span>
+          <div id="grid-symbol-summary" style="font-family: var(--font-mono); font-size: 0.88rem; color: var(--accent-terracotta); font-weight: 600; margin-top: 3px;">
+            host ──▶ 0x10A
+          </div>
+        </div>
+      </div>
+
+      <!-- 2x3 實體記憶體槽位網格 -->
+      <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">
+        堆積記憶體實體槽位矩陣 (Heap Memory Cell Matrix)：
+      </div>
+      <div class="memory-grid-wrapper" id="memory-cells-board">
+        <!-- 6 個實體槽位由 JS 動態渲染 -->
+      </div>
+
+      <!-- 底層原理解析視窗 -->
+      <div style="background-color: var(--bg-subtle); padding: 14px 18px; border-radius: 6px; font-size: 0.92rem; color: var(--text-main); margin-top: 20px; border-left: 4px solid var(--accent-teal);" id="grid-explanation-text">
+        說明：步驟 1 在記憶體門牌 0x10A 配置字串物件 "Alpha"，並在門牌外側掛上實體變數名牌 [ host ]。
+      </div>
+    </div>
+  </div>
+
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>常見例外訊息</th>
+        <th>引發錯誤之程式碼</th>
+        <th>直譯器底層根因分析</th>
+        <th>標準修復方案</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code class="inline-code">NameError: name 'user_role' is not defined</code></td>
+        <td><code class="inline-code">print(user_role)</code></td>
+        <td>直譯器於符號表中查無該識別碼名牌，通常因尚未宣告賦值或英文字母大小寫不一致。</td>
+        <td>確保使用該變數前已完成賦值，並檢查識別碼拼寫。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">SyntaxError: cannot assign to literal</code></td>
+        <td><code class="inline-code">"admin" = role</code></td>
+        <td>賦值等號左側必須為合法之變數名稱，不可為靜態常值。</td>
+        <td>將變數識別碼置於等號左側：<code class="inline-code">role = "admin"</code>。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==========================================================================
+       第 3 章：標準輸入機制與 input() 終端互動
+       ========================================================================== -->
+  <h2 class="chapter-title">第 3 章：標準輸入機制與 input() 終端互動</h2>
+
+  <h3 class="section-title">3.1 input() 阻塞式讀取機制與提示字串</h3>
+  <p>
+    <code class="inline-code">input()</code> 是 Python 與終端使用者建立雙向互動的標準機制。當直譯器執行至 <code class="inline-code">input()</code> 時，指令指標（Instruction Pointer）將會<strong>陷入阻塞狀態（Blocking）</strong>，程式暫停推進，直到使用者於標準輸入串流（<code class="inline-code">sys.stdin</code>）鍵入字元序列並按下 <code class="inline-code">Enter</code> 鍵發送換行訊號為止。
+  </p>
+  <p>
+    傳入 <code class="inline-code">input(prompt)</code> 之引數為提示字串，將直接輸出於終端機且<strong>不會自動換行</strong>，使使用者之鍵盤輸入緊鄰提示文字後方。
+  </p>
+
+  <h3 class="section-title">3.2 終端輸入之預設純字串（str）本質與特性</h3>
+  <div class="note-box alert">
+    <strong>鐵律：input() 回傳值永遠是純文字字串（class 'str'）</strong><br>
+    無論使用者在鍵盤上鍵入何種內容，哪怕全為數字（例如輸入 <code class="inline-code">2026</code>）或布林符號（例如輸入 <code class="inline-code">True</code>），直譯器標準輸入模組一律將其打包封裝為<strong>純文字字串物件</strong>（即 <code class="inline-code">"2026"</code> 與 <code class="inline-code">"True"</code>），絕不會自動轉換為數值型態。在未定義轉型運算前，嚴禁進行算術運算。
+  </div>
+
+  <pre class="code-block">target_service = input("請輸入欲連接之伺服器名稱: ")
+print("已鎖定目標服務：", target_service)</pre>
+
+  <!-- 動態教具 3 -->
+  <div class="widget-container" id="widget-input-pipeline">
+    <div class="widget-header">
+      <span class="widget-title-label">
+        <span>📥</span>
+        <span>【直譯器機制標註：stdin 阻塞等待與純字串封裝管線】</span>
+      </span>
+      <span class="widget-status-badge">sys.stdin Blocking Simulator</span>
+    </div>
+    <div class="widget-body">
+      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <!-- 左側：終端模擬互動 -->
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">終端機輸入互動視窗：</div>
+          <div class="terminal-box">
+            <div class="terminal-bar">
+              <span class="terminal-circle circle-red"></span>
+              <span class="terminal-circle circle-yellow"></span>
+              <span class="terminal-circle circle-green"></span>
+              <span>Interactive stdin Console</span>
+            </div>
+            <div class="terminal-screen" style="min-height: 105px;">
+              <span>請輸入您的識別代碼: </span>
+              <input type="text" id="input-stdin-field" class="ctrl-input" style="width: 140px; border: none; background: transparent; color: #38bdf8; outline: none; padding: 0; font-size: 0.95rem;" placeholder="輸入文字後按Enter..." autocomplete="off">
+              <span class="terminal-cursor" id="input-cursor-indicator"></span>
+              <div id="stdin-echo-terminal" style="color: #4ade80; margin-top: 10px;"></div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; display: flex; gap: 8px;">
+            <button class="ctrl-btn" id="btn-submit-stdin">送出 Enter 訊號</button>
+            <button class="ctrl-btn" id="btn-reset-stdin">重新啟動阻塞監聽</button>
+          </div>
+        </div>
+
+        <!-- 右側：封裝艙與直譯器狀態 -->
+        <div style="background-color: #ffffff; border: 1px solid var(--border-soft); border-radius: 6px; padding: 18px;">
+          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 8px;">直譯器狀態監視器</div>
+          <div style="margin-bottom: 12px; font-size: 0.9rem;">
+            CPU 狀態：<span id="cpu-status-indicator" style="font-weight: 700; color: #dc2626;">阻塞暫停中 (Blocked Waiting)</span>
+          </div>
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">封裝艙產出物件型態檢驗：</div>
+          <div id="packaging-chamber" style="background-color: var(--bg-subtle); border: 2px dashed var(--border-accent); border-radius: 6px; padding: 16px; text-align: center; min-height: 70px; display: flex; align-items: center; justify-content: center;">
+            <span style="color: var(--text-muted); font-size: 0.85rem;">等待標準輸入資料注入...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>邊界狀況與特殊輸入</th>
+        <th>使用者輸入內容</th>
+        <th>直譯器底層行為分析</th>
+        <th>程式端接收結果</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>輸入純數字序列</td>
+        <td>鍵入 <code class="inline-code">2026</code> 並按下 Enter</td>
+        <td>直譯器將其視為 4 個 ASCII 字元，打包為純字串物件，絕非整數。</td>
+        <td>變數繫結至 <code class="inline-code">"2026"</code>（<code class="inline-code">str</code>）</td>
+      </tr>
+      <tr>
+        <td>直接按下 Enter 空輸入</td>
+        <td>直接按下 Enter 鍵</td>
+        <td>標準輸入收到換行符號，產出長度為 0 的空字串。</td>
+        <td>變數繫結至 <code class="inline-code">""</code>（長度為 0 之有效 <code class="inline-code">str</code>）</td>
+      </tr>
+      <tr>
+        <td>包含空格的文字</td>
+        <td>鍵入 <code class="inline-code">Hello World</code></td>
+        <td>字串保留所有空格字元，不會自動分割或忽略。</td>
+        <td>變數繫結至 <code class="inline-code">"Hello World"</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==========================================================================
+       第 4 章：字串資料流整合 —— 串接運算子與 f-string 格式化
+       ========================================================================== -->
+  <h2 class="chapter-title">第 4 章：字串資料流整合 —— 串接運算子與 f-string 格式化</h2>
+
+  <h3 class="section-title">4.1 字串串接運算子（+）與不可變物件組合</h3>
+  <p>
+    在 Python 中，加號運算子（<code class="inline-code">+</code>）在運算元皆為字串時，代表<strong>字串串接（Concatenation）</strong>。
+  </p>
+  <p>
+    由於 Python 的字串是<strong>不可變物件（Immutable）</strong>，串接運算絕不是在原字串內部追加內容，而是直譯器在堆積記憶體中<strong>重新配置一塊全新的記憶體空間</strong>，將兩者字元合併後生成全新字串物件。
+  </p>
+
+  <h3 class="section-title">4.2 現代 f-string 字串插值語法與槽位解析</h3>
+  <p>
+    自 Python 3.6 起導入之格式化字串常值（PEP 498, f-string）是現代 Python 組合資料流的業界標準規範。
+  </p>
+  <ul>
+    <li><strong>語法標記</strong>：字串前綴必須緊鄰字母 <code class="inline-code">f</code> 或 <code class="inline-code">F</code>。</li>
+    <li><strong>動態槽位（Slots）</strong>：在大括號 <code class="inline-code">{variable}</code> 內部填入已宣告之變數識別碼。</li>
+    <li><strong>執行期求值（Runtime Evaluation）</strong>：直譯器在執行期解析大括號，主動檢索符號表，將槽位無縫替換為變數內容並組裝為最終字串。</li>
+  </ul>
+
+  <pre class="code-block">protocol = "HTTPS"
+domain = "api.internal.net"
+
+# 方式一：傳統字串串接運算子
+endpoint_concat = protocol + "://" + domain
+
+# 方式二：現代 f-string 格式化字串
+endpoint_fstring = f"{protocol}://{domain}"
+
+print(endpoint_concat)
+print(endpoint_fstring)</pre>
+
+  <!-- 動態教具 4 -->
+  <div class="widget-container" id="widget-fstring-slots">
+    <div class="widget-header">
+      <span class="widget-title-label">
+        <span>🧩</span>
+        <span>【直譯器機制標註：f-string 樣板挖洞動態翻牌組裝器】</span>
+      </span>
+      <span class="widget-status-badge">PEP 498 Interpolation Engine</span>
+    </div>
+    <div class="widget-body">
+      <div class="widget-controls">
+        <label style="font-size: 0.88rem; font-weight: 600;">樣板解析模式：</label>
+        <button class="ctrl-btn active" id="btn-fstring-normal">合法 f-string: f"節點: {node} | 狀態: {status}"</button>
+        <button class="ctrl-btn" id="btn-fstring-missing-f">常犯地雷：遺漏前綴 f"..."</button>
+        <button class="ctrl-btn" id="btn-fstring-trigger">單步執行：查表求值與翻牌組裝</button>
+      </div>
+
+      <div style="background-color: #ffffff; border: 1px solid var(--border-soft); border-radius: 6px; padding: 20px; margin-bottom: 20px;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px;">符號表當前存在之變數狀態：</div>
+        <div style="display: flex; gap: 14px; margin-bottom: 16px;">
+          <span style="background-color: var(--bg-subtle); padding: 4px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9rem;">
+            node ──▶ "node-us-east"
+          </span>
+          <span style="background-color: var(--bg-subtle); padding: 4px 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9rem;">
+            status ──▶ "ONLINE"
+          </span>
+        </div>
+
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">樣板槽位動態解析區：</div>
+        <div id="fstring-slot-stage" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 1.05rem; padding: 14px; background-color: var(--bg-subtle); border-radius: 6px;">
+          <!-- 動態注入樣板卡片 -->
+        </div>
+      </div>
+
+      <div class="terminal-box">
+        <div class="terminal-bar">
+          <span class="terminal-circle circle-red"></span>
+          <span class="terminal-circle circle-yellow"></span>
+          <span class="terminal-circle circle-green"></span>
+          <span>Terminal Output</span>
+        </div>
+        <div class="terminal-screen" id="fstring-terminal-screen">等待執行組裝...</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="spec-table">
+    <thead>
+      <tr>
+        <th>常見異常情境</th>
+        <th>錯誤程式碼範例</th>
+        <th>直譯器底層根因分析</th>
+        <th>標準排查與修復方針</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>未解析變數直接輸出大括號</td>
+        <td><code class="inline-code">"User: {name}"</code></td>
+        <td>字串前綴遺漏字母 <code class="inline-code">f</code>，直譯器視為靜態純文字字面常值。</td>
+        <td>於字串起始引號前方補上前綴 <code class="inline-code">f"..."</code>。</td>
+      </tr>
+      <tr>
+        <td><code class="inline-code">NameError: name 'port' is not defined</code></td>
+        <td><code class="inline-code">f"Port: {port}"</code></td>
+        <td>大括號內填入之識別碼未事先於符號表中完成宣告與賦值。</td>
+        <td>確保在組裝 f-string 前已為該變數指派物件。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==========================================================================
+       第 5 章：單元綜合專案實作與驗證
+       ========================================================================== -->
+  <h2 class="chapter-title">第 5 章：單元綜合專案實作與驗證</h2>
+
+  <h3 class="section-title">5.1 實作一：個人基本資料名片輸出程式</h3>
+  <p>
+    <strong>任務目標</strong>：請宣告個人的「英文姓名」、「職位職稱」與「聯絡信箱」三個字串變數，嚴格遵守 PEP 8 命名規格，並利用現代 f-string 與格式邊框將名片完整印出至終端機中。
+  </p>
+
+  <pre class="code-block">name = "Alex Chen"
+title = "Site Reliability Engineer"
+email = "alex.chen@cloud-corp.internal"
+
+print("========================================")
+print(f"NAME    : {name}")
+print(f"TITLE   : {title}")
+print(f"CONTACT : {email}")
+print("========================================")</pre>
+
+  <h3 class="section-title">5.2 實作二：互動式問答終端輸出工具</h3>
+  <p>
+    <strong>任務目標</strong>：撰寫一互動工具，依序使用 <code class="inline-code">input()</code> 提示使用者鍵入「專案名稱」與「環境標籤」，隨後利用字串串接或 f-string 組裝為部署驗證資訊並輸出。
+  </p>
+
+  <pre class="code-block">project_name = input("請輸入專案代碼: ")
+environment = input("請輸入部屬環境 (dev/prod): ")
+
+log_message = f"系統日誌：已成功登記專案 [{project_name}] 於環境 [{environment}] 待命。"
+print(log_message)</pre>
+
+  <!-- 官方版權宣告結尾 -->
+  <footer class="disclaimer-box">
+    <strong>免責聲明與權益宣示</strong><br>
+    本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+    如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。
+  </footer>
+
+</div>
+
+<!-- ==========================================================================
+     動態教具專屬 JavaScript 邏輯（作用域隔離 IIFE）
+     ========================================================================== -->
+<script>
+// --------------------------------------------------------------------------
+// 教具 1：stdout 排版參數與管線模擬器
+// --------------------------------------------------------------------------
+(function() {
+  const preview = document.getElementById('print-code-preview');
+  const track = document.getElementById('pipeline-track');
+  const terminal = document.getElementById('print-terminal-screen');
+  const buttons = document.querySelectorAll('#widget-print-pipeline .ctrl-btn');
+
+  const configs = {
+    'default': { sep: ' ', end: '\\n', args: ['Alpha', 'Beta', 'Gamma'], code: 'print("Alpha", "Beta", "Gamma", sep=" ", end="\\n")', screen: 'Alpha Beta Gamma\n' },
+    'path': { sep: '/', end: '\\n', args: ['var', 'log', 'deploy.log'], code: 'print("var", "log", "deploy.log", sep="/", end="\\n")', screen: 'var/log/deploy.log\n' },
+    'no-newline': { sep: ' ', end: '...', args: ['Loading', 'Data'], code: 'print("Loading", "Data", sep=" ", end="...")', screen: 'Loading Data...' },
+    'compact': { sep: '', end: '', args: ['SEC', '8080'], code: 'print("SEC", "8080", sep="", end="")', screen: 'SEC8080' }
+  };
+
+  function render(cfg) {
+    preview.textContent = cfg.code;
+    track.innerHTML = '';
+
+    cfg.args.forEach((arg, idx) => {
+      const token = document.createElement('div');
+      token.style.cssText = 'background: #1e3a8a; color: #fff; padding: 6px 12px; border-radius: 4px; font-family: monospace; font-size: 0.9rem; font-weight: bold;';
+      token.textContent = `"${arg}"`;
+      track.appendChild(token);
+
+      if (idx < cfg.args.length - 1) {
+        const sepToken = document.createElement('div');
+        sepToken.style.cssText = 'background: #b45309; color: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 0.8rem;';
+        sepToken.textContent = `sep="${cfg.sep}"`;
+        track.appendChild(sepToken);
+      }
+    });
+
+    const endToken = document.createElement('div');
+    endToken.style.cssText = 'background: #c2410c; color: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; margin-left: 8px;';
+    endToken.textContent = `end="${cfg.end}"`;
+    track.appendChild(endToken);
+
+    terminal.innerHTML = cfg.screen + '<span class="terminal-cursor"></span>';
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      buttons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const scenario = this.getAttribute('data-scenario');
+      render(configs[scenario]);
+    });
+  });
+
+  render(configs['default']);
+})();
+
+// --------------------------------------------------------------------------
+// 教具 2：實體記憶體槽位網格與磁吸名牌繫結器 (升級版)
+// --------------------------------------------------------------------------
+(function() {
+  const board = document.getElementById('memory-cells-board');
+  const codePreview = document.getElementById('grid-code-preview');
+  const symbolSummary = document.getElementById('grid-symbol-summary');
+  const explanation = document.getElementById('grid-explanation-text');
+
+  const btnStep1 = document.getElementById('btn-grid-step1');
+  const btnStep2 = document.getElementById('btn-grid-step2');
+  const btnStep3 = document.getElementById('btn-grid-step3');
+  const btnStep4 = document.getElementById('btn-grid-step4');
+  const btnReset = document.getElementById('btn-grid-reset');
+  const allBtns = [btnStep1, btnStep2, btnStep3, btnStep4, btnReset];
+
+  // 6 個固定門牌之實體記憶體槽位
+  const addresses = ['0x10A', '0x10B', '0x10C', '0x10D', '0x10E', '0x10F'];
+
+  function setActiveBtn(activeBtn) {
+    allBtns.forEach(b => b.classList.remove('active'));
+    if (activeBtn) activeBtn.classList.add('active');
+  }
+
+  // 狀態渲染核心函式
+  function renderGrid(step) {
+    let cellData = {
+      '0x10A': null,
+      '0x10B': null,
+      '0x10C': null,
+      '0x10D': null,
+      '0x10E': null,
+      '0x10F': null
+    };
+
+    if (step === 1) {
+      codePreview.textContent = 'host = "Alpha"';
+      symbolSummary.textContent = 'host ──▶ 0x10A';
+      explanation.innerHTML = '<strong>步驟 1</strong>：電腦於記憶體門牌 <code>0x10A</code> 配置字串物件 <code>"Alpha"</code>。變數 <code>host</code> 像是一張磁吸名牌吊牌，<strong>「啪」地掛在該門牌外側軌道上</strong>，完成指標繫結。';
+
+      cellData['0x10A'] = {
+        val: '"Alpha"',
+        tags: ['host'],
+        isNew: true,
+        isGC: false
+      };
+    } else if (step === 2) {
+      codePreview.textContent = 'backup = host';
+      symbolSummary.textContent = 'host ──▶ 0x10A | backup ──▶ 0x10A';
+      explanation.innerHTML = '<strong>步驟 2</strong>：執行 <code>backup = host</code>，<strong>絕無複製新物件</strong>！直譯器僅是拿出一張新的名牌 <code>[ backup ]</code>，同樣掛在 <code>0x10A</code> 門牌軌道上。兩個變數共享同一個記憶體實體。';
+
+      cellData['0x10A'] = {
+        val: '"Alpha"',
+        tags: ['host', 'backup'],
+        isNew: false,
+        isGC: false
+      };
+    } else if (step === 3) {
+      codePreview.textContent = 'host = "Beta"';
+      symbolSummary.textContent = 'host ──▶ 0x10B | backup ──▶ 0x10A';
+      explanation.innerHTML = '<strong>步驟 3</strong>：字串為不可變物件！<code>host = "Beta"</code> 在新門牌 <code>0x10B</code> 生成新物件，名牌 <code>[ host ]</code> <strong>從 0x10A 拔下並轉移改掛至 0x10B</strong>。而 <code>[ backup ]</code> 仍留在 0x10A 守候 <code>"Alpha"</code>。';
+
+      cellData['0x10A'] = {
+        val: '"Alpha"',
+        tags: ['backup'],
+        isNew: false,
+        isGC: false
+      };
+      cellData['0x10B'] = {
+        val: '"Beta"',
+        tags: ['host'],
+        isNew: true,
+        isGC: false
+      };
+    } else if (step === 4) {
+      codePreview.textContent = 'backup = "Gamma"';
+      symbolSummary.textContent = 'host ──▶ 0x10B | backup ──▶ 0x10C';
+      explanation.innerHTML = '<strong>步驟 4</strong>：在新門牌 <code>0x10C</code> 配置 <code>"Gamma"</code>，名牌 <code>[ backup ]</code> 轉移掛至 0x10C。此時 <code>0x10A</code> 門牌<strong>已無任何名牌吊掛（參照計數歸零）</strong>，直譯器將其反灰標註為「待垃圾回收 (GC Candidate)」。';
+
+      cellData['0x10A'] = {
+        val: '"Alpha"',
+        tags: [],
+        isNew: false,
+        isGC: true
+      };
+      cellData['0x10B'] = {
+        val: '"Beta"',
+        tags: ['host'],
+        isNew: false,
+        isGC: false
+      };
+      cellData['0x10C'] = {
+        val: '"Gamma"',
+        tags: ['backup'],
+        isNew: true,
+        isGC: false
+      };
+    } else {
+      codePreview.textContent = '# 記憶體已清空重設';
+      symbolSummary.textContent = '(無活動識別碼)';
+      explanation.textContent = '記憶體已重設為初始狀態。請點擊上方步驟按鈕，依序觀察物件存入槽位與名牌掛載、轉移動畫。';
+    }
+
+    // 渲染 DOM
+    board.innerHTML = '';
+    addresses.forEach(addr => {
+      const data = cellData[addr];
+      const cellEl = document.createElement('div');
+      cellEl.className = 'memory-cell';
+
+      let statusClasses = '';
+      if (data) {
+        if (data.isGC) statusClasses += ' gc-target';
+        else if (data.isNew) statusClasses += ' occupied highlight-new';
+        else statusClasses += ' occupied';
+      }
+      cellEl.className += statusClasses;
+
+      // 門牌地址列
+      let doorplateHtml = `
+        <div class="cell-doorplate">
+          <span class="cell-address">${addr}</span>
+          <span>${data ? (data.isGC ? '⚠️ 參照計數: 0' : `參照計數: ${data.tags.length}`) : '空置槽位'}</span>
+        </div>
+      `;
+
+      // 變數名牌軌道
+      let tagRailHtml = '<div class="cell-tag-rail">';
+      if (data && data.tags.length > 0) {
+        data.tags.forEach(tag => {
+          tagRailHtml += `<span class="variable-tag-badge snap-in">${tag}</span>`;
+        });
+      }
+      tagRailHtml += '</div>';
+
+      // 槽位內部物件
+      let payloadHtml = '';
+      if (data) {
+        payloadHtml = `
+          <div class="cell-object-payload">
+            <div class="cell-object-type">&lt;class 'str'&gt;</div>
+            <div class="cell-object-value">${data.val}</div>
+            ${data.isGC ? '<div class="gc-badge-flag">待垃圾回收 (GC)</div>' : ''}
+          </div>
+        `;
+      } else {
+        payloadHtml = '<div class="cell-empty-text">(未配置物件)</div>';
+      }
+
+      cellEl.innerHTML = doorplateHtml + tagRailHtml + payloadHtml;
+      board.appendChild(cellEl);
+    });
+  }
+
+  btnStep1.addEventListener('click', () => { setActiveBtn(btnStep1); renderGrid(1); });
+  btnStep2.addEventListener('click', () => { setActiveBtn(btnStep2); renderGrid(2); });
+  btnStep3.addEventListener('click', () => { setActiveBtn(btnStep3); renderGrid(3); });
+  btnStep4.addEventListener('click', () => { setActiveBtn(btnStep4); renderGrid(4); });
+  btnReset.addEventListener('click', () => { setActiveBtn(btnReset); renderGrid(0); });
+
+  renderGrid(1);
+})();
+
+// --------------------------------------------------------------------------
+// 教具 3：stdin 阻塞等待與純字串打包器
+// --------------------------------------------------------------------------
+(function() {
+  const inputField = document.getElementById('input-stdin-field');
+  const btnSubmit = document.getElementById('btn-submit-stdin');
+  const btnReset = document.getElementById('btn-reset-stdin');
+  const echoTerminal = document.getElementById('stdin-echo-terminal');
+  const cpuIndicator = document.getElementById('cpu-status-indicator');
+  const packagingChamber = document.getElementById('packaging-chamber');
+
+  btnSubmit.addEventListener('click', function() {
+    const val = inputField.value;
+    cpuIndicator.textContent = '執行完畢：已接收換行訊號，解除阻塞';
+    cpuIndicator.style.color = '#16a34a';
+
+    packagingChamber.innerHTML = `
+      <div style="background-color: #ffffff; border: 2px solid #16a34a; border-radius: 6px; padding: 10px 18px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);">
+        <span style="font-size: 0.8rem; background-color: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">&lt;class 'str'&gt;</span>
+        <div style="font-family: monospace; font-size: 1.15rem; color: #166534; font-weight: bold; margin-top: 4px;">"${val}"</div>
+      </div>
+    `;
+
+    echoTerminal.textContent = `[標準輸出回饋] 變數以純字串接收：${JSON.stringify(val)}`;
+  });
+
+  inputField.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      btnSubmit.click();
+    }
+  });
+
+  btnReset.addEventListener('click', function() {
+    inputField.value = '';
+    cpuIndicator.textContent = '阻塞暫停中 (Blocked Waiting)';
+    cpuIndicator.style.color = '#dc2626';
+    packagingChamber.innerHTML = '<span style="color: var(--text-muted); font-size: 0.85rem;">等待標準輸入資料注入...</span>';
+    echoTerminal.textContent = '';
+    inputField.focus();
+  });
+})();
+
+// --------------------------------------------------------------------------
+// 教具 4：f-string 樣板挖洞翻牌組裝器
+// --------------------------------------------------------------------------
+(function() {
+  const stage = document.getElementById('fstring-slot-stage');
+  const terminal = document.getElementById('fstring-terminal-screen');
+  const btnNormal = document.getElementById('btn-fstring-normal');
+  const btnMissingF = document.getElementById('btn-fstring-missing-f');
+  const btnTrigger = document.getElementById('btn-fstring-trigger');
+
+  let mode = 'normal';
+
+  function renderStage() {
+    if (mode === 'normal') {
+      stage.innerHTML = `
+        <span style="color: #c2410c; font-weight: bold;">f"</span>
+        <span>節點: </span>
+        <div id="slot-node" style="background: #fed7aa; color: #9a3412; padding: 4px 10px; border-radius: 4px; border: 1px dashed #ea580c; transition: all 0.3s ease;">{node}</div>
+        <span> | 狀態: </span>
+        <div id="slot-status" style="background: #fed7aa; color: #9a3412; padding: 4px 10px; border-radius: 4px; border: 1px dashed #ea580c; transition: all 0.3s ease;">{status}</div>
+        <span style="color: #c2410c; font-weight: bold;">"</span>
+      `;
+      terminal.textContent = '樣板已就緒（等待點擊「單步執行」進行查表翻牌）';
+    } else {
+      stage.innerHTML = `
+        <span style="color: #64748b; font-weight: bold;">"</span>
+        <span>節點: {node} | 狀態: {status}</span>
+        <span style="color: #64748b; font-weight: bold;">"</span>
+      `;
+      terminal.textContent = '遺漏 f 前綴：大括號不被視為槽位，直接作為靜態常值輸出。';
+    }
+  }
+
+  btnNormal.addEventListener('click', function() {
+    mode = 'normal';
+    btnNormal.classList.add('active');
+    btnMissingF.classList.remove('active');
+    renderStage();
+  });
+
+  btnMissingF.addEventListener('click', function() {
+    mode = 'missing';
+    btnMissingF.classList.add('active');
+    btnNormal.classList.remove('active');
+    renderStage();
+  });
+
+  btnTrigger.addEventListener('click', function() {
+    if (mode === 'normal') {
+      const slotNode = document.getElementById('slot-node');
+      const slotStatus = document.getElementById('slot-status');
+      if (slotNode && slotStatus) {
+        slotNode.style.background = '#bbf7d0';
+        slotNode.style.color = '#15803d';
+        slotNode.style.borderColor = '#16a34a';
+        slotNode.style.transform = 'scale(1.05)';
+        slotNode.textContent = '"node-us-east"';
+
+        slotStatus.style.background = '#bbf7d0';
+        slotStatus.style.color = '#15803d';
+        slotStatus.style.borderColor = '#16a34a';
+        slotStatus.style.transform = 'scale(1.05)';
+        slotStatus.textContent = '"ONLINE"';
+
+        terminal.textContent = '節點: node-us-east | 狀態: ONLINE';
+      }
+    } else {
+      terminal.textContent = '節點: {node} | 狀態: {status}';
+    }
+  });
+
+  renderStage();
+})();
+</script>
+
+</body>
+</html>

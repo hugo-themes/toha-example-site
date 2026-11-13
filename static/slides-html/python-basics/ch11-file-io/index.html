@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 11: 現代檔案處理與資料交換 (File I/O, CSV, JSON & Pathlib)</title>
+  <style>
+    :root {
+      --bg-main: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --text-main: #2d2926;
+      --text-muted: #57534e;
+      --border-color: #e7e5e4;
+      --primary: #c2410c;
+      --primary-light: #ffedd5;
+      --accent-amber: #b45309;
+      --accent-teal: #0d9488;
+      --accent-blue: #1e3a8a;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --font-code: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.75;
+      font-size: 16px;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    header.lecture-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .unit-tag {
+      display: inline-block;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.875rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h1.unit-title {
+      font-family: "Georgia", "Noto Serif TC", serif;
+      font-size: 2.35rem;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .unit-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .unit-meta span strong {
+      color: var(--text-main);
+    }
+
+    section.chapter-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    h2.chapter-title {
+      font-family: "Georgia", "Noto Serif TC", serif;
+      font-size: 1.65rem;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h3.sub-title {
+      font-size: 1.25rem;
+      color: var(--accent-blue);
+      margin: 1.75rem 0 1rem 0;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+      color: var(--text-main);
+    }
+
+    ul, ol {
+      margin: 0 0 1.5rem 1.75rem;
+      color: var(--text-main);
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0 2rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    table.spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    table.spec-table th {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.spec-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    table.spec-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.spec-table tr:nth-child(even) {
+      background-color: #fdfdfc;
+    }
+
+    /* 程式碼排版衛生規範：強制保留換行與縮排 */
+    pre.code-block {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0 2rem 0;
+      font-family: var(--font-code);
+      font-size: 0.925rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      white-space: pre !important;
+      word-break: normal;
+      box-shadow: var(--shadow-sm);
+    }
+
+    pre.code-block code {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+      white-space: pre !important;
+    }
+
+    code.inline-code {
+      font-family: var(--font-code);
+      background-color: var(--bg-subtle);
+      color: var(--primary);
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9em;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* 動態教具通用外框 */
+    .sandbox-card {
+      background-color: var(--bg-subtle);
+      border: 1px solid #dfd8cc;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin: 2.25rem 0;
+    }
+
+    .sandbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px dashed #d1c7b7;
+      padding-bottom: 0.75rem;
+    }
+
+    .sandbox-tag {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-action {
+      background-color: var(--accent-teal);
+      color: #fff;
+      border: none;
+      padding: 0.65rem 1.15rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-action:hover {
+      background-color: #0f766e;
+    }
+
+    .btn-action:active {
+      transform: translateY(1px);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+    }
+    .btn-danger:hover {
+      background-color: #991b1b;
+    }
+
+    .btn-secondary {
+      background-color: #475569;
+    }
+    .btn-secondary:hover {
+      background-color: #334155;
+    }
+
+    /* =========================================================
+       教具 1：with 上下文管理器生命週期
+       ========================================================= */
+    .context-workbench {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+      .context-workbench {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .code-tracker-box {
+      background: var(--code-bg);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: var(--font-code);
+      font-size: 0.875rem;
+    }
+
+    .tracker-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tracker-line {
+      display: flex;
+      align-items: center;
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      color: #94a3b8;
+      transition: all 0.25s ease;
+      white-space: pre;
+    }
+
+    .tracker-line .line-arrow {
+      width: 20px;
+      color: transparent;
+      font-weight: bold;
+    }
+
+    .tracker-line.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: #f8fafc;
+      border-left: 3px solid #38bdf8;
+    }
+
+    .tracker-line.active .line-arrow {
+      color: #38bdf8;
+    }
+
+    .tracker-line.crash-line.active {
+      background: rgba(239, 68, 68, 0.2);
+      border-left-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    .tracker-line.crash-line.active .line-arrow {
+      color: #ef4444;
+    }
+
+    .os-chamber {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+    }
+
+    .os-dashboard-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+    }
+
+    .metric-badge {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .metric-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .metric-val {
+      font-family: var(--font-code);
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #64748b;
+    }
+
+    .stream-stage-vault {
+      position: relative;
+      background: #0f172a;
+      border-radius: var(--radius-md);
+      border: 2px solid #334155;
+      padding: 1.25rem;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .gate-plate-unit {
+      border: 2px dashed #64748b;
+      border-radius: 4px;
+      padding: 0.5rem;
+      text-align: center;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.03);
+      transition: all 0.4s ease;
+    }
+
+    .gate-plate-unit.open {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.15);
+      color: #86efac;
+    }
+
+    .gate-plate-unit.emergency {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+    }
+
+    .stream-transit-rail {
+      position: relative;
+      height: 80px;
+      border-left: 2px dotted #334155;
+      border-right: 2px dotted #334155;
+      margin: 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .data-line-packet {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+      border-radius: 4px;
+      padding: 0.35rem 0.85rem;
+      font-family: var(--font-code);
+      font-size: 0.825rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .data-line-packet.flowing {
+      opacity: 1;
+      transform: translateY(0);
+      background: #0369a1;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    .data-line-packet.crashed {
+      background: #991b1b;
+      color: #ffffff;
+      border-color: #f87171;
+    }
+
+    .os-terminal-log {
+      margin-top: 1rem;
+      background: #0f172a;
+      color: #94a3b8;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* =========================================================
+       教具 2：讀取管線與三態專屬載具樣式重構
+       ========================================================= */
+    .file-pipeline-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    @media (max-width: 920px) {
+      .file-pipeline-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pipeline-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .pipeline-controls-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .pipeline-stage-view {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 440px;
+    }
+
+    .file-sheet-card {
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+
+    .file-sheet-header {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: #94a3b8;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .file-doc-line {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 0.4rem 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 0.35rem;
+      font-family: var(--font-code);
+      font-size: 0.825rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .file-doc-line.extracted {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      transform: translateX(8px);
+    }
+
+    /* 中間動態搬運舞台與三大專屬載具 */
+    .worker-transit-deck {
+      margin: 1rem 0;
+      min-height: 120px;
+      border-top: 1px dashed #334155;
+      border-bottom: 1px dashed #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 4px;
+      padding: 0.5rem;
+    }
+
+    /* 載具 A：單行公文夾 (.readline) */
+    .carrier-single-folder {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #1e3a8a;
+      border: 2px solid #60a5fa;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      color: #ffffff;
+      font-family: var(--font-code);
+      font-size: 0.825rem;
+      box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+      animation: popIn 0.35s ease forwards;
+    }
+
+    /* 載具 B：串列分格置物箱 (.readlines) */
+    .carrier-list-crate {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: rgba(30, 41, 59, 0.9);
+      border: 2px solid #38bdf8;
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      width: 90%;
+      box-shadow: 0 4px 16px rgba(56, 189, 248, 0.25);
+      animation: popIn 0.35s ease forwards;
+    }
+
+    .crate-banner {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      font-weight: 700;
+      font-family: var(--font-code);
+      border-bottom: 1px dashed #475569;
+      padding-bottom: 0.25rem;
+    }
+
+    .crate-grid-slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+    }
+
+    .crate-slot-cell {
+      background: #0f172a;
+      border: 1px solid #38bdf8;
+      border-radius: 4px;
+      padding: 0.35rem 0.45rem;
+      font-family: var(--font-code);
+      font-size: 0.725rem;
+      color: #e2e8f0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .crate-slot-cell .slot-idx {
+      color: #38bdf8;
+      font-size: 0.65rem;
+      font-weight: bold;
+    }
+
+    /* 載具 C：連續文字長卷軸 (.read) */
+    .carrier-raw-scroll {
+      display: flex;
+      flex-direction: column;
+      background: #fef3c7;
+      border: 2px solid #b45309;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      color: #78350f;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      width: 85%;
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25);
+      animation: popIn 0.35s ease forwards;
+    }
+
+    .scroll-banner {
+      font-size: 0.725rem;
+      font-weight: 700;
+      color: #b45309;
+      border-bottom: 1px solid #d97706;
+      padding-bottom: 0.2rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .scroll-body {
+      white-space: pre-wrap;
+      line-height: 1.4;
+      font-size: 0.75rem;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .variable-drop-zone {
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      color: #f8fafc;
+    }
+
+    /* =========================================================
+       教具 3：JSON 即時編輯與雙向轉換管線
+       ========================================================= */
+    .json-workbench-grid {
+      display: grid;
+      grid-template-columns: 1fr 180px 1fr;
+      gap: 1.25rem;
+      align-items: stretch;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    @media (max-width: 950px) {
+      .json-workbench-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .json-pane-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pane-header-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      height: 190px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0.85rem;
+      font-family: var(--font-code);
+      font-size: 0.875rem;
+      line-height: 1.55;
+      resize: vertical;
+      white-space: pre;
+    }
+
+    .editor-textarea:focus {
+      outline: 2px solid var(--accent-teal);
+      border-color: transparent;
+    }
+
+    .diff-nature-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .badge-py { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-json { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+
+    .json-center-controls {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.85rem;
+      align-items: center;
+    }
+
+    .morph-status-log {
+      margin-top: 1rem;
+      background: #0f172a;
+      color: #cbd5e1;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* 實作題目容器 */
+    .practice-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      background: #ffffff;
+    }
+
+    .practice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .practice-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text-main);
+    }
+
+    .io-spec {
+      background-color: var(--bg-subtle);
+      border-left: 4px solid var(--accent-amber);
+      padding: 1rem 1.25rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 1.25rem 0;
+      font-size: 0.925rem;
+    }
+
+    .io-spec strong {
+      color: var(--accent-amber);
+    }
+
+    .solution-toggle-wrapper {
+      margin-top: 1.5rem;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 1.25rem;
+    }
+
+    .btn-toggle-solution {
+      background-color: #f1f5f9;
+      color: var(--accent-blue);
+      border: 1px solid #cbd5e1;
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-toggle-solution:hover {
+      background-color: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .solution-drawer {
+      display: none;
+      margin-top: 1rem;
+      animation: fadeInDrawer 0.3s ease forwards;
+    }
+
+    @keyframes fadeInDrawer {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer.disclaimer-footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 2rem;
+      margin-top: 4rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.75;
+    }
+
+    footer.disclaimer-footer p {
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 11-1 pathlib 模組 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">11-1 檔案系統抽象化與物件導向路徑操作：pathlib 模組</h2>
+    <p>
+      在傳統 Python 程式碼中，檔案路徑多以純字串（<code class="inline-code">str</code>）進行處理。此作法極易在跨作業系統部署時引發路徑分隔符號衝突（POSIX 系統使用正斜線 <code class="inline-code">/</code>，Windows 系統使用反斜線 <code class="inline-code">\</code>）。自 Python 3.4 起引入的 <code class="inline-code">pathlib</code> 模組，將檔案系統抽象化為純物件導向語意，具備跨平台語法安全與鏈式操作能力。
+    </p>
+
+    <h3 class="sub-title">11-1.1 pathlib.Path 物件實例化與除法運算子重載</h3>
+    <p>
+      <code class="inline-code">pathlib.Path</code> 類別重載了 Python 的除法運算子（<code class="inline-code">/</code>），使得路徑層級的串接能以直觀且平台無關的語法完成：
+    </p>
+
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>操作面向</th>
+            <th>傳統 os.path 語法</th>
+            <th>現代 pathlib 物件導向語法</th>
+            <th>底層運作與回傳型態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>取得目前工作目錄</strong></td>
+            <td><code class="inline-code">os.getcwd()</code></td>
+            <td><code class="inline-code">Path.cwd()</code></td>
+            <td>回傳當前目錄之 <code class="inline-code">Path</code> 實例。</td>
+          </tr>
+          <tr>
+            <td><strong>路徑安全串接</strong></td>
+            <td><code class="inline-code">os.path.join(a, b)</code></td>
+            <td><code class="inline-code">base_path / "data" / "file.txt"</code></td>
+            <td>呼叫 <code class="inline-code">__truediv__()</code> 進行路徑拼接。</td>
+          </tr>
+          <tr>
+            <td><strong>絕對路徑解析</strong></td>
+            <td><code class="inline-code">os.path.abspath(path)</code></td>
+            <td><code class="inline-code">path.resolve()</code></td>
+            <td>解析符號連結並輸出標準絕對路徑。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-title">11-1.2 路徑核心屬性存取與檔案狀態檢驗</h3>
+    <p>
+      <code class="inline-code">Path</code> 物件提供多項唯讀屬性存取路徑組成元件，並內建檔案系統狀態檢驗方法：
+    </p>
+
+    <ul>
+      <li><code class="inline-code">.name</code>：取得完整檔案名稱（包含副檔名，例如 <code class="inline-code">"report.csv"</code>）。</li>
+      <li><code class="inline-code">.stem</code>：取得檔案主檔名（排除副檔名，例如 <code class="inline-code">"report"</code>）。</li>
+      <li><code class="inline-code">.suffix</code>：取得副檔名標記（例如 <code class="inline-code">".csv"</code>）。</li>
+      <li><code class="inline-code">.parent</code>：取得上一層父目錄物件，支援鏈式存取（例如 <code class="inline-code">path.parent.parent</code>）。</li>
+      <li><code class="inline-code">.exists()</code>：檢查實體磁碟是否存在此路徑（回傳布林值）。</li>
+      <li><code class="inline-code">.is_file()</code> / <code class="inline-code">.is_dir()</code>：判定路徑是否為常規檔案或目錄。</li>
+      <li><code class="inline-code">.glob(pattern)</code>：依據萬用字元（如 <code class="inline-code">"*.json"</code>）搜尋目錄下符合之檔案集合。</li>
+    </ul>
+
+    <h3 class="sub-title">標準示範程式碼（嚴格 PEP 8 換行）</h3>
+    <pre class="code-block"><code>from pathlib import Path
+
+# 1. 建立基礎工作路徑
+base_dir = Path.cwd()
+target_file = base_dir / "workspace" / "metadata.json"
+
+# 2. 物件導向屬性存取
+print(f"完整路徑: {target_file}")
+print(f"檔案全名: {target_file.name}")
+print(f"檔案主名: {target_file.stem}")
+print(f"副檔名: {target_file.suffix}")
+print(f"父層目錄: {target_file.parent}")
+print(f"實體是否存在: {target_file.exists()}")</code></pre>
+  </section>
+
+  <!-- 11-2 文字檔案基礎 I/O 與 with open() -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">11-2 上下文管理器與文字檔案基礎 I/O：with open()</h2>
+    <p>
+      檔案存取牽涉作業系統底層核心資源。當 Python 程式調用 <code class="inline-code">open()</code> 時，作業系統核心會配置一個檔案描述子（File Descriptor, FD）。若未顯式釋放，可能導致資源洩漏、檔案鎖定或快取寫入延遲。
+    </p>
+
+    <h3 class="sub-title">11-2.1 with 陳述式運作協議與資源保護機制</h3>
+    <p>
+      傳統使用 <code class="inline-code">file.close()</code> 的寫法，若在讀寫過程中發生例外崩潰，關閉指令將被略過。<code class="inline-code">with</code> 陳述式導入了上下文管理器協議（Context Management Protocol）：
+    </p>
+    <ul>
+      <li><strong>進入區塊時</strong>：自動觸發物件的 <code class="inline-code">__enter__()</code> 方法，回傳已開啟的串流物件並繫結至 <code class="inline-code">as</code> 變數。</li>
+      <li><strong>離開區塊時</strong>：無論是正常執行完畢，或區塊內部突發嚴重例外（如 <code class="inline-code">ValueError</code>、<code class="inline-code">ZeroDivisionError</code>），直譯器保證強制調用 <code class="inline-code">__exit__()</code>，釋放底層檔案描述子。</li>
+    </ul>
+
+    <!-- 教具 1：with 上下文管理器生命週期與異常防護 -->
+    <div class="sandbox-card">
+      <div class="sandbox-header">
+        <span class="sandbox-tag">直譯器機制動態教具 01</span>
+        <span style="font-size:0.85rem; color:var(--text-muted);">上下文管理器生命週期與 OS 描述子安全閥門演練</span>
+      </div>
+
+      <div class="context-workbench">
+        <div class="code-tracker-box">
+          <div>
+            <div style="color:#38bdf8; font-size:0.8rem; font-weight:bold; margin-bottom:0.75rem;">
+              ▶ 指令執行指標 (Instruction Pointer)
+            </div>
+            <div class="tracker-lines" id="tracker-lines">
+              <div class="tracker-line" id="line-ctx-1">
+                <span class="line-arrow">▶</span><span>with open("log.txt", "r") as f:</span>
+              </div>
+              <div class="tracker-line" id="line-ctx-2">
+                <span class="line-arrow">▶</span><span>    for line in f:</span>
+              </div>
+              <div class="tracker-line" id="line-ctx-3">
+                <span class="line-arrow">▶</span><span id="line-ctx-3-text">        print(line.strip())</span>
+              </div>
+              <div class="tracker-line" id="line-ctx-4">
+                <span class="line-arrow">▶</span><span>print(f"檔案是否安全關閉: {f.closed}")</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn-action" id="btn-stream-normal" style="flex:1;">情境 A：正常讀取完成</button>
+              <button class="btn-action btn-danger" id="btn-stream-crash" style="flex:1;">情境 B：讀取中途崩潰</button>
+            </div>
+            <button class="btn-action btn-secondary" id="btn-stream-reset">重設系統狀態</button>
+          </div>
+        </div>
+
+        <div class="os-chamber">
+          <div class="os-dashboard-top">
+            <div class="metric-badge">
+              <span class="metric-title">OS 檔案描述子</span>
+              <span class="metric-val" id="stream-fd">未配置 (None)</span>
+            </div>
+            <div class="metric-badge">
+              <span class="metric-title">直譯器協定方法</span>
+              <span class="metric-val" id="stream-protocol">待命中 (Standby)</span>
+            </div>
+            <div class="metric-badge">
+              <span class="metric-title">屬性 f.closed</span>
+              <span class="metric-val" id="stream-closed" style="color:#ef4444;">True</span>
+            </div>
+          </div>
+
+          <div class="stream-stage-vault">
+            <div class="gate-plate-unit" id="vault-gate-top">[ __enter__() 檔案描述子防護閥門：頂層 ]</div>
+            
+            <div class="stream-transit-rail">
+              <div class="data-line-packet" id="packet-1">Line 1: [INFO] 伺服器啟動完成</div>
+              <div class="data-line-packet" id="packet-2">Line 2: [WARN] 記憶體高負載運作</div>
+            </div>
+
+            <div class="gate-plate-unit" id="vault-gate-bottom">[ __exit__() 資源強制回收閥門：底層 ]</div>
+          </div>
+
+          <div class="os-terminal-log" id="stream-log">
+            &gt; 作業系統核心就緒。尚未調用 open()，串流關閉中。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">11-2.2 串流讀取方法與搬運模式演繹 (.read, .readline, .readlines)</h3>
+    <p>
+      Python 提供多種從檔案串流抽取資料的方法，不同方法在記憶體結構與返回型態上有本質差異：
+    </p>
+
+    <ul>
+      <li><code class="inline-code">file.readline()</code>：<strong>單行公文夾提取</strong>。每次呼叫僅搬運單一行文字列並存入變數，指標停在下一行開頭。再次呼叫則搬運下一行。</li>
+      <li><code class="inline-code">file.readlines()</code>：<strong>串列分格置物箱打包</strong>。搬運工攜帶一個具備索引格位的置物箱（串列 <code class="inline-code">list</code>），逐行抽取並將每一行獨立放入不同格位，一次性返回 <code class="inline-code">list[str]</code>。</li>
+      <li><code class="inline-code">file.read()</code>：<strong>連續文字長卷軸直接載入</strong>。將整個檔案的所有字元不分行全數捲成單一長字串（<code class="inline-code">str</code>）。大檔案嚴禁使用以防記憶體耗盡。</li>
+    </ul>
+
+    <!-- 教具 2：讀取管線與三態專屬載具模擬器 -->
+    <div class="sandbox-card">
+      <div class="sandbox-header">
+        <span class="sandbox-tag">直譯器機制動態教具 02</span>
+        <span style="font-size:0.85rem; color:var(--text-muted);">檔案讀取方式與專屬搬運載具模擬器 (.readline vs .readlines vs .read)</span>
+      </div>
+
+      <div class="file-pipeline-grid">
+        <!-- 左側控制按鈕 -->
+        <div class="pipeline-controls">
+          <div class="pipeline-controls-title">讀取操作指令</div>
+          <button class="btn-action" id="btn-op-readline">
+            <span>.readline()</span>
+            <span style="font-size:0.75rem; font-weight:normal;">單行公文夾 ➔ 單一變數 (str)</span>
+          </button>
+          <button class="btn-action" id="btn-op-readlines" style="background:#0284c7;">
+            <span>.readlines()</span>
+            <span style="font-size:0.75rem; font-weight:normal;">分格置物箱 ➔ 裝入串列 (list)</span>
+          </button>
+          <button class="btn-action btn-secondary" id="btn-op-read" style="background:#b45309;">
+            <span>.read()</span>
+            <span style="font-size:0.75rem; font-weight:normal;">連續長卷軸 ➔ 全量字串 (str)</span>
+          </button>
+          
+          <div class="pipeline-controls-title" style="margin-top:0.75rem;">檔案指標與重設</div>
+          <button class="btn-action btn-secondary" id="btn-op-reset">重設指標與檔案</button>
+        </div>
+
+        <!-- 右側動態舞台 -->
+        <div class="pipeline-stage-view">
+          <!-- 實體文檔 -->
+          <div class="file-sheet-card">
+            <div class="file-sheet-header">
+              <span>實體磁碟文檔：data.txt</span>
+              <span id="doc-pointer-tag">檔案讀取指標：Line 1 開頭 (位移量 0)</span>
+            </div>
+            <div class="file-doc-line" id="fline-1">
+              <span>第 1 行：使用者資料: ID#101\n</span>
+              <span style="font-size:0.7rem; color:#64748b;">[Index 0]</span>
+            </div>
+            <div class="file-doc-line" id="fline-2">
+              <span>第 2 行：登入紀錄: 2026-03-29\n</span>
+              <span style="font-size:0.7rem; color:#64748b;">[Index 1]</span>
+            </div>
+            <div class="file-doc-line" id="fline-3">
+              <span>第 3 行：認證狀態: SUCCESS</span>
+              <span style="font-size:0.7rem; color:#64748b;">[Index 2]</span>
+            </div>
+          </div>
+
+          <!-- 搬運工作台：呈現三種完全不同的實體載具 -->
+          <div class="worker-transit-deck" id="worker-deck">
+            <div style="color:#64748b; font-family:var(--font-code); font-size:0.8rem;" id="deck-idle-text">
+              👷‍♂️ 搬運工待命中... 請點擊左側操作按鈕觀察專屬載具！
+            </div>
+          </div>
+
+          <!-- 目標接收變數區 -->
+          <div class="variable-drop-zone">
+            <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.35rem;">Python 記憶體變數接收端 (Target Variable):</div>
+            <div id="var-display-content" style="color:#38bdf8; font-weight:bold;">變數尚未接收資料</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">11-2.3 檔案開啟模式語意拓撲：'r', 'w', 'a'</h3>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>模式字元</th>
+            <th>語意行為</th>
+            <th>檔案不存在時</th>
+            <th>檔案已存在時</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline-code">'r'</code> (唯讀)</td>
+            <td>僅允許讀取資料串流（預設模式）。</td>
+            <td>拋出 <code class="inline-code">FileNotFoundError</code>。</td>
+            <td>保持原內容不變，指標置於開頭。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">'w'</code> (寫入覆蓋)</td>
+            <td>僅允許寫入資料串流。</td>
+            <td>自動建立全新實體檔案。</td>
+            <td><strong>立即截斷清空檔案內容（Truncate 歸零）</strong>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">'a'</code> (尾端附加)</td>
+            <td>僅允許由尾端寫入資料串流。</td>
+            <td>自動建立全新實體檔案。</td>
+            <td>指標自動鎖定在檔案尾端，原內容完好。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">'x'</code> (獨佔建立)</td>
+            <td>防禦性建立並寫入檔案。</td>
+            <td>建立全新實體檔案。</td>
+            <td><strong>直接拋出 FileExistsError 拒絕覆蓋</strong>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-title">標準示範程式碼（嚴格 PEP 8 換行）</h3>
+    <pre class="code-block"><code>from pathlib import Path
+
+file_path = Path("demo.txt")
+
+# 1. 安全覆蓋寫入文字檔
+with open(file_path, mode="w", encoding="utf-8") as file:
+    file.write("Python 資料工程\n")
+    file.write("現代 File I/O 實務\n")
+
+# 2. 原生檔案迭代器逐行走訪
+with open(file_path, mode="r", encoding="utf-8") as file:
+    for line in file:
+        clean_line = line.strip()
+        print(f"讀取內容: {clean_line}")
+
+# 離開 with 區塊後自動關閉檢驗
+print(f"檔案是否已安全關閉: {file.closed}")</code></pre>
+  </section>
+
+  <!-- 11-3 csv 模組 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">11-3 表格資料結構化交換：csv 模組</h2>
+    <p>
+      逗號分隔值（Comma-Separated Values, CSV）為表格資料交換的主流文字格式。由於資料內容可能包含半形逗號、引號或換行字元，若使用純字串方法 <code class="inline-code">.split(",")</code> 進行剖析，將引發嚴重的欄位錯位崩潰。Python 內建的 <code class="inline-code">csv</code> 模組完整實作了 RFC 4180 規格，能精確處理逸出字元與文字包裹規則。
+    </p>
+
+    <h3 class="sub-title">11-3.1 串列型介面 vs 字典型介面規格</h3>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>處理維度</th>
+            <th>串列型介面 (reader / writer)</th>
+            <th>字典型介面 (DictReader / DictWriter)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>每列資料結構</strong></td>
+            <td>純字串串列：<code class="inline-code">list[str]</code></td>
+            <td>以標頭為鍵的字典：<code class="inline-code">dict[str, str]</code></td>
+          </tr>
+          <tr>
+            <td><strong>標頭行處理</strong></td>
+            <td>需手動調用 <code class="inline-code">next(reader)</code> 提取或跳過標頭。</td>
+            <td>自動將第一列解析為字典欄位鍵（Keys）。</td>
+          </tr>
+          <tr>
+            <td><strong>欄位順序依賴性</strong></td>
+            <td>高度依賴索引位置（例如 <code class="inline-code">row[0]</code>, <code class="inline-code">row[1]</code>）。</td>
+            <td>依據欄位名稱存取（例如 <code class="inline-code">row["price"]</code>），程式碼彈性高。</td>
+          </tr>
+          <tr>
+            <td><strong>寫入標頭需求</strong></td>
+            <td>手動呼叫 <code class="inline-code">writer.writerow(header_list)</code>。</td>
+            <td>建立時指定 <code class="inline-code">fieldnames</code>，調用 <code class="inline-code">writer.writeheader()</code>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      <strong>newline='' 參數關鍵約束</strong>：在呼叫 <code class="inline-code">open()</code> 開啟檔案以供 <code class="inline-code">csv.writer</code> 寫入時，<strong>必須嚴格傳入 <code class="inline-code">newline=''</code> 參數</strong>。若未宣告此設定，Python 的通用換行模組與 <code class="inline-code">csv</code> 內部換行控制將在 Windows 平臺上重疊疊加，導致輸出的 CSV 檔案每筆資料列之間皆產生額外的空白行。
+    </p>
+
+    <h3 class="sub-title">標準示範程式碼（嚴格 PEP 8 換行）</h3>
+    <pre class="code-block"><code>import csv
+from pathlib import Path
+
+csv_path = Path("inventory.csv")
+products = [
+    {"sku": "A101", "name": "機械鍵盤", "price": 2800, "stock": 45},
+    {"sku": "B202", "name": "無線滑鼠", "price": 1200, "stock": 80},
+    {"sku": "C303", "name": "螢幕支架", "price": 1500, "stock": 15}
+]
+
+# 1. 字典型介面寫入 (務必加上 newline='')
+field_names = ["sku", "name", "price", "stock"]
+with open(csv_path, mode="w", encoding="utf-8", newline="") as file:
+    writer = csv.DictWriter(file, fieldnames=field_names)
+    writer.writeheader()
+    writer.writerows(products)
+
+# 2. 字典型介面讀取與結構化運算
+with open(csv_path, mode="r", encoding="utf-8") as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+        # 注意：CSV 讀入的值一律為字串，需顯式轉型
+        total_val = int(row["price"]) * int(row["stock"])
+        print(f"品項: {row['name']} | 庫存總值: {total_val}")</code></pre>
+  </section>
+
+  <!-- 11-4 json 模組 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">11-4 輕量資料序列化協定：json 模組</h2>
+    <p>
+      JavaScript 物件標記法（JavaScript Object Notation, JSON）為現代分散式系統、微服務與 Web API 資料交換的工業標準。JSON 為純文字格式，但具有嚴格的結構階層。<code class="inline-code">json</code> 模組負責 Python 記憶體物件與 JSON 文字串流間的序列化（Serialization）與反序列化（Deserialization）。
+    </p>
+
+    <h3 class="sub-title">11-4.1 Python 原生型態與 JSON 規範映射矩陣</h3>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Python 原生資料型態</th>
+            <th>JSON 國際標準型態</th>
+            <th>序列化 (dumps) 行為</th>
+            <th>反序列化 (loads) 行為</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline-code">dict</code></td>
+            <td><code class="inline-code">object</code></td>
+            <td>轉為 <code class="inline-code">{"key": "value"}</code>（鍵強制轉字串）</td>
+            <td>轉為原生字典物件 <code class="inline-code">dict</code></td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">list</code>, <code class="inline-code">tuple</code></td>
+            <td><code class="inline-code">array</code></td>
+            <td>轉為中括號陣列 <code class="inline-code">[1, 2, 3]</code></td>
+            <td><strong>一律還原為串列 list</strong>（元組喪失保護特性）</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str</code></td>
+            <td><code class="inline-code">string</code></td>
+            <td>字串（<strong>一律強制轉為標準雙引號 "..."</strong>）</td>
+            <td>轉為 Unicode 字串 <code class="inline-code">str</code></td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">int</code>, <code class="inline-code">float</code></td>
+            <td><code class="inline-code">number</code></td>
+            <td>數值常值</td>
+            <td>轉為 <code class="inline-code">int</code> 或 <code class="inline-code">float</code></td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">True</code>, <code class="inline-code">False</code></td>
+            <td><code class="inline-code">true</code>, <code class="inline-code">false</code></td>
+            <td>翻轉為<strong>全小寫布林常值</strong></td>
+            <td>還原為 Python 大寫首字布林值</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">None</code></td>
+            <td><code class="inline-code">null</code></td>
+            <td>翻轉為全小寫 <code class="inline-code">null</code></td>
+            <td>還原為 <code class="inline-code">None</code> 物件</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 教具 3：JSON 即時編輯與雙向轉換管線 -->
+    <div class="sandbox-card">
+      <div class="sandbox-header">
+        <span class="sandbox-tag">直譯器機制動態教具 03</span>
+        <span style="font-size:0.85rem; color:var(--text-muted);">Python 原生記憶體物件 vs. JSON 純文字字串即時編輯轉換器</span>
+      </div>
+
+      <div class="json-workbench-grid">
+        <!-- 左側：可編輯 Python 字典物件 -->
+        <div class="json-pane-box">
+          <div class="pane-header-title">
+            <span style="color:#0f766e;">Python 記憶體物件區 (可編輯)</span>
+            <span class="diff-nature-badge badge-py">dict 物件 (活體型態)</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.35rem;">
+            支援 True / None / 單引號鍵值，可直接於下方手動修改鍵與數值：
+          </p>
+          <textarea class="editor-textarea" id="py-live-editor">{
+  'server_name': '台北核心節點',
+  'port': 8080,
+  'is_online': True,
+  'standby_target': None
+}</textarea>
+        </div>
+
+        <!-- 中央：序列化與反序列化按鈕 -->
+        <div class="json-center-controls">
+          <button class="btn-action" id="btn-run-dumps" style="width:100%; justify-content:center;">
+            序列化 dumps ▶<br><span style="font-size:0.7rem; font-weight:normal;">壓扁為純文字字串</span>
+          </button>
+          <button class="btn-action btn-secondary" id="btn-run-loads" style="width:100%; justify-content:center;">
+            ◀ 反序列化 loads<br><span style="font-size:0.7rem; font-weight:normal;">注入型態還原活體</span>
+          </button>
+        </div>
+
+        <!-- 右側：可編輯 JSON 純文字字串 -->
+        <div class="json-pane-box">
+          <div class="pane-header-title">
+            <span style="color:#b45309;">JSON 純文字字串區 (可編輯)</span>
+            <span class="diff-nature-badge badge-json">str 純字串 (通用字元)</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.35rem;">
+            標準 JSON 規格：強制雙引號 "key"，小寫 true / null：
+          </p>
+          <textarea class="editor-textarea" id="json-live-editor">{
+  "server_name": "台北核心節點",
+  "port": 8080,
+  "is_online": true,
+  "standby_target": null
+}</textarea>
+        </div>
+      </div>
+
+      <div class="morph-status-log" id="json-morph-log">
+        &gt; 雙向編輯器就緒。您可自由編輯兩側內容，點擊中央按鈕體驗序列化與反序列化的型態翻牌與雙引號強制轉換！
+      </div>
+    </div>
+
+    <h3 class="sub-title">11-4.2 核心方法區隔：s 字尾之記憶體字串 vs 檔案資料流</h3>
+    <ul>
+      <li><strong>記憶體字串轉換（含 s 結尾）</strong>：
+        <ul>
+          <li><code class="inline-code">json.dumps(obj)</code>：將 Python 物件序列化為 <strong>JSON 格式純字串（str）</strong>。</li>
+          <li><code class="inline-code">json.loads(json_str)</code>：將 <strong>JSON 格式純字串</strong> 解析反序列化為 Python 記憶體物件。</li>
+        </ul>
+      </li>
+      <li><strong>實體檔案串流操作（無 s 結尾）</strong>：
+        <ul>
+          <li><code class="inline-code">json.dump(obj, file_stream)</code>：將 Python 物件直接序列化並<strong>寫入已開啟的檔案串流</strong>。</li>
+          <li><code class="inline-code">json.load(file_stream)</code>：從已開啟的檔案串流直接<strong>讀取文字並反序列化</strong>為 Python 物件。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3 class="sub-title">標準示範程式碼（嚴格 PEP 8 換行）</h3>
+    <pre class="code-block"><code>import json
+from pathlib import Path
+
+config_data = {
+    "app_name": "監控服務器",
+    "port": 8080,
+    "enable_ssl": True,
+    "cluster_nodes": ["node-a", "node-b"],
+    "proxy_route": None
+}
+
+json_file = Path("app_config.json")
+
+# 1. 檔案串流寫入 (包含縮排與繁體中文保留)
+with open(json_file, mode="w", encoding="utf-8") as file:
+    json.dump(config_data, file, indent=2, ensure_ascii=False)
+
+# 2. 檔案串流讀取反序列化
+with open(json_file, mode="r", encoding="utf-8") as file:
+    loaded_config = json.load(file)
+
+print("反序列化完成，型態為:", type(loaded_config))
+print(f"服務名稱: {loaded_config['app_name']}")
+print(f"SSL 狀態: {loaded_config['enable_ssl']} (原生布林值: {isinstance(loaded_config['enable_ssl'], bool)})")</code></pre>
+  </section>
+
+  <!-- 11-5 常見陷阱與新手避坑指南 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">11-5 常見陷阱與新手避坑指南</h2>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>例外型態或異常現象</th>
+            <th>引發錯誤的典型程式碼</th>
+            <th>直譯器底層原因分析</th>
+            <th>防範解法與標準修復寫法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline-code">UnicodeDecodeError</code></td>
+            <td><code class="inline-code">with open("data.txt", "r") as f:</code><br>(在 Windows 平臺執行)</td>
+            <td>未顯式設定編碼，直譯器採用平臺預設之 ANSI/CP950 編碼解碼現代 UTF-8 字元。</td>
+            <td>強制傳入編碼參數：<br><code class="inline-code">with open("data.txt", "r", encoding="utf-8") as f:</code></td>
+          </tr>
+          <tr>
+            <td><strong>CSV 出現空白隔行</strong></td>
+            <td><code class="inline-code">with open("out.csv", "w") as f:</code><br><code class="inline-code">csv.writer(f)</code></td>
+            <td>Windows 平臺在文字寫入時會將 <code class="inline-code">\n</code> 自動轉換為 <code class="inline-code">\r\n</code>，疊加造成雙重換行。</td>
+            <td>開啟檔案時必須加上 <code class="inline-code">newline=""</code>：<br><code class="inline-code">open("out.csv", "w", encoding="utf-8", newline="")</code></td>
+          </tr>
+          <tr>
+            <td><strong>原始檔案內容遭清空</strong></td>
+            <td><code class="inline-code">with open("db.txt", "w") as f:</code><br>(原本意圖要在最後追加一行)</td>
+            <td>寫入模式 <code class="inline-code">'w'</code> 會在開啟成功瞬間強制執行磁碟截斷（Truncate），內容直接歸零。</td>
+            <td>追加資料必須改用附加模式 <code class="inline-code">'a'</code>（Append），保留既有位元組。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">TypeError: Object is not JSON serializable</code></td>
+            <td><code class="inline-code">json.dumps({"time": datetime.now()})</code><br><code class="inline-code">json.dumps({"tags": {1, 2, 3}})</code></td>
+            <td>JSON 規格僅支援原生六大基本型態，不支援 <code class="inline-code">datetime</code>、<code class="inline-code">set</code> 或自訂 Class 實例。</td>
+            <td>需先手動轉型為支援型態，如 <code class="inline-code">dt.isoformat()</code> 或 <code class="inline-code">list(my_set)</code>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 11-6 課堂綜合實作驗證題 (含隱藏/展開功能) -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">11-6 課堂綜合實作驗證題</h2>
+
+    <!-- 實作題 1 -->
+    <div class="practice-card">
+      <div class="practice-header">
+        <span class="practice-title">實作題 01：電商會員資料 CSV 匯入、欄位格式清洗與條件過濾導出工具</span>
+        <span class="unit-tag" style="background:#e0f2fe; color:#0369a1;">CSV & Pathlib</span>
+      </div>
+      <p>
+        <strong>題目描述：</strong>系統從前臺匯出了一份名為 <code class="inline-code">raw_members.csv</code> 的名冊，部分使用者的消費金額帶有小數點，且狀態欄位大小寫不一。請使用 <code class="inline-code">pathlib.Path</code> 與 <code class="inline-code">csv.DictReader</code> 讀取檔案，篩選出狀態為有效會員（狀態不區分大小寫為 <code class="inline-code">"active"</code>）且累計消費大於等於 1,000 元的使用者，最後使用 <code class="inline-code">csv.DictWriter</code> 將清洗後名單寫入新檔案 <code class="inline-code">filtered_vip.csv</code>。
+      </p>
+      <div class="io-spec">
+        <strong>輸入 / 輸出規格 (I/O Spec)：</strong><br>
+        1. 來源欄位包含：<code class="inline-code">uid, name, total_spend, status</code>。<br>
+        2. <code class="inline-code">total_spend</code> 須轉換為浮點數比較後，輸出四捨五入為整數。<br>
+        3. 輸出新檔案時，欄位順序維持不變，且必須確保在 Windows 平臺無空行產生。
+      </div>
+
+      <div class="solution-toggle-wrapper">
+        <button class="btn-toggle-solution" onclick="toggleSolution('sol-1', this)">
+          <span>👁️ 顯示參考解答與解析</span>
+        </button>
+        <div class="solution-drawer" id="sol-1">
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.75rem;">
+            <strong>參考實作程式碼：</strong>
+          </p>
+          <pre class="code-block"><code>import csv
+from pathlib import Path
+
+input_path = Path("raw_members.csv")
+output_path = Path("filtered_vip.csv")
+
+# 1. 建立測試用原始資料
+raw_data = [
+    {"uid": "U1001", "name": "林小明", "total_spend": "1500.5", "status": "ACTIVE"},
+    {"uid": "U1002", "name": "陳大華", "total_spend": "800.0", "status": "active"},
+    {"uid": "U1003", "name": "張美麗", "total_spend": "3200", "status": "suspended"},
+    {"uid": "U1004", "name": "王國榮", "total_spend": "2400", "status": "Active"}
+]
+
+fieldnames = ["uid", "name", "total_spend", "status"]
+
+with open(input_path, mode="w", encoding="utf-8", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=fieldnames)
+    w.writeheader()
+    w.writerows(raw_data)
+
+# 2. 資料清洗與篩選邏輯
+valid_vips = []
+with open(input_path, mode="r", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        spend = float(row["total_spend"])
+        status = row["status"].strip().lower()
+        if status == "active" and spend >= 1000.0:
+            valid_vips.append({
+                "uid": row["uid"],
+                "name": row["name"],
+                "total_spend": str(round(spend)),
+                "status": "Active"
+            })
+
+# 3. 匯出過濾結果 (嚴格指定 newline='')
+with open(output_path, mode="w", encoding="utf-8", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(valid_vips)
+
+print(f"篩選完成，共匯出 {len(valid_vips)} 筆 VIP 會員資料。")</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 實作題 2 -->
+    <div class="practice-card">
+      <div class="practice-header">
+        <span class="practice-title">實作題 02：系統環境組態設定檔 JSON 讀寫、版本驗證與自動備份器</span>
+        <span class="unit-tag" style="background:#fef3c7; color:#92400e;">JSON & 容錯防護</span>
+      </div>
+      <p>
+        <strong>題目描述：</strong>請撰寫一段維運指令碼，使用 <code class="inline-code">pathlib.Path</code> 檢查當前目錄下是否存在組態設定檔 <code class="inline-code">config.json</code>。若存在，則讀取其內容並將版本號碼（<code class="inline-code">version</code>）遞增 0.1，並在磁碟中複製產生一份檔名為 <code class="inline-code">config.backup.json</code> 的備份檔；若檔案不存在，則動態建立一份標準初始組態檔並儲存。
+      </p>
+      <div class="io-spec">
+        <strong>輸入 / 輸出規格 (I/O Spec)：</strong><br>
+        1. 初始設定資料包含：<code class="inline-code">app_id, version, debug_mode, endpoints</code>。<br>
+        2. 輸出時必須啟用縮排格式化（<code class="inline-code">indent=2</code>）與非 ASCII 字元保護（<code class="inline-code">ensure_ascii=False</code>）。<br>
+        3. 嚴格使用上下文管理器 <code class="inline-code">with open()</code> 確保讀寫完畢後檔案立即安全關閉。
+      </div>
+
+      <div class="solution-toggle-wrapper">
+        <button class="btn-toggle-solution" onclick="toggleSolution('sol-2', this)">
+          <span>👁️ 顯示參考解答與解析</span>
+        </button>
+        <div class="solution-drawer" id="sol-2">
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.75rem;">
+            <strong>參考實作程式碼：</strong>
+          </p>
+          <pre class="code-block"><code>import json
+from pathlib import Path
+
+config_path = Path("config.json")
+backup_path = Path("config.backup.json")
+
+# 檢查檔案狀態
+if not config_path.exists():
+    initial_config = {
+        "app_id": "payment_service",
+        "version": 1.0,
+        "debug_mode": False,
+        "endpoints": ["https://api.domain.com/v1"]
+    }
+    with open(config_path, mode="w", encoding="utf-8") as f:
+        json.dump(initial_config, f, indent=2, ensure_ascii=False)
+    print("組態檔不存在，已建立標準預設設定檔。")
+else:
+    with open(config_path, mode="r", encoding="utf-8") as f:
+        current_config = json.load(f)
+
+    # 1. 建立備份檔
+    with open(backup_path, mode="w", encoding="utf-8") as f:
+        json.dump(current_config, f, indent=2, ensure_ascii=False)
+
+    # 2. 更新原設定檔版本號碼
+    current_config["version"] = round(current_config["version"] + 0.1, 1)
+    with open(config_path, mode="w", encoding="utf-8") as f:
+        json.dump(current_config, f, indent=2, ensure_ascii=False)
+
+    print(f"組態檔已完成備份，目前版本號碼提升為: {current_config['version']}")</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 官方免責聲明與權益宣示 -->
+  <footer class="disclaimer-footer">
+    <p><strong>免責聲明與權益宣示</strong></p>
+    <p>
+      本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。
+    </p>
+    <p>
+      如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。
+    </p>
+  </footer>
+</div>
+
+<!-- 獨立封裝 JavaScript 邏輯 -->
+<script>
+// 全域解答折疊控制函式
+function toggleSolution(drawerId, btnElement) {
+  const drawer = document.getElementById(drawerId);
+  const isHidden = window.getComputedStyle(drawer).display === 'none';
+  if (isHidden) {
+    drawer.style.display = 'block';
+    btnElement.innerHTML = '<span>🙈 隱藏參考解答</span>';
+  } else {
+    drawer.style.display = 'none';
+    btnElement.innerHTML = '<span>👁️ 顯示參考解答與解析</span>';
+  }
+}
+
+// 教具 1：with 上下文管理器安全閥門
+(function() {
+  const btnNormal = document.getElementById('btn-stream-normal');
+  const btnCrash = document.getElementById('btn-stream-crash');
+  const btnReset = document.getElementById('btn-stream-reset');
+
+  const l1 = document.getElementById('line-ctx-1');
+  const l2 = document.getElementById('line-ctx-2');
+  const l3 = document.getElementById('line-ctx-3');
+  const l3Text = document.getElementById('line-ctx-3-text');
+  const l4 = document.getElementById('line-ctx-4');
+
+  const gateTop = document.getElementById('vault-gate-top');
+  const gateBottom = document.getElementById('vault-gate-bottom');
+  const p1 = document.getElementById('packet-1');
+  const p2 = document.getElementById('packet-2');
+
+  const sFd = document.getElementById('stream-fd');
+  const sProto = document.getElementById('stream-protocol');
+  const sClosed = document.getElementById('stream-closed');
+  const sLog = document.getElementById('stream-log');
+
+  function clearHighlight() {
+    [l1, l2, l3, l4].forEach(l => l.className = 'tracker-line');
+  }
+
+  function resetSystem() {
+    clearHighlight();
+    l3Text.textContent = '        print(line.strip())';
+    l3.classList.remove('crash-line');
+
+    gateTop.className = 'gate-plate-unit';
+    gateTop.textContent = '[ __enter__() 檔案描述子防護閥門：頂層 ]';
+    gateBottom.className = 'gate-plate-unit';
+    gateBottom.textContent = '[ __exit__() 資源強制回收閥門：底層 ]';
+
+    p1.className = 'data-line-packet';
+    p2.className = 'data-line-packet';
+
+    sFd.textContent = '未配置 (None)';
+    sFd.style.color = '#64748b';
+    sProto.textContent = '待命中 (Standby)';
+    sProto.style.color = '#64748b';
+    sClosed.textContent = 'True';
+    sClosed.style.color = '#ef4444';
+    sLog.textContent = '> 作業系統核心就緒。尚未調用 open()，串流關閉中。';
+  }
+
+  btnReset.addEventListener('click', resetSystem);
+
+  btnNormal.addEventListener('click', function() {
+    resetSystem();
+
+    l1.classList.add('active');
+    gateTop.className = 'gate-plate-unit open';
+    gateTop.textContent = '✔ __enter__() 成功：OS 檔案描述子 FD #3 通電開啟';
+    sFd.textContent = 'FD #3 (鎖定中)';
+    sFd.style.color = '#22c55e';
+    sProto.textContent = '__enter__() 執行';
+    sProto.style.color = '#0284c7';
+    sClosed.textContent = 'False';
+    sClosed.style.color = '#22c55e';
+    sLog.textContent = '> [OS 核心] open() 成功配置 FD #3，安全閥門開啟，就緒傳輸串流。';
+
+    setTimeout(() => {
+      clearHighlight();
+      l2.classList.add('active');
+      p1.className = 'data-line-packet flowing';
+      sLog.textContent = '> [串流資料流] 提取 Line 1「[INFO] 伺服器啟動完成」，文字進入記憶體緩衝區。';
+    }, 900);
+
+    setTimeout(() => {
+      clearHighlight();
+      l3.classList.add('active');
+      p2.className = 'data-line-packet flowing';
+      sLog.textContent = '> [串流資料流] 提取 Line 2「[WARN] 記憶體高負載運作」，迭代器持續推進。';
+    }, 1800);
+
+    setTimeout(() => {
+      clearHighlight();
+      l4.classList.add('active');
+      gateTop.className = 'gate-plate-unit';
+      gateBottom.className = 'gate-plate-unit open';
+      gateBottom.textContent = '✔ __exit__() 自動觸發：平穩釋放 FD #3';
+      sFd.textContent = 'FD #3 已歸還 OS';
+      sFd.style.color = '#64748b';
+      sProto.textContent = '__exit__() 自動觸發';
+      sProto.style.color = '#15803d';
+      sClosed.textContent = 'True';
+      sClosed.style.color = '#ef4444';
+      sLog.textContent = '> [安全回收] 離開 with 區塊，__exit__() 保證調用 close()，f.closed 為 True。';
+    }, 2700);
+  });
+
+  btnCrash.addEventListener('click', function() {
+    resetSystem();
+    l3Text.textContent = '        raise ValueError("資料損毀中斷")';
+    l3.classList.add('crash-line');
+
+    l1.classList.add('active');
+    gateTop.className = 'gate-plate-unit open';
+    gateTop.textContent = '✔ __enter__() 成功：OS 檔案描述子 FD #3 通電開啟';
+    sFd.textContent = 'FD #3 (鎖定中)';
+    sFd.style.color = '#22c55e';
+    sClosed.textContent = 'False';
+    sClosed.style.color = '#22c55e';
+    sLog.textContent = '> [OS 核心] 進入 with 區塊，配置檔案描述子 FD #3。';
+
+    setTimeout(() => {
+      clearHighlight();
+      l2.classList.add('active');
+      p1.className = 'data-line-packet flowing';
+      sLog.textContent = '> [串流資料流] 讀取 Line 1 成功... 準備讀取 Line 2...';
+    }, 900);
+
+    setTimeout(() => {
+      clearHighlight();
+      l3.classList.add('active');
+      p2.className = 'data-line-packet crashed';
+      p2.textContent = '⚠️ 嚴重異常：ValueError: 資料損毀中斷！';
+      sLog.textContent = '> ⚠️ [直譯器警報] 執行中途拋出 ValueError！程式即將終止！';
+    }, 1800);
+
+    setTimeout(() => {
+      clearHighlight();
+      gateTop.className = 'gate-plate-unit emergency';
+      gateBottom.className = 'gate-plate-unit emergency';
+      gateBottom.textContent = '🛑 __exit__() 緊急介入：強制釋放 FD #3';
+      sFd.textContent = 'FD #3 已強制釋放';
+      sFd.style.color = '#ef4444';
+      sProto.textContent = '__exit__() 緊急介入';
+      sProto.style.color = '#ef4444';
+      sClosed.textContent = 'True';
+      sClosed.style.color = '#ef4444';
+      sLog.textContent = '> [防禦保證] 即使區塊內部拋出例外崩潰，直譯器保證先執行 __exit__() 關閉檔案描述子，絕不洩漏資源！';
+    }, 2700);
+  });
+})();
+
+// 教具 2：讀取管線與三態專屬載具模擬器 (重構版)
+(function() {
+  const btnReadline = document.getElementById('btn-op-readline');
+  const btnReadlines = document.getElementById('btn-op-readlines');
+  const btnRead = document.getElementById('btn-op-read');
+  const btnReset = document.getElementById('btn-op-reset');
+
+  const flines = [
+    document.getElementById('fline-1'),
+    document.getElementById('fline-2'),
+    document.getElementById('fline-3')
+  ];
+
+  const lineTexts = [
+    '使用者資料: ID#101\\n',
+    '登入紀錄: 2026-03-29\\n',
+    '認證狀態: SUCCESS'
+  ];
+
+  const pointerTag = document.getElementById('doc-pointer-tag');
+  const workerDeck = document.getElementById('worker-deck');
+  const varDisplay = document.getElementById('var-display-content');
+
+  let currentPointer = 0; // 0, 1, 2, or 3 (EOF)
+
+  function resetPipeline() {
+    currentPointer = 0;
+    flines.forEach(fl => fl.className = 'file-doc-line');
+    pointerTag.textContent = '檔案讀取指標：Line 1 開頭 (位移量 0)';
+    workerDeck.innerHTML = `
+      <div style="color:#64748b; font-family:var(--font-code); font-size:0.8rem;" id="deck-idle-text">
+        👷‍♂️ 搬運工待命中... 請點擊左側操作按鈕觀察專屬載具！
+      </div>
+    `;
+    varDisplay.innerHTML = '變數尚未接收資料';
+  }
+
+  btnReset.addEventListener('click', resetPipeline);
+
+  // 1. .readline()：單行公文夾提取
+  btnReadline.addEventListener('click', function() {
+    if (currentPointer >= flines.length) {
+      pointerTag.textContent = '檔案讀取指標：已抵達檔案末端 (EOF)';
+      workerDeck.innerHTML = `
+        <div style="color:#f87171; font-family:var(--font-code); font-size:0.825rem; font-weight:bold;">
+          🤷‍♂️ 指標已在 EOF！搬運工夾板為空，回傳空字串 ""。
+        </div>
+      `;
+      varDisplay.innerHTML = '<code>line = ""</code> <span style="color:#94a3b8;">(型態: str, 長度: 0)</span>';
+      return;
+    }
+
+    const targetIdx = currentPointer;
+    flines[targetIdx].classList.add('extracted');
+    
+    // 渲染專屬單行公文夾
+    workerDeck.innerHTML = `
+      <div class="carrier-single-folder">
+        <span style="font-size:1.3rem;">📋</span>
+        <div>
+          <div style="font-size:0.7rem; color:#93c5fd; font-weight:bold;">單行公文夾 (單一變數存放)</div>
+          <div>內裝：<strong>"${lineTexts[targetIdx]}"</strong></div>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      varDisplay.innerHTML = `<code>line = "${lineTexts[targetIdx]}"</code> <span style="color:#22c55e;">(型態: str)</span>`;
+      currentPointer++;
+      if (currentPointer < flines.length) {
+        pointerTag.textContent = `檔案讀取指標：Line ${currentPointer + 1} 開頭`;
+      } else {
+        pointerTag.textContent = '檔案讀取指標：已抵達檔案末端 (EOF)';
+      }
+    }, 450);
+  });
+
+  // 2. .readlines()：串列分格置物箱 (具備 3 個獨立隔間)
+  btnReadlines.addEventListener('click', function() {
+    flines.forEach(fl => fl.classList.add('extracted'));
+
+    // 渲染專屬串列分格收納箱
+    workerDeck.innerHTML = `
+      <div class="carrier-list-crate">
+        <div class="crate-banner">
+          <span>📦 串列分隔置物箱 list [ ... ]</span>
+          <span>容量：3 個獨立元素槽位</span>
+        </div>
+        <div class="crate-grid-slots">
+          <div class="crate-slot-cell">
+            <span class="slot-idx">索引 [0]</span>
+            <span>"${lineTexts[0]}"</span>
+          </div>
+          <div class="crate-slot-cell">
+            <span class="slot-idx">索引 [1]</span>
+            <span>"${lineTexts[1]}"</span>
+          </div>
+          <div class="crate-slot-cell">
+            <span class="slot-idx">索引 [2]</span>
+            <span>"${lineTexts[2]}"</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      varDisplay.innerHTML = `<code>lines = ['${lineTexts[0]}', '${lineTexts[1]}', '${lineTexts[2]}']</code> <span style="color:#38bdf8;">(型態: list[str]，共 3 筆獨立字串元素)</span>`;
+      currentPointer = flines.length;
+      pointerTag.textContent = '檔案讀取指標：已一次性掃描至末端 (EOF)';
+    }, 450);
+  });
+
+  // 3. .read()：無分隔連續長卷軸
+  btnRead.addEventListener('click', function() {
+    flines.forEach(fl => fl.classList.add('extracted'));
+
+    // 渲染專屬連續長卷軸
+    workerDeck.innerHTML = `
+      <div class="carrier-raw-scroll">
+        <div class="scroll-banner">
+          📜 連續文字長卷軸 (無隔層・單一巨大字串 str)
+        </div>
+        <div class="scroll-body">${lineTexts[0]}${lineTexts[1]}${lineTexts[2]}</div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      varDisplay.innerHTML = `<code>content = "${lineTexts.join('')}"</code> <span style="color:#b45309;">(型態: str，全量未分格連續字串)</span>`;
+      currentPointer = flines.length;
+      pointerTag.textContent = '檔案讀取指標：已直接捲入至末端 (EOF)';
+    }, 450);
+  });
+})();
+
+// 教具 3：JSON 即時編輯與雙向轉換管線 (dumps vs loads)
+(function() {
+  const pyEditor = document.getElementById('py-live-editor');
+  const jsonEditor = document.getElementById('json-live-editor');
+  const btnDumps = document.getElementById('btn-run-dumps');
+  const btnLoads = document.getElementById('btn-run-loads');
+  const statusLog = document.getElementById('json-morph-log');
+
+  btnDumps.addEventListener('click', function() {
+    const rawPy = pyEditor.value;
+    try {
+      const normalized = rawPy
+        .replace(/'/g, '"')
+        .replace(/True/g, 'true')
+        .replace(/False/g, 'false')
+        .replace(/None/g, 'null');
+
+      const parsed = JSON.parse(normalized);
+      const jsonFormatted = JSON.stringify(parsed, null, 2);
+
+      jsonEditor.value = jsonFormatted;
+      jsonEditor.style.outline = '2px solid #b45309';
+      setTimeout(() => { jsonEditor.style.outline = 'none'; }, 600);
+
+      statusLog.innerHTML = `&gt; <strong>json.dumps() 執行完畢</strong>：Python 物件被序列化為純文字字串。<br>&gt; 單引號自動轉為標準雙引號，True 變為文字 "true"，None 變為文字 "null"！`;
+    } catch (e) {
+      statusLog.innerHTML = `<span style="color:#f87171;">⚠️ Python 格式解析失敗！請確保鍵值語法接近標準字典（包含大括號與成對符號）。</span>`;
+    }
+  });
+
+  btnLoads.addEventListener('click', function() {
+    const rawJson = jsonEditor.value;
+    try {
+      const parsed = JSON.parse(rawJson);
+      
+      const pyRepr = JSON.stringify(parsed, null, 2)
+        .replace(/"([^"]+)":/g, "'$1':")
+        .replace(/: "([^"]*)"/g, ": '$1'")
+        .replace(/: true/g, ": True")
+        .replace(/: false/g, ": False")
+        .replace(/: null/g, ": None");
+
+      pyEditor.value = pyRepr;
+      pyEditor.style.outline = '2px solid #0d9488';
+      setTimeout(() => { pyEditor.style.outline = 'none'; }, 600);
+
+      statusLog.innerHTML = `&gt; <strong>json.loads() 執行完畢</strong>：純文字字串被剖析並注入型態生命！<br>&gt; 重構為記憶體中的原生 dict 物件，布林值還原為 Python True，null 還原為 None。`;
+    } catch (e) {
+      statusLog.innerHTML = `<span style="color:#f87171;">⚠️ JSON 格式無效！標準 JSON 嚴格要求：所有鍵名必須使用「雙引號」，布林必須為小寫 true/false。</span>`;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

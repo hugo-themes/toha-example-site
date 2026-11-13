@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BM25 演算法動態視覺教學實驗室</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- MathJax 3 配置與 CDN -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      background-color: #F8F5F0;
+      color: #2D2522;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+    }
+    .warm-card {
+      background-color: #FFFFFF;
+      border: 1px solid #EADBCC;
+      box-shadow: 0 4px 16px -2px rgba(180, 140, 100, 0.08);
+    }
+    .border-warm { border-color: #EADBCC; }
+    
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+    .scanning-active {
+      animation: pulseGlow 0.8s infinite;
+    }
+    .term-highlight {
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- 頂部標題區 -->
+    <header class="warm-card rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-t-4 border-t-[#C85A32]">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C85A32] mb-1">
+          <i data-lucide="calculator" class="w-4 h-4"></i>
+          Lesson 7 專題補充模組
+        </div>
+        <h1 class="text-2xl md:text-3xl font-black text-[#2D2522]">BM25 關鍵字檢索演算法：動態演算與參數實驗室</h1>
+        <p class="text-sm text-[#705E57] mt-1">
+          從 TF、IDF 逐步累加，到 $k_1$ 詞頻飽和與 $b$ 文件長度正規化動態調校
+        </p>
+      </div>
+      
+      <!-- 導航切換按鈕 -->
+      <div class="flex flex-wrap bg-[#EFE9E0] p-1.5 rounded-xl gap-1 text-sm font-medium">
+        <button id="btn-tab-1" onclick="switchTab(1)" class="px-4 py-2 rounded-lg transition-all duration-200 bg-white text-[#C85A32] shadow-sm font-bold flex items-center gap-2">
+          <i data-lucide="scan-text" class="w-4 h-4"></i> 1. TF/IDF 步進計算動畫
+        </button>
+        <button id="btn-tab-2" onclick="switchTab(2)" class="px-4 py-2 rounded-lg transition-all duration-200 text-[#705E57] hover:text-[#2D2522] flex items-center gap-2">
+          <i data-lucide="sliders" class="w-4 h-4"></i> 2. BM25 飽和與長度懲罰曲線
+        </button>
+        <button id="btn-tab-3" onclick="switchTab(3)" class="px-4 py-2 rounded-lg transition-all duration-200 text-[#705E57] hover:text-[#2D2522] flex items-center gap-2">
+          <i data-lucide="search" class="w-4 h-4"></i> 3. 實戰 BM25 全文評分沙盒
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== TAB 1: TF / IDF 步進計算動畫 ==================== -->
+    <main id="tab-1" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 左側：語料庫掃描觀察區 -->
+        <div class="lg:col-span-7 warm-card rounded-2xl p-6 space-y-4">
+          <div class="flex justify-between items-center pb-3 border-b border-warm">
+            <h2 class="font-bold text-lg text-[#2D2522] flex items-center gap-2">
+              <i data-lucide="library" class="w-5 h-5 text-[#C85A32]"></i>
+              知識庫語料文本 (Corpus: 4 篇文件)
+            </h2>
+            <span class="text-xs bg-[#F1ECE4] px-2.5 py-1 rounded-full text-[#705E57] font-semibold">總篇數 $N = 4$</span>
+          </div>
+
+          <!-- 選擇要觀測的關鍵字 -->
+          <div class="flex flex-wrap items-center gap-2 bg-[#FAF6F0] p-3 rounded-xl border border-warm">
+            <span class="text-xs font-bold text-[#705E57]">選擇觀測單字 (Query Term)：</span>
+            <button onclick="selectTerm('MacBook')" class="term-btn px-3 py-1 text-xs rounded-lg font-bold bg-[#C85A32] text-white" data-term="MacBook">MacBook</button>
+            <button onclick="selectTerm('M3')" class="term-btn px-3 py-1 text-xs rounded-lg font-medium bg-white text-[#705E57] border border-warm hover:border-[#C85A32]" data-term="M3">M3</button>
+            <button onclick="selectTerm('保固')" class="term-btn px-3 py-1 text-xs rounded-lg font-medium bg-white text-[#705E57] border border-warm hover:border-[#C85A32]" data-term="保固">保固</button>
+            <button onclick="selectTerm('的')" class="term-btn px-3 py-1 text-xs rounded-lg font-medium bg-white text-[#705E57] border border-warm hover:border-[#C85A32]" data-term="的">的 (常見高頻詞)</button>
+            <button onclick="selectTerm('量子')" class="term-btn px-3 py-1 text-xs rounded-lg font-medium bg-white text-[#705E57] border border-warm hover:border-[#C85A32]" data-term="量子">量子 (全庫未出現)</button>
+          </div>
+
+          <!-- 4 篇文件卡片 -->
+          <div class="space-y-3" id="doc-container">
+            <div id="doc-card-0" class="p-3.5 rounded-xl border border-warm bg-[#FFFDFB] transition-all">
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <span class="font-bold text-[#8C4A2F]">Doc 0 (短精準文)</span>
+                <span id="doc-stat-0" class="text-xs font-mono text-[#705E57]">長度: 12 詞 ｜ 命中: 0 次</span>
+              </div>
+              <p id="doc-text-0" class="text-sm leading-relaxed text-[#4A3E39]">
+                MacBook Pro 搭載 M3 晶片 並 提供 完整 保固 服務 的 電腦
+              </p>
+            </div>
+            
+            <div id="doc-card-1" class="p-3.5 rounded-xl border border-warm bg-[#FFFDFB] transition-all">
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <span class="font-bold text-[#8C4A2F]">Doc 1 (關鍵字堆疊文)</span>
+                <span id="doc-stat-1" class="text-xs font-mono text-[#705E57]">長度: 11 詞 ｜ 命中: 0 次</span>
+              </div>
+              <p id="doc-text-1" class="text-sm leading-relaxed text-[#4A3E39]">
+                M3 M3 M3 M3 蘋果 的 筆電 真是 太棒 的 選擇
+              </p>
+            </div>
+            
+            <div id="doc-card-2" class="p-3.5 rounded-xl border border-warm bg-[#FFFDFB] transition-all">
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <span class="font-bold text-[#8C4A2F]">Doc 2 (長篇干擾文)</span>
+                <span id="doc-stat-2" class="text-xs font-mono text-[#705E57]">長度: 23 詞 ｜ 命中: 0 次</span>
+              </div>
+              <p id="doc-text-2" class="text-sm leading-relaxed text-[#4A3E39]">
+                這 是 一 篇 探討 全球 經濟 與 科技 趨勢 的 長篇 報告 其中 順帶 提到了 MacBook 的 銷量 與 蘋果 的 市佔率
+              </p>
+            </div>
+            
+            <div id="doc-card-3" class="p-3.5 rounded-xl border border-warm bg-[#FFFDFB] transition-all">
+              <div class="flex justify-between items-center text-xs mb-1.5">
+                <span class="font-bold text-[#8C4A2F]">Doc 3 (無關文)</span>
+                <span id="doc-stat-3" class="text-xs font-mono text-[#705E57]">長度: 9 詞 ｜ 命中: 0 次</span>
+              </div>
+              <p id="doc-text-3" class="text-sm leading-relaxed text-[#4A3E39]">
+                今天 天氣 晴朗 我們 一起 去 喝 咖啡 吧
+              </p>
+            </div>
+          </div>
+
+          <!-- 步進動畫控制鈕 -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2">
+            <button onclick="startScanningAnimation()" class="px-5 py-2.5 bg-[#C85A32] hover:bg-[#B34C27] text-white rounded-xl font-bold text-sm shadow flex items-center gap-2 transition-all">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              播放 TF / IDF 動態掃描動畫
+            </button>
+            <span id="scan-status-text" class="text-xs text-[#705E57] font-medium">點擊按鈕，觀察系統如何逐字累加詞頻與計算全庫逆向頻率</span>
+          </div>
+        </div>
+
+        <!-- 右側：TF / IDF 即時動態拆解看板 -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <!-- TF 計分卡 -->
+          <div class="warm-card rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-warm">
+              <h3 class="font-bold text-sm text-[#2D2522] flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#C85A32]"></span>
+                步驟 1：文章內詞頻 TF (Term Frequency)
+              </h3>
+              <span class="text-xs text-[#705E57]">單篇局域指標</span>
+            </div>
+            <p class="text-xs text-[#705E57] leading-relaxed">
+              統計該關鍵字在單一文件中出現的實體次數 $f(q, D)$：
+            </p>
+            <div class="grid grid-cols-4 gap-2 text-center text-xs pt-1">
+              <div class="bg-[#FAF6F0] p-2 rounded-lg border border-warm">
+                <div class="text-[#705E57] font-mono text-[11px]">Doc 0</div>
+                <div id="tf-val-0" class="text-base font-bold text-[#C85A32] mt-0.5">0 次</div>
+              </div>
+              <div class="bg-[#FAF6F0] p-2 rounded-lg border border-warm">
+                <div class="text-[#705E57] font-mono text-[11px]">Doc 1</div>
+                <div id="tf-val-1" class="text-base font-bold text-[#C85A32] mt-0.5">0 次</div>
+              </div>
+              <div class="bg-[#FAF6F0] p-2 rounded-lg border border-warm">
+                <div class="text-[#705E57] font-mono text-[11px]">Doc 2</div>
+                <div id="tf-val-2" class="text-base font-bold text-[#C85A32] mt-0.5">0 次</div>
+              </div>
+              <div class="bg-[#FAF6F0] p-2 rounded-lg border border-warm">
+                <div class="text-[#705E57] font-mono text-[11px]">Doc 3</div>
+                <div id="tf-val-3" class="text-base font-bold text-[#C85A32] mt-0.5">0 次</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- IDF 計分卡 (修復 MathJax 數學渲染) -->
+          <div class="warm-card rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-warm">
+              <h3 class="font-bold text-sm text-[#2D2522] flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#D97706]"></span>
+                步驟 2：逆向文件頻率 IDF (全庫罕見度)
+              </h3>
+              <span class="text-xs text-[#705E57]">全庫宏觀指標</span>
+            </div>
+            <p class="text-xs text-[#705E57] leading-relaxed">
+              統計整個語料庫中包含該字的篇數 $n(q)$，越罕見的字詞獲得越高的權重加分：
+            </p>
+            
+            <!-- 數學公式展示區塊 -->
+            <div class="bg-[#FAF6F0] p-4 rounded-xl border border-warm space-y-3">
+              <div class="text-xs text-[#705E57] font-semibold">BM25 平滑 IDF 標準公式：</div>
+              <div class="text-center py-1 overflow-x-auto">
+                $$\text{IDF}(q) = \ln\left(\frac{N - n(q) + 0.5}{n(q) + 0.5} + 1\right)$$
+              </div>
+              <div class="text-xs font-mono text-[#2D2522] flex justify-between items-center pt-2 border-t border-dashed border-[#E6DCce]">
+                <span>總文件數 $N = 4$</span>
+                <span>包含此字篇數 $n(q) = <strong id="idf-n-val" class="text-[#D97706]">2</strong> 篇</span>
+              </div>
+              <div class="p-3 bg-white rounded-lg border border-warm flex justify-between items-center">
+                <span class="text-xs font-bold text-[#705E57]">計算得出 IDF 權重分數：</span>
+                <span id="idf-result-score" class="text-lg font-black text-[#D97706] font-mono">0.6931</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aha! Moment 觀念小結卡 -->
+          <div class="p-4 rounded-xl bg-[#F4EDE2] border border-[#E4D7C3] text-xs leading-relaxed text-[#5C4A42] space-y-1">
+            <div class="font-bold text-[#8C4A2F] flex items-center gap-1">
+              <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+              觀念重點 (Aha! Moment)：
+            </div>
+            <p id="tf-idf-insight-text">
+              若單字是專有名詞，出現在極少數文件，IDF 很高；若是停用詞如「的」，因所有文章都出現，IDF 幾乎為 0，完全無法獲得加分！
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== TAB 2: BM25 飽和曲線與長度懲罰 ==================== -->
+    <main id="tab-2" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 左側：曲線繪製 Canvas 與公式解析 -->
+        <div class="lg:col-span-7 warm-card rounded-2xl p-6 space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b border-warm">
+            <div>
+              <h2 class="font-bold text-lg text-[#2D2522] flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-5 h-5 text-[#C85A32]"></i>
+                詞頻 (TF) 加分曲線：TF-IDF vs. BM25
+              </h2>
+              <p class="text-xs text-[#705E57] mt-0.5">觀察詞頻增加時，BM25 如何透過飽和機制防止關鍵字堆砌作弊</p>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-1 bg-[#FAF6F0] rounded-full text-[#C85A32] border border-warm">即時物理模擬</span>
+          </div>
+
+          <!-- 畫布區域 -->
+          <div class="relative w-full bg-[#FFFDF9] rounded-xl border border-warm p-2">
+            <canvas id="curveCanvas" width="560" height="280" class="w-full h-[280px]"></canvas>
+            <div class="flex justify-center gap-6 text-xs mt-2 font-medium">
+              <span class="flex items-center gap-1.5 text-[#B83838]">
+                <span class="w-3 h-1 bg-[#B83838] inline-block rounded"></span> TF-IDF (線性無上限暴增)
+              </span>
+              <span class="flex items-center gap-1.5 text-[#C85A32]">
+                <span class="w-3 h-1 bg-[#C85A32] inline-block rounded"></span> BM25 (邊際效益遞減飽和)
+              </span>
+            </div>
+          </div>
+
+          <!-- 公式拆解區 (修復 MathJax 數學渲染) -->
+          <div class="p-4 rounded-xl bg-[#FAF6F0] border border-warm space-y-2">
+            <div class="text-xs font-bold text-[#8C4A2F]">BM25 詞頻飽和項與長度懲罰項數學公式：</div>
+            <div class="py-2 bg-white rounded-lg border border-warm text-center overflow-x-auto">
+              $$\text{Score}_{\text{TF}} = \frac{f(q, D) \cdot (k_1 + 1)}{f(q, D) + k_1 \cdot \left(1 - b + b \cdot \frac{|D|}{\text{avgdl}}\right)}$$
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側：參數調節旋鈕 -->
+        <div class="lg:col-span-5 warm-card rounded-2xl p-6 space-y-5">
+          <div class="pb-3 border-b border-warm">
+            <h3 class="font-bold text-base text-[#2D2522] flex items-center gap-2">
+              <i data-lucide="sliders-horizontal" class="w-5 h-5 text-[#D97706]"></i>
+              參數調節旋鈕 (Interactive Knobs)
+            </h3>
+            <p class="text-xs text-[#705E57] mt-0.5">拖動滑桿，觀察左圖飽和速度與加分天花板的變化</p>
+          </div>
+
+          <!-- 滑桿 1: k1 飽和參數 -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-[#2D2522]">$k_1$ 詞頻飽和係數 (Saturation Knob)：</span>
+              <span id="k1-val-display" class="font-mono font-bold text-sm text-[#C85A32] bg-[#FAF6F0] px-2 py-0.5 rounded border border-warm">1.50</span>
+            </div>
+            <input type="range" id="slider-k1" min="0.1" max="3.0" step="0.1" value="1.5" class="w-full accent-[#C85A32] cursor-pointer" oninput="updateCurves()">
+            <div class="flex justify-between text-[11px] text-[#705E57]">
+              <span>0.1 (極快飽和，出現 2 次就封頂)</span>
+              <span>3.0 (接近線性加分)</span>
+            </div>
+          </div>
+
+          <!-- 滑桿 2: b 長度懲罰參數 -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-[#2D2522]">$b$ 文件長度懲罰力道 (Length Penalty)：</span>
+              <span id="b-val-display" class="font-mono font-bold text-sm text-[#D97706] bg-[#FAF6F0] px-2 py-0.5 rounded border border-warm">0.75</span>
+            </div>
+            <input type="range" id="slider-b" min="0.0" max="1.0" step="0.05" value="0.75" class="w-full accent-[#D97706] cursor-pointer" oninput="updateCurves()">
+            <div class="flex justify-between text-[11px] text-[#705E57]">
+              <span>0.0 (完全不懲罰長文章)</span>
+              <span>1.0 (完全依篇幅長度等比懲罰)</span>
+            </div>
+          </div>
+
+          <!-- 滑桿 3: 當前文章長度比率 -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-[#2D2522]">文件篇幅比率 ($|D| / \text{avgdl}$)：</span>
+              <span id="len-val-display" class="font-mono font-bold text-sm text-[#705E57] bg-[#FAF6F0] px-2 py-0.5 rounded border border-warm">1.0x (平均長度)</span>
+            </div>
+            <input type="range" id="slider-len" min="0.2" max="3.0" step="0.1" value="1.0" class="w-full accent-[#705E57] cursor-pointer" oninput="updateCurves()">
+            <div class="flex justify-between text-[11px] text-[#705E57]">
+              <span>0.2x (極精簡短文)</span>
+              <span>3.0x (篇幅超長之干擾文)</span>
+            </div>
+          </div>
+
+          <!-- 即時計算動態診斷 -->
+          <div class="p-3.5 rounded-xl bg-[#F6F0E6] border border-[#E5DAC8] text-xs space-y-1.5">
+            <div class="font-bold text-[#8C4A2F]">即時狀態分析：</div>
+            <p id="curve-analysis-text" class="text-[#5C4A42] leading-relaxed">
+              當關鍵字出現 10 次時，TF-IDF 得分 10.00 分，而 BM25 僅給予 2.27 分，成功壓抑了 77% 的灌水加分！
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== TAB 3: 實戰 BM25 全文評分沙盒 ==================== -->
+    <main id="tab-3" class="space-y-6 hidden">
+      <div class="warm-card rounded-2xl p-6 space-y-6">
+        
+        <!-- 搜尋輸入列 -->
+        <div class="flex flex-col md:flex-row gap-3">
+          <div class="flex-1 relative">
+            <input type="text" id="sandbox-query" value="MacBook M3 保固" placeholder="輸入查詢關鍵字（以空格分隔，例如：MacBook M3）" class="w-full px-4 py-3 rounded-xl border border-warm focus:outline-none focus:border-[#C85A32] bg-[#FAF6F0] text-sm font-medium">
+          </div>
+          <button onclick="runBM25Sandbox()" class="px-6 py-3 bg-[#C85A32] hover:bg-[#B34C27] text-white rounded-xl font-bold text-sm shadow flex items-center justify-center gap-2 transition-all">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            計算 BM25 全文排名
+          </button>
+        </div>
+
+        <!-- 預設測試查詢快選 -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="font-bold text-[#705E57]">快速測試範例：</span>
+          <button onclick="setQuery('MacBook M3 保固')" class="px-3 py-1 bg-[#F1ECE4] hover:bg-[#E5DCD0] rounded-lg text-[#5C4A42] font-medium">範例 1：MacBook M3 保固 (精準多詞)</button>
+          <button onclick="setQuery('M3')" class="px-3 py-1 bg-[#F1ECE4] hover:bg-[#E5DCD0] rounded-lg text-[#5C4A42] font-medium">範例 2：M3 (測試關鍵字堆疊)</button>
+          <button onclick="setQuery('的 筆電')" class="px-3 py-1 bg-[#F1ECE4] hover:bg-[#E5DCD0] rounded-lg text-[#5C4A42] font-medium">範例 3：的 筆電 (測試高頻停用詞)</button>
+        </div>
+
+        <!-- 評分結果卡片列表 -->
+        <div class="space-y-3 pt-2" id="sandbox-result-container">
+          <!-- JS 動態渲染 -->
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // 語料庫資料結構 (以空格切詞)
+    const corpus = [
+      { id: 0, title: "Doc 0 (短精準文)", text: "MacBook Pro 搭載 M3 晶片 並 提供 完整 保固 服務 的 電腦", tokens: ["MacBook", "Pro", "搭載", "M3", "晶片", "並", "提供", "完整", "保固", "服務", "的", "電腦"] },
+      { id: 1, title: "Doc 1 (關鍵字堆疊文)", text: "M3 M3 M3 M3 蘋果 的 筆電 真是 太棒 的 選擇", tokens: ["M3", "M3", "M3", "M3", "蘋果", "的", "筆電", "真是", "太棒", "的", "選擇"] },
+      { id: 2, title: "Doc 2 (長篇干擾文)", text: "這 是 一 篇 探討 全球 經濟 與 科技 趨勢 的 長篇 報告 其中 順帶 提到了 MacBook 的 銷量 與 蘋果 的 市佔率", tokens: ["這", "是", "一", "篇", "探討", "全球", "經濟", "與", "科技", "趨勢", "的", "長篇", "報告", "其中", "順帶", "提到了", "MacBook", "的", "銷量", "與", "蘋果", "的", "市佔率"] },
+      { id: 3, title: "Doc 3 (無關文)", text: "今天 天氣 晴朗 我們 一起 去 喝 咖啡 吧", tokens: ["今天", "天氣", "晴朗", "我們", "一起", "去", "喝", "咖啡", "吧"] }
+    ];
+
+    let currentTerm = "MacBook";
+    const N = corpus.length;
+    const avgdl = corpus.reduce((acc, d) => acc + d.tokens.length, 0) / N;
+
+    // 計算 IDF
+    function calcIDF(term) {
+      let n = 0;
+      corpus.forEach(doc => {
+        if (doc.tokens.includes(term)) n++;
+      });
+      if (n === 0) return { idf: 0, n: 0 };
+      const idf = Math.log(((N - n + 0.5) / (n + 0.5)) + 1);
+      return { idf: Math.max(0, idf), n: n };
+    }
+
+    // 計算單一詞對單一文件的 BM25 TF 貢獻
+    function calcBM25TF(tf, docLen, k1 = 1.5, b = 0.75) {
+      if (tf === 0) return 0;
+      const numerator = tf * (k1 + 1);
+      const denominator = tf + k1 * (1 - b + b * (docLen / avgdl));
+      return numerator / denominator;
+    }
+
+    // 切換 Tab
+    function switchTab(tabIndex) {
+      [1, 2, 3].forEach(i => {
+        const tabEl = document.getElementById(`tab-${i}`);
+        const btnEl = document.getElementById(`btn-tab-${i}`);
+        if (i === tabIndex) {
+          tabEl.classList.remove('hidden');
+          btnEl.className = "px-4 py-2 rounded-lg transition-all duration-200 bg-white text-[#C85A32] shadow-sm font-bold flex items-center gap-2";
+        } else {
+          tabEl.classList.add('hidden');
+          btnEl.className = "px-4 py-2 rounded-lg transition-all duration-200 text-[#705E57] hover:text-[#2D2522] flex items-center gap-2";
+        }
+      });
+      
+      if (tabIndex === 2) {
+        setTimeout(updateCurves, 50);
+      } else if (tabIndex === 3) {
+        runBM25Sandbox();
+      }
+
+      // 當切換 Tab 時重新觸發 MathJax 排版
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
+      }
+      lucide.createIcons();
+    }
+
+    // 選擇單字
+    function selectTerm(term) {
+      currentTerm = term;
+      document.querySelectorAll('.term-btn').forEach(btn => {
+        if (btn.getAttribute('data-term') === term) {
+          btn.className = "term-btn px-3 py-1 text-xs rounded-lg font-bold bg-[#C85A32] text-white";
+        } else {
+          btn.className = "term-btn px-3 py-1 text-xs rounded-lg font-medium bg-white text-[#705E57] border border-warm hover:border-[#C85A32]";
+        }
+      });
+      refreshDocHighlights(false);
+    }
+
+    // 刷新文件高亮與數值
+    function refreshDocHighlights(animated = false) {
+      const { idf, n } = calcIDF(currentTerm);
+      document.getElementById('idf-n-val').innerText = n;
+      document.getElementById('idf-result-score').innerText = idf.toFixed(4);
+
+      let insight = "";
+      if (n === 0) insight = `關鍵字「${currentTerm}」在全資料庫 0 篇文章中出現，IDF 權重為 0，代表此字無法提供任何辨識價值。`;
+      else if (n === N) insight = `關鍵字「${currentTerm}」在全部 ${N} 篇文章都有出現（常見停用詞），IDF 分數被全庫稀釋至極低 (${idf.toFixed(4)})，幾近於無效。`;
+      else insight = `關鍵字「${currentTerm}」僅在 ${n} 篇特定文件中出現，IDF 給予高達 ${idf.toFixed(4)} 的加分權重，具有顯著的區別力！`;
+      document.getElementById('tf-idf-insight-text').innerText = insight;
+
+      corpus.forEach((doc, idx) => {
+        const tf = doc.tokens.filter(t => t === currentTerm).length;
+        document.getElementById(`tf-val-${idx}`).innerText = `${tf} 次`;
+        document.getElementById(`doc-stat-${idx}`).innerText = `長度: ${doc.tokens.length} 詞 ｜ 命中: ${tf} 次`;
+
+        const highlightedHTML = doc.tokens.map(t => {
+          if (t === currentTerm) {
+            return `<span class="bg-[#FDE68A] text-[#92400E] font-bold px-1 py-0.5 rounded border border-[#F59E0B] term-highlight">${t}</span>`;
+          }
+          return `<span class="text-[#4A3E39]">${t}</span>`;
+        }).join(" ");
+        document.getElementById(`doc-text-${idx}`).innerHTML = highlightedHTML;
+      });
+    }
+
+    // 播放掃描動畫
+    function startScanningAnimation() {
+      const statusText = document.getElementById('scan-status-text');
+      statusText.innerText = "⏳ 正在逐字掃描 TF 詞頻與全庫逆向頻率 IDF...";
+      statusText.classList.add('text-[#C85A32]', 'font-bold');
+
+      let currentDoc = 0;
+      const interval = setInterval(() => {
+        corpus.forEach((_, i) => {
+          const card = document.getElementById(`doc-card-${i}`);
+          if (i === currentDoc) {
+            card.classList.add('bg-[#FFF3E8]', 'border-[#C85A32]', 'scanning-active');
+          } else {
+            card.classList.remove('bg-[#FFF3E8]', 'border-[#C85A32]', 'scanning-active');
+          }
+        });
+
+        currentDoc++;
+        if (currentDoc >= corpus.length) {
+          clearInterval(interval);
+          setTimeout(() => {
+            corpus.forEach((_, i) => {
+              document.getElementById(`doc-card-${i}`).classList.remove('bg-[#FFF3E8]', 'border-[#C85A32]', 'scanning-active');
+            });
+            refreshDocHighlights(true);
+            statusText.innerText = `✅ 掃描完成！單字「${currentTerm}」IDF 權重已動態計算完畢。`;
+            statusText.classList.remove('text-[#C85A32]');
+          }, 300);
+        }
+      }, 350);
+    }
+
+    // ==================== TAB 2: Canvas 繪製飽和曲線 ====================
+    function updateCurves() {
+      const k1 = parseFloat(document.getElementById('slider-k1').value);
+      const b = parseFloat(document.getElementById('slider-b').value);
+      const lenRatio = parseFloat(document.getElementById('slider-len').value);
+
+      document.getElementById('k1-val-display').innerText = k1.toFixed(2);
+      document.getElementById('b-val-display').innerText = b.toFixed(2);
+      document.getElementById('len-val-display').innerText = `${lenRatio.toFixed(1)}x`;
+
+      const canvas = document.getElementById('curveCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // 繪製座標系網格 (暖色系)
+      ctx.strokeStyle = "#EADBCC";
+      ctx.lineWidth = 1;
+      for (let x = 40; x < w - 20; x += 60) {
+        ctx.beginPath();
+        ctx.moveTo(x, 20);
+        ctx.lineTo(x, h - 30);
+        ctx.stroke();
+      }
+      for (let y = 20; y <= h - 30; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(40, y);
+        ctx.lineTo(w - 20, y);
+        ctx.stroke();
+      }
+
+      // 軸線
+      ctx.strokeStyle = "#705E57";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(40, 20);
+      ctx.lineTo(40, h - 30);
+      ctx.lineTo(w - 20, h - 30);
+      ctx.stroke();
+
+      // 軸標籤
+      ctx.fillStyle = "#705E57";
+      ctx.font = "11px sans-serif";
+      ctx.fillText("TF 詞頻 (0 -> 25 次)", w - 130, h - 12);
+      ctx.fillText("加分得分", 8, 30);
+
+      const maxTF = 25;
+      const maxScore = 8;
+
+      function getX(tf) { return 40 + (tf / maxTF) * (w - 70); }
+      function getY(score) { return (h - 30) - (score / maxScore) * (h - 60); }
+
+      // 1. 繪製 TF-IDF 線性曲線 (紅色)
+      ctx.strokeStyle = "#B83838";
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      for (let tf = 0; tf <= maxTF; tf += 0.5) {
+        const score = tf * 0.45;
+        const px = getX(tf);
+        const py = getY(score);
+        if (tf === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 2. 繪製 BM25 飽和曲線 (暖橘色)
+      ctx.strokeStyle = "#C85A32";
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      for (let tf = 0; tf <= maxTF; tf += 0.2) {
+        const num = tf * (k1 + 1);
+        const den = tf + k1 * (1 - b + b * lenRatio);
+        const score = num / den;
+        const px = getX(tf);
+        const py = getY(score);
+        if (tf === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // 標註飽和天花板虛線
+      const ceiling = k1 + 1;
+      const ceilingY = getY(ceiling);
+      if (ceilingY >= 20) {
+        ctx.strokeStyle = "#D97706";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(40, ceilingY);
+        ctx.lineTo(w - 20, ceilingY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#D97706";
+        ctx.fillText(`理論加分天花板 = ${ceiling.toFixed(2)}`, w - 160, ceilingY - 4);
+      }
+
+      // 即時文字分析
+      const tfSample = 10;
+      const bm25Sample = (tfSample * (k1 + 1)) / (tfSample + k1 * (1 - b + b * lenRatio));
+      const tfidfSample = tfSample;
+      const suppressed = ((1 - (bm25Sample / tfidfSample)) * 100).toFixed(0);
+      document.getElementById('curve-analysis-text').innerText = 
+        `當關鍵字出現 ${tfSample} 次時，TF-IDF 累積加分高達 ${tfidfSample} 分；而 BM25 透過 k1=${k1.toFixed(1)} 與長度懲罰，將分數壓抑至 ${bm25Sample.toFixed(2)} 分（成功抑制了 ${suppressed}% 的惡意堆疊加分）！`;
+    }
+
+    // ==================== TAB 3: 實戰沙盒檢索 ====================
+    function setQuery(q) {
+      document.getElementById('sandbox-query').value = q;
+      runBM25Sandbox();
+    }
+
+    function runBM25Sandbox() {
+      const queryStr = document.getElementById('sandbox-query').value.trim();
+      const queryTerms = queryStr.split(/\s+/).filter(t => t.length > 0);
+      const container = document.getElementById('sandbox-result-container');
+      container.innerHTML = "";
+
+      if (queryTerms.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-xs text-[#705E57]">請輸入至少一個關鍵字</div>`;
+        return;
+      }
+
+      const k1 = 1.5;
+      const b = 0.75;
+
+      const results = corpus.map(doc => {
+        let totalBM25 = 0;
+        let breakdown = [];
+
+        queryTerms.forEach(term => {
+          const { idf } = calcIDF(term);
+          const tf = doc.tokens.filter(t => t === term).length;
+          const tfScore = calcBM25TF(tf, doc.tokens.length, k1, b);
+          const termScore = idf * tfScore;
+          totalBM25 += termScore;
+
+          breakdown.push({
+            term,
+            tf,
+            idf: idf.toFixed(3),
+            tfScore: tfScore.toFixed(3),
+            termScore: termScore.toFixed(3)
+          });
+        });
+
+        return {
+          ...doc,
+          score: totalBM25,
+          breakdown
+        };
+      });
+
+      results.sort((a, b) => b.score - a.score);
+
+      results.forEach((res, rank) => {
+        const isWinner = rank === 0 && res.score > 0;
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border transition-all ${
+          isWinner ? 'bg-[#FFF9F3] border-[#C85A32] ring-1 ring-[#C85A32]' : 'bg-[#FFFFFF] border-warm'
+        }`;
+
+        let breakdownHTML = res.breakdown.map(b => `
+          <div class="bg-[#FAF6F0] p-2 rounded border border-warm text-[11px] font-mono">
+            <span class="font-bold text-[#8C4A2F]">${b.term}</span>: 
+            TF=${b.tf} (得 ${b.tfScore}分) × IDF=${b.idf} = <strong class="text-[#C85A32]">${b.termScore}</strong>
+          </div>
+        `).join("");
+
+        card.innerHTML = `
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-2 pb-2 border-b border-warm">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
+                isWinner ? 'bg-[#C85A32] text-white' : 'bg-[#EFE9E0] text-[#705E57]'
+              }">${rank + 1}</span>
+              <h4 class="font-bold text-sm text-[#2D2522]">${res.title}</h4>
+              <span class="text-xs text-[#705E57]">(${res.tokens.length} 詞)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[#705E57]">BM25 總分：</span>
+              <span class="text-lg font-black font-mono ${isWinner ? 'text-[#C85A32]' : 'text-[#705E57]'}">
+                ${res.score.toFixed(4)}
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-[#5C4A42] mb-3 leading-relaxed">${res.text}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            ${breakdownHTML}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // 初始化加載
+    window.onload = () => {
+      lucide.createIcons();
+      refreshDocHighlights(false);
+      updateCurves();
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise();
+      }
+    };
+  </script>
+</body>
+</html>

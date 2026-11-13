@@ -1,0 +1,797 @@
+<style>
+  /* 
+    =======================================================
+    JWT 互動式教學沙盒 (影視導覽 + 實機操作 雙模式)
+    - 本樣式僅作用於 .jwt-sandbox-container 內部，避免污染外部全域
+    =======================================================
+  */
+  
+  :root {
+    --jwt-slate: #1e293b;
+    --jwt-bg: #f8fafc;
+    --jwt-blue: #2563eb;
+    --jwt-green: #10b981;
+    --jwt-red: #ef4444;
+    --jwt-yellow: #f59e0b;
+    --jwt-gray: #94a3b8;
+    --jwt-light-gray: #e2e8f0;
+    --jwt-h: #fb7185;
+    --jwt-p: #c084fc;
+    --jwt-s: #38bdf8;
+  }
+
+  .jwt-sandbox-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 2rem auto;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: var(--jwt-slate);
+    position: relative;
+    user-select: none;
+    box-sizing: border-box;
+  }
+  
+  .jwt-sandbox-container * {
+    box-sizing: border-box;
+  }
+
+  /* 模式切換器 (Tab) */
+  .mode-switch {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .mode-btn {
+    padding: 10px 24px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    background: #fff;
+    color: var(--jwt-gray);
+    border: 2px solid var(--jwt-light-gray);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: 0.3s;
+    outline: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mode-btn.active {
+    background: var(--jwt-blue);
+    color: #fff;
+    border-color: var(--jwt-slate);
+    box-shadow: 0 4px 0 var(--jwt-slate);
+    transform: translateY(-2px);
+  }
+  
+  /* 
+    虛擬畫布外框
+    使用 aspect-ratio 固定 16:10 比例，透過 container queries 或 % 自適應
+  */
+  .canvas-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background-color: var(--jwt-bg);
+    background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    border: 2px solid var(--jwt-light-gray);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+  }
+
+  /* 內部絕對縮放層 (基準 1200x750) */
+  .virtual-stage {
+    position: absolute;
+    width: 1200px;
+    height: 750px;
+    top: 0; left: 0;
+    transform-origin: top left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* --- 影視導覽模式下：底層字幕條 --- */
+  .subtitle-bar {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    border: 2.5px solid var(--jwt-slate);
+    border-radius: 16px;
+    padding: 18px 30px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    transition: opacity 0.3s;
+  }
+  .sub-text-area { flex: 1; margin-right: 20px;}
+  .sub-main { font-size: 1.35rem; font-weight: 800; color: var(--jwt-slate); margin-bottom: 4px; }
+  .sub-desc { font-size: 0.95rem; color: #475569; font-weight: 600; line-height: 1.4; }
+  
+  .sub-controls { display: flex; gap: 12px; }
+  .btn-action {
+    padding: 10px 24px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    background: var(--jwt-blue);
+    color: #fff;
+    border: 2.5px solid var(--jwt-slate);
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--jwt-slate);
+    transition: 0.1s;
+  }
+  .btn-action:active { transform: translateY(4px); box-shadow: 0 0 0 var(--jwt-slate); }
+  .btn-reset { background: #fff; color: var(--jwt-slate); }
+
+  /* --- 核心角色卡片佈局 --- */
+  .actors-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 70px;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -60%); /* 留空間給下方字幕 */
+    width: 100%;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.4, 1); /* 用於運鏡 */
+  }
+
+  .actor-card {
+    background: #fff;
+    border: 3px solid var(--jwt-slate);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex; flex-direction: column; align-items: center;
+    transition: opacity 0.4s, filter 0.4s, transform 0.4s;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.04);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .actor-card.dimmed { opacity: 0.4; filter: grayscale(40%); }
+
+  .actor-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 2px;}
+  .actor-en { font-size: 0.75rem; color: var(--jwt-gray); background: var(--jwt-light-gray); padding: 3px 10px; border-radius: 99px; margin-bottom: 16px; font-family: monospace; font-weight: 700; }
+
+  /* 1. 前端 Browser */
+  #browser { width: 280px; height: 380px; }
+  .browser-screen {
+    width: 100%; border: 2px dashed #cbd5e1; border-radius: 8px;
+    padding: 12px; margin-bottom: 16px; background: #fafafa;
+    min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px;
+  }
+  
+  /* 實機操作模式的輸入框與按鈕 */
+  .interactive-input {
+    width: 100%; padding: 8px 10px; border: 2px solid #cbd5e1; border-radius: 6px;
+    font-size: 0.9rem; font-weight: 600; text-align: center;
+    outline: none; transition: border-color 0.2s;
+  }
+  .interactive-input:focus { border-color: var(--jwt-blue); }
+  .interactive-btn {
+    width: 100%; padding: 8px; background: var(--jwt-blue); color: #fff;
+    border: 2px solid var(--jwt-slate); border-radius: 6px;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 var(--jwt-slate);
+  }
+  .interactive-btn:active { transform: translateY(3px); box-shadow: 0 0 0; }
+
+  /* Cookie 槽 */
+  .cookie-slot {
+    width: 100%; border: 2px solid #cbd5e1; background: #f8fafc;
+    border-radius: 12px; padding: 12px; text-align: center;
+    min-height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; transition: all 0.3s;
+  }
+  .cookie-slot.active-recv { border-color: var(--jwt-yellow); background: var(--jwt-yellow-light); transform: scale(1.03); }
+  .cookie-badge { font-size: 0.75rem; font-weight: 800; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; color: var(--jwt-slate-light); }
+  .lock-icon {
+    position: absolute; top: -10px; right: -10px; font-size: 16px;
+    background: var(--jwt-yellow); border: 2px solid var(--jwt-slate); border-radius: 50%;
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: scale(0); transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 2. 後端 Backend */
+  #backend { width: 330px; height: 380px; }
+  .factory-area {
+    width: 100%; border: 2px solid #e2e8f0; border-radius: 10px; background: #fafafa;
+    min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; margin-bottom: 16px;
+  }
+  .factory-tag { position: absolute; top: 6px; left: 10px; font-size: 0.7rem; font-weight: 800; color: var(--jwt-gray); }
+  
+  .sk-card {
+    width: 100%; border: 2px dashed #fca5a5; background: #fff5f5; border-radius: 8px;
+    padding: 10px; text-align: center; transition: all 0.3s;
+  }
+  .sk-card.hl { border-color: var(--jwt-red); background: #fee2e2; transform: scale(1.05); }
+  .sk-title { font-weight: 800; color: #dc2626; font-size: 0.9rem; }
+  .sk-desc { font-size: 0.7rem; color: var(--jwt-red); font-weight: 700; margin-top: 2px; }
+
+  /* 3. 資料庫 Database */
+  #database { width: 220px; height: 380px; justify-content: flex-start; }
+  .db-stack { margin-top: 36px; display: flex; flex-direction: column; align-items: center; }
+  .db-cyl { width: 120px; height: 38px; border: 2.5px solid var(--jwt-slate); border-radius: 50%; background: #e0f2fe; margin-bottom: -16px; transition: 0.4s; }
+  .db-cyl.t { z-index: 3; background: #bae6fd; }
+  .db-cyl.m { z-index: 2; }
+  .db-cyl.b { z-index: 1; }
+  .db-hint { margin-top: 36px; font-size: 0.8rem; font-weight: 700; color: var(--jwt-gray); text-align: center; }
+  .skip-db {
+    position: absolute; top: 120px; left: -30px; z-index: 20;
+    background: #fff; border: 2px solid var(--jwt-red); color: var(--jwt-red);
+    padding: 6px 12px; border-radius: 99px; font-size: 0.8rem; font-weight: 800;
+    opacity: 0; transform: scale(0); transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap;
+  }
+
+  /* 飛行物件 & 反饋元件 */
+  .flight-obj {
+    position: absolute; z-index: 60; display: none;
+    background: #fff; border: 2px solid var(--jwt-slate); border-radius: 8px;
+    padding: 6px 12px; font-weight: 800; font-size: 0.85rem;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-direction: column; align-items: center;
+  }
+  .flight-obj span { font-size: 0.7rem; font-weight: 600; color: var(--jwt-gray); margin-top: 2px; }
+  
+  .jwt-ticket { display: inline-flex; border: 2px solid var(--jwt-slate); border-radius: 6px; overflow: hidden; font-size: 0.7rem; font-weight: 800; }
+  .jwt-seg { padding: 4px 6px; }
+  .jwt-h { background: var(--jwt-h); color: #881337; }
+  .jwt-p { background: var(--jwt-p); color: #581c87; }
+  .jwt-s { background: var(--jwt-s); color: #0c4a6e; }
+
+  .feedback-pill {
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%) scale(0);
+    background: var(--jwt-green); color: #fff; border: 2px solid var(--jwt-slate);
+    padding: 4px 14px; border-radius: 99px; font-size: 0.85rem; font-weight: 800;
+    opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 30; white-space: nowrap;
+  }
+
+  /* 後端工廠動態元件 */
+  .fac-item { position: absolute; opacity: 0; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; }
+  .fac-p { background: #f3e8ff; border: 1.5px solid var(--jwt-p); color: #7e22ce; transform: scale(0.8); top: 35%; }
+  .fac-s { background: #fee2e2; border: 1.5px solid var(--jwt-red); color: var(--jwt-red); transform: translateY(-10px); top: 55%; }
+  .fac-res { top: 40%; transform: scale(0.6); }
+
+  /* 實機模式特有：操作提示遮罩 */
+  .interactive-hint {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: var(--jwt-yellow); color: #fff; font-weight: 800; font-size: 0.9rem;
+    padding: 6px 16px; border-radius: 99px; border: 2px solid var(--jwt-slate);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); z-index: 90;
+    display: none;
+  }
+</style>
+
+<div class="jwt-sandbox-container">
+  
+  <!-- 雙模式切換 Tab -->
+  <div class="mode-switch">
+    <button class="mode-btn active" id="mode-watch">🎬 影視導覽模式</button>
+    <button class="mode-btn" id="mode-lab">🕹️ 實機動手沙盒</button>
+  </div>
+
+  <div class="canvas-wrapper" id="canvas-wrapper">
+    <div class="virtual-stage" id="virtual-stage">
+      
+      <!-- 實機模式提示 -->
+      <div class="interactive-hint" id="lab-hint">👉 請在左側瀏覽器親自輸入帳號密碼登入</div>
+
+      <!-- 三角色舞台 -->
+      <div class="actors-container" id="actors-box">
+        
+        <!-- 1. Frontend -->
+        <div class="actor-card" id="card-browser">
+          <div class="actor-title">前端瀏覽器</div>
+          <div class="actor-en">Client</div>
+          
+          <div class="browser-screen" id="b-screen">
+            <!-- 初始為 Watch Mode 靜態內容，切換模式由 JS 替換為 Input -->
+          </div>
+          
+          <div class="cookie-slot" id="cookie-slot">
+            <div class="cookie-badge">Cookie 保險箱</div>
+            <div id="cookie-status" style="font-size:0.85rem; font-weight:800; color:#94a3b8;">📦 Empty</div>
+            <div class="lock-icon" id="cookie-lock">🔒</div>
+          </div>
+        </div>
+
+        <!-- 2. Backend -->
+        <div class="actor-card" id="card-backend">
+          <div class="feedback-pill" id="be-feedback"></div>
+          <div class="actor-title">後端伺服器</div>
+          <div class="actor-en">Backend API</div>
+          
+          <div class="factory-area">
+            <div class="factory-tag">JWT 工廠</div>
+            <div class="fac-item fac-p" id="fac-p">📄 Payload (ID: 101)</div>
+            <div class="fac-item fac-s" id="fac-s">🛡️ HMAC 簽章</div>
+            <div class="fac-item fac-res" id="fac-jwt">
+              <div class="jwt-ticket">
+                <div class="jwt-seg jwt-h">H</div><div class="jwt-seg jwt-p">Payload</div><div class="jwt-seg jwt-s">Sign</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="sk-card" id="sk-card">
+            <div class="sk-title">🔑 Secret Key</div>
+            <div class="sk-desc">保留於後端</div>
+          </div>
+        </div>
+
+        <!-- 3. Database -->
+        <div class="actor-card" id="card-database">
+          <div class="feedback-pill" id="db-feedback"></div>
+          <div class="actor-title">資料庫名冊</div>
+          <div class="actor-en">Database</div>
+          
+          <div class="db-stack">
+            <div class="db-cyl t" id="db-t"></div>
+            <div class="db-cyl m"></div>
+            <div class="db-cyl b" id="db-b"></div>
+          </div>
+          <div class="db-hint">儲存密碼 Hash<br><span style="font-size:0.7rem;">登入時查閱核對</span></div>
+          
+          <div class="skip-db" id="skip-db">🚫 免查資料庫！</div>
+        </div>
+
+      </div>
+
+      <!-- 飛行卡片 -->
+      <div class="flight-obj" id="fly-login" style="border-color:#2563eb; color:#2563eb; background:#eff6ff;">
+        🔑 帳號 + 密碼
+        <span>Login Data</span>
+      </div>
+      <div class="flight-obj" id="fly-query" style="border-color:#10b981; color:#10b981; background:#f0fdf4; flex-direction:row; gap:6px;">
+        🔍 核對名冊...
+      </div>
+      <div class="flight-obj" id="fly-jwt" style="padding:0; border:none; background:transparent;">
+        <div class="jwt-ticket" style="transform: scale(1.2);">
+          <div class="jwt-seg jwt-h">Header</div><div class="jwt-seg jwt-p">Payload</div><div class="jwt-seg jwt-s">Signature</div>
+        </div>
+      </div>
+      <div class="flight-obj" id="fly-req" style="flex-direction:row; gap:8px;">
+        <span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; margin:0; color:#1e293b;">API 請求</span>
+        <span style="font-weight:900; font-size:1rem; margin:0; color:#1e293b;">+</span>
+        <div class="jwt-ticket" style="transform:scale(0.85);">
+          <div class="jwt-seg jwt-h">H</div><div class="jwt-seg jwt-p">P</div><div class="jwt-seg jwt-s">S</div>
+        </div>
+      </div>
+
+      <!-- 影視導覽模式底部字幕條 -->
+      <div class="subtitle-bar" id="sub-bar">
+        <div class="sub-text-area">
+          <div class="sub-main" id="sub-main">JWT 身分驗證流程</div>
+          <div class="sub-desc" id="sub-desc">點擊右側按鈕開始逐步導覽</div>
+        </div>
+        <div class="sub-controls">
+          <button class="btn-action btn-reset" id="btn-sub-reset">重置</button>
+          <button class="btn-action" id="btn-sub-next">開始導覽 (Step 1)</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // --- 1. 虛擬畫布 RWD 等比縮放 ---
+  const wrapper = document.getElementById('canvas-wrapper');
+  const stage = document.getElementById('virtual-stage');
+  const BASE_W = 1200, BASE_H = 750;
+
+  function resizeCanvas() {
+    const rect = wrapper.getBoundingClientRect();
+    const scale = Math.min(rect.width / BASE_W, rect.height / BASE_H);
+    stage.style.transform = `scale(${scale})`;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  // 若環境支援 ResizeObserver 則掛載，否則略過
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(resizeCanvas).observe(wrapper);
+  }
+  setTimeout(resizeCanvas, 50);
+
+  // --- DOM 快取與輔助函數 ---
+  const el = {
+    modeWatch: document.getElementById('mode-watch'),
+    modeLab: document.getElementById('mode-lab'),
+    actorsBox: document.getElementById('actors-box'),
+    cBrowser: document.getElementById('card-browser'),
+    cBackend: document.getElementById('card-backend'),
+    cDatabase: document.getElementById('card-database'),
+    
+    bScreen: document.getElementById('b-screen'),
+    ckSlot: document.getElementById('cookie-slot'),
+    ckStatus: document.getElementById('cookie-status'),
+    ckLock: document.getElementById('cookie-lock'),
+    
+    facP: document.getElementById('fac-p'),
+    facS: document.getElementById('fac-s'),
+    facJwt: document.getElementById('fac-jwt'),
+    skCard: document.getElementById('sk-card'),
+    beFeed: document.getElementById('be-feedback'),
+    
+    dbTop: document.getElementById('db-t'),
+    dbBot: document.getElementById('db-b'),
+    dbFeed: document.getElementById('db-feedback'),
+    skipDb: document.getElementById('skip-db'),
+    
+    flyLogin: document.getElementById('fly-login'),
+    flyQuery: document.getElementById('fly-query'),
+    flyJwt: document.getElementById('fly-jwt'),
+    flyReq: document.getElementById('fly-req'),
+    
+    subBar: document.getElementById('sub-bar'),
+    subMain: document.getElementById('sub-main'),
+    subDesc: document.getElementById('sub-desc'),
+    btnNext: document.getElementById('btn-sub-next'),
+    btnReset: document.getElementById('btn-sub-reset'),
+    
+    labHint: document.getElementById('lab-hint')
+  };
+
+  function getLocalCenter(elem) {
+    const sRect = stage.getBoundingClientRect();
+    const eRect = elem.getBoundingClientRect();
+    const scale = sRect.width / BASE_W;
+    return {
+      x: (eRect.left - sRect.left + eRect.width / 2) / scale,
+      y: (eRect.top - sRect.top + eRect.height / 2) / scale
+    };
+  }
+  function setLocalPos(elem, x, y) { elem.style.left = x + 'px'; elem.style.top = y + 'px'; }
+  
+  let timers = [];
+  function delay(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function clearLive() {
+    timers.forEach(clearTimeout); timers = [];
+    [el.flyLogin, el.flyQuery, el.flyJwt, el.flyReq].forEach(c => { c.style.display='none'; c.style.transition='none'; });
+    el.beFeed.style.transform='translateX(-50%) scale(0)'; el.beFeed.style.opacity='0';
+    el.dbFeed.style.transform='translateX(-50%) scale(0)'; el.dbFeed.style.opacity='0';
+  }
+
+  // --- 基礎 UI 狀態重置 ---
+  function resetBaseUI(mode) {
+    clearLive();
+    // 運鏡歸位
+    el.actorsBox.style.transform = 'translate(-50%, -60%) scale(1)';
+    el.cBrowser.className = 'actor-card'; el.cBackend.className = 'actor-card'; el.cDatabase.className = 'actor-card';
+    
+    el.ckSlot.className = 'cookie-slot';
+    el.ckStatus.innerHTML = '📦 Empty';
+    el.ckLock.style.opacity = '0'; el.ckLock.style.transform = 'scale(0)';
+    
+    el.facP.style.opacity='0'; el.facP.style.transform='scale(0.8)';
+    el.facS.style.opacity='0'; el.facS.style.transform='translateY(-10px)';
+    el.facJwt.style.opacity='0'; el.facJwt.style.transform='scale(0.6)';
+    el.skCard.className = 'sk-card';
+    
+    el.dbTop.style.transform='translateY(0)'; el.dbBot.style.transform='translateY(0)';
+    el.dbTop.style.background='#bae6fd';
+    el.skipDb.style.opacity='0'; el.skipDb.style.transform='scale(0)';
+    
+    if (mode === 'watch') {
+      el.bScreen.innerHTML = '<div style="font-size:1.1rem; font-weight:800;">👤 未登入</div><div style="font-size:0.75rem;">等待操作...</div>';
+      el.labHint.style.display = 'none';
+      el.subBar.style.display = 'flex';
+      setTimeout(()=> el.subBar.style.opacity = '1', 50);
+    } else {
+      // 實機模式：注入真實輸入框
+      el.bScreen.innerHTML = `
+        <input type="text" class="interactive-input" id="lab-user" placeholder="帳號" value="alex@tech" />
+        <input type="password" class="interactive-input" id="lab-pwd" placeholder="密碼" value="***" />
+        <button class="interactive-btn" id="lab-btn-login">親自點擊登入</button>
+      `;
+      el.labHint.innerText = '👉 請在左側瀏覽器親自點擊登入按鈕';
+      el.labHint.style.background = 'var(--jwt-yellow)';
+      el.labHint.style.display = 'block';
+      el.subBar.style.opacity = '0';
+      setTimeout(()=> el.subBar.style.display = 'none', 300);
+      
+      // 綁定實機登入事件
+      document.getElementById('lab-btn-login').addEventListener('click', runLabLoginFlow);
+    }
+  }
+
+  /* 
+    =======================================================
+    模式 A：影視導覽模式 (Watch Mode)
+    - 以步數控制，自動運鏡與下標
+    =======================================================
+  */
+  let watchStep = 0;
+  const watchScript = [
+    {
+      m: "JWT 身分驗證流程", s: "點擊右側按鈕開始逐步導覽", btn: "開始導覽 (Step 1)",
+      run: () => resetBaseUI('watch')
+    },
+    {
+      m: "1. 使用者登入", s: "瀏覽器打包帳號與密碼，送往後端", btn: "下一步：核對 (Step 2)",
+      run: () => {
+        el.actorsBox.style.transform = 'translate(-35%, -60%) scale(1.1)'; // 微推近前端
+        el.cDatabase.className = 'actor-card dimmed';
+        
+        const bPos = getLocalCenter(el.bScreen);
+        setLocalPos(el.flyLogin, bPos.x - 70, bPos.y - 20);
+        el.flyLogin.style.display='flex'; el.flyLogin.style.transform='scale(0.8)'; el.flyLogin.style.opacity='0';
+        delay(()=>{
+          el.flyLogin.style.transition='all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          el.flyLogin.style.transform='scale(1)'; el.flyLogin.style.opacity='1';
+          delay(()=>{
+            const bePos = getLocalCenter(el.cBackend);
+            el.flyLogin.style.transition='all 1s cubic-bezier(0.25, 1, 0.4, 1)';
+            setLocalPos(el.flyLogin, bePos.x - 70, bePos.y - 80);
+          }, 350);
+        },100);
+      }
+    },
+    {
+      m: "2. 後端核對名冊", s: "後端向資料庫驗證帳密是否吻合", btn: "下一步：發證 (Step 3)",
+      run: () => {
+        el.actorsBox.style.transform = 'translate(-65%, -60%) scale(1.1)'; // 移向資料庫
+        el.cBrowser.className = 'actor-card dimmed'; el.cBackend.className = 'actor-card'; el.cDatabase.className = 'actor-card';
+        el.flyLogin.style.display='none';
+        
+        const bePos = getLocalCenter(el.cBackend);
+        setLocalPos(el.flyQuery, bePos.x + 40, bePos.y - 20);
+        el.flyQuery.innerHTML = '🔍 核對名冊...';
+        el.flyQuery.style.background='#f0fdf4'; el.flyQuery.style.borderColor='var(--jwt-green)'; el.flyQuery.style.color='var(--jwt-green)';
+        el.flyQuery.style.display='flex';
+        
+        delay(()=>{
+          const dbPos = getLocalCenter(el.cDatabase);
+          el.flyQuery.style.transition='all 0.8s cubic-bezier(0.25, 1, 0.4, 1)';
+          setLocalPos(el.flyQuery, dbPos.x - 65, dbPos.y - 40);
+          
+          delay(()=>{
+            el.dbTop.style.transform='translateY(-12px)'; el.dbBot.style.transform='translateY(12px)';
+            el.dbTop.style.background='#86efac';
+            el.dbFeed.innerHTML = '✓ 身分確認';
+            el.dbFeed.style.opacity='1'; el.dbFeed.style.transform='translateX(-50%) scale(1)';
+            
+            delay(()=>{
+              el.flyQuery.innerHTML = '✓ 吻合';
+              setLocalPos(el.flyQuery, bePos.x + 30, bePos.y - 20);
+              delay(()=>{
+                el.flyQuery.style.display='none';
+                el.beFeed.innerHTML = '✓ 帳密無誤';
+                el.beFeed.style.opacity='1'; el.beFeed.style.transform='translateX(-50%) scale(1)';
+                el.dbTop.style.transform='translateY(0)'; el.dbBot.style.transform='translateY(0)'; el.dbTop.style.background='#bae6fd';
+                el.dbFeed.style.opacity='0';
+              }, 800);
+            }, 600);
+          }, 800);
+        },100);
+      }
+    },
+    {
+      m: "3. 後端產生 JWT", s: "使用保留在後端的 Secret Key 簽署防偽通行證", btn: "下一步：保存 (Step 4)",
+      run: () => {
+        el.actorsBox.style.transform = 'translate(-50%, -60%) scale(1.15)'; // 特寫後端
+        el.cDatabase.className = 'actor-card dimmed'; el.beFeed.style.opacity='0';
+        
+        delay(()=>{
+          el.facP.style.opacity='1'; el.facP.style.transform='scale(1)';
+          delay(()=>{
+            el.skCard.classList.add('hl');
+            el.facS.style.opacity='1'; el.facS.style.transform='translateY(0)';
+            delay(()=>{
+              el.facP.style.opacity='0'; el.facS.style.opacity='0';
+              el.facJwt.style.opacity='1'; el.facJwt.style.transform='scale(1.2)';
+              delay(()=>{ el.facJwt.style.transform='scale(1)'; el.skCard.classList.remove('hl'); }, 200);
+            }, 800);
+          }, 700);
+        }, 200);
+      }
+    },
+    {
+      m: "4. 保存 JWT 至 Cookie", s: "瀏覽器將 JWT 妥善存進專屬保險箱並上鎖 (HttpOnly)", btn: "下一步：發送請求 (Step 5)",
+      run: () => {
+        el.actorsBox.style.transform = 'translate(-35%, -60%) scale(1.1)';
+        el.cBrowser.className = 'actor-card'; el.facJwt.style.opacity='0';
+        
+        const bePos = getLocalCenter(el.cBackend);
+        setLocalPos(el.flyJwt, bePos.x - 70, bePos.y - 70);
+        el.flyJwt.style.display='block'; el.flyJwt.style.opacity='1'; el.flyJwt.style.transform='scale(1)';
+        
+        delay(()=>{
+          const ckPos = getLocalCenter(el.ckSlot);
+          el.flyJwt.style.transition='all 1s cubic-bezier(0.25, 1, 0.4, 1)';
+          setLocalPos(el.flyJwt, ckPos.x - 70, ckPos.y - 20);
+          
+          delay(()=>{
+            el.ckSlot.classList.add('active-recv');
+            delay(()=>{
+              el.flyJwt.style.transition='all 0.3s'; el.flyJwt.style.transform='scale(0.3)'; el.flyJwt.style.opacity='0';
+              delay(()=>{
+                el.flyJwt.style.display='none'; el.ckSlot.classList.remove('active-recv');
+                el.ckStatus.innerHTML = '<div class="jwt-ticket" style="margin-bottom:4px;"><div class="jwt-seg jwt-h">H</div><div class="jwt-seg jwt-p">Payload</div><div class="jwt-seg jwt-s">Sign</div></div><div style="font-size:0.75rem; color:#b45309; font-weight:800;">已保存 (HttpOnly)</div>';
+                el.ckLock.style.opacity='1'; el.ckLock.style.transform='scale(1)';
+                el.bScreen.innerHTML = '<div style="font-size:1.1rem; color:var(--jwt-green); font-weight:800;">✓ 已登入</div><div style="font-size:0.75rem;">憑證已在 Cookie 就緒</div>';
+              }, 250);
+            }, 500);
+          }, 450);
+        }, 150);
+      }
+    },
+    {
+      m: "5. 自動夾帶 JWT", s: "執行需權限操作時，瀏覽器自動帶上 Cookie 裡的憑證", btn: "下一步：無狀態驗證 (Step 6)",
+      run: () => {
+        el.actorsBox.style.transform = 'translate(-50%, -60%) scale(1.05)';
+        el.bScreen.innerHTML = '<div style="font-size:1rem; color:var(--jwt-blue); font-weight:800;">📦 點擊查詢訂單</div><div style="font-size:0.7rem;">自動夾帶 JWT 送出</div>';
+        
+        const bPos = getLocalCenter(el.bScreen);
+        setLocalPos(el.flyReq, bPos.x - 80, bPos.y - 10);
+        el.flyReq.style.display='flex'; el.flyReq.style.opacity='0'; el.flyReq.style.transform='scale(0.8)';
+        
+        delay(()=>{
+          el.flyReq.style.transition='all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          el.flyReq.style.opacity='1'; el.flyReq.style.transform='scale(1)';
+          delay(()=>{
+            const bePos = getLocalCenter(el.cBackend);
+            el.flyReq.style.transition='all 1s cubic-bezier(0.25, 1, 0.4, 1)';
+            setLocalPos(el.flyReq, bePos.x - 90, bePos.y - 70);
+          }, 350);
+        }, 150);
+      }
+    },
+    {
+      m: "6. 後端直接驗證 (Stateless)", s: "後端不查資料庫！直接用私鑰重新算簽章驗證，通過即放行", btn: "重新播放",
+      run: () => {
+        el.actorsBox.style.transform = 'translate(-60%, -60%) scale(1.1)';
+        el.cDatabase.className = 'actor-card'; el.cBrowser.className = 'actor-card dimmed';
+        el.flyReq.style.display='none'; el.skCard.classList.add('hl');
+        
+        delay(()=>{
+          el.beFeed.innerHTML = '✓ JWT 簽章吻合';
+          el.beFeed.style.opacity='1'; el.beFeed.style.transform='translateX(-50%) scale(1)';
+          
+          delay(()=>{
+            el.skipDb.style.opacity='1'; el.skipDb.style.transform='scale(1.1)';
+            delay(()=> el.skipDb.style.transform='scale(1)', 200);
+            
+            el.bScreen.innerHTML = '<div style="font-size:1rem; color:var(--jwt-green); font-weight:800;">🎉 載入成功！</div><div style="font-size:0.7rem;">後端 0 次資料庫查詢即放行</div>';
+          }, 400);
+        }, 500);
+      }
+    }
+  ];
+
+  function execWatchStep(idx) {
+    clearLive();
+    watchStep = idx;
+    const s = watchScript[idx];
+    el.subMain.innerText = s.m;
+    el.subDesc.innerText = s.s;
+    el.btnNext.innerText = s.btn;
+    s.run();
+  }
+
+  el.btnNext.addEventListener('click', () => {
+    watchStep++;
+    if (watchStep >= watchScript.length) watchStep = 0;
+    execWatchStep(watchStep);
+  });
+  el.btnReset.addEventListener('click', () => execWatchStep(0));
+
+  /* 
+    =======================================================
+    模式 B：實機操作沙盒 (Interactive Lab Mode)
+    - 綁定按鈕事件，一氣呵成跑完流程
+    =======================================================
+  */
+  function runLabLoginFlow() {
+    el.labHint.innerText = '⏳ 處理中：觀察資料流動...';
+    el.labHint.style.background = 'var(--jwt-gray)';
+    document.getElementById('lab-btn-login').disabled = true;
+    
+    // 飛帳密 -> 查 DB -> 產 JWT -> 存 Cookie -> 變更介面
+    const bPos = getLocalCenter(el.bScreen);
+    setLocalPos(el.flyLogin, bPos.x - 70, bPos.y - 20);
+    el.flyLogin.style.display='flex'; el.flyLogin.style.transform='scale(1)'; el.flyLogin.style.opacity='1';
+    el.flyLogin.style.transition='all 0.8s cubic-bezier(0.25, 1, 0.4, 1)';
+    
+    const bePos = getLocalCenter(el.cBackend);
+    delay(()=> setLocalPos(el.flyLogin, bePos.x - 70, bePos.y - 80), 50);
+    
+    delay(()=>{
+      el.flyLogin.style.display='none';
+      setLocalPos(el.flyQuery, bePos.x + 40, bePos.y - 20);
+      el.flyQuery.innerHTML = '🔍 查 DB';
+      el.flyQuery.style.display='flex'; el.flyQuery.style.transition='all 0.6s';
+      
+      const dbPos = getLocalCenter(el.cDatabase);
+      delay(()=> setLocalPos(el.flyQuery, dbPos.x - 65, dbPos.y - 40), 50);
+      
+      delay(()=>{
+        el.dbTop.style.transform='translateY(-12px)'; el.dbTop.style.background='#86efac';
+        delay(()=>{
+          el.flyQuery.innerHTML = '✓ 吻合';
+          setLocalPos(el.flyQuery, bePos.x + 30, bePos.y - 20);
+          delay(()=>{
+            el.flyQuery.style.display='none'; el.dbTop.style.transform='translateY(0)'; el.dbTop.style.background='#bae6fd';
+            el.skCard.classList.add('hl');
+            
+            delay(()=>{
+              el.skCard.classList.remove('hl');
+              setLocalPos(el.flyJwt, bePos.x - 70, bePos.y - 70);
+              el.flyJwt.style.display='block'; el.flyJwt.style.transform='scale(1)'; el.flyJwt.style.transition='all 0.8s';
+              
+              const ckPos = getLocalCenter(el.ckSlot);
+              delay(()=> setLocalPos(el.flyJwt, ckPos.x - 70, ckPos.y - 20), 50);
+              
+              delay(()=>{
+                el.flyJwt.style.display='none';
+                el.ckStatus.innerHTML = '<div class="jwt-ticket" style="margin-bottom:4px;"><div class="jwt-seg jwt-h">H</div><div class="jwt-seg jwt-p">Payload</div><div class="jwt-seg jwt-s">Sign</div></div>';
+                el.ckLock.style.opacity='1'; el.ckLock.style.transform='scale(1)';
+                
+                el.bScreen.innerHTML = '<div style="margin-bottom:12px; font-weight:800; color:var(--jwt-green);">✓ 登入成功</div><button class="interactive-btn" id="lab-btn-api" style="background:var(--jwt-green); border-color:var(--jwt-slate);">呼叫 API 查詢資料</button>';
+                document.getElementById('lab-btn-api').addEventListener('click', runLabApiFlow);
+                
+                el.labHint.innerText = '👉 憑證已就緒，請點擊【呼叫 API】按鈕！';
+                el.labHint.style.background = 'var(--jwt-yellow)';
+              }, 850);
+            }, 600);
+          }, 600);
+        }, 500);
+      }, 700);
+    }, 850);
+  }
+
+  function runLabApiFlow() {
+    el.labHint.innerText = '⏳ JWT 攜帶中...觀察後端如何免查資料庫！';
+    el.labHint.style.background = 'var(--jwt-blue)';
+    document.getElementById('lab-btn-api').disabled = true;
+
+    const bPos = getLocalCenter(el.bScreen);
+    setLocalPos(el.flyReq, bPos.x - 80, bPos.y - 10);
+    el.flyReq.style.display='flex'; el.flyReq.style.transform='scale(1)';
+    el.flyReq.style.transition='all 1s cubic-bezier(0.25, 1, 0.4, 1)';
+    
+    const bePos = getLocalCenter(el.cBackend);
+    delay(()=> setLocalPos(el.flyReq, bePos.x - 90, bePos.y - 70), 50);
+    
+    delay(()=>{
+      el.flyReq.style.display='none';
+      el.skCard.classList.add('hl');
+      
+      delay(()=>{
+        el.beFeed.innerHTML = '✓ JWT 驗證通過';
+        el.beFeed.style.opacity='1'; el.beFeed.style.transform='translateX(-50%) scale(1)';
+        
+        delay(()=>{
+          el.skipDb.style.opacity='1'; el.skipDb.style.transform='scale(1)';
+          el.bScreen.innerHTML = '<div style="font-size:1.1rem; color:var(--jwt-blue); font-weight:800;">🎉 取得私密資料！</div><div style="font-size:0.75rem;">(無資料庫查詢)</div>';
+          el.skCard.classList.remove('hl');
+          
+          el.labHint.innerText = '✨ 實驗完成！這就是 JWT 的無狀態威力。';
+          el.labHint.style.background = 'var(--jwt-green)';
+        }, 400);
+      }, 500);
+    }, 1050);
+  }
+
+  // --- 模式切換器事件 ---
+  el.modeWatch.addEventListener('click', () => {
+    el.modeWatch.classList.add('active'); el.modeLab.classList.remove('active');
+    execWatchStep(0);
+  });
+  el.modeLab.addEventListener('click', () => {
+    el.modeLab.classList.add('active'); el.modeWatch.classList.remove('active');
+    resetBaseUI('lab');
+  });
+
+  // Init
+  execWatchStep(0);
+
+})();
+</script>

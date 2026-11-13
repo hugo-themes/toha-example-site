@@ -1,0 +1,69 @@
+# section information
+section:
+  name: 經歷
+  id: experiences
+  enable: true
+  weight: 3
+  showOnNavbar: true
+  template: sections/experiences.html
+  # Can optionally hide the title in sections
+  # hideTitle: true 
+
+# Your experiences
+experiences:
+- company:
+    name: 基亞生物科技股份有限公司
+    url: "https://www.medigen.com.tw/"
+    location: 台北市南港區
+    logo: /images/sections/experiences/medigen-logo.png
+    # company overview
+    overview: Example Co. হচ্ছে ক্লাউড নেটিভ ডেভেলপমেন্টের জন্যে একটি স্বীকৃত প্রতিষ্ঠান । এটি Kubernetes এর জন্যে বিভিন্ন সফটওয়্যার বানায়।
+  positions:
+  - designation: AI工程師
+    start: May 2025
+    # don't provide end date if you are currently working there. It will be replaced by "Present"
+    # end: Dec 2020
+    # give some points about what was your responsibilities at the company.
+    responsibilities:
+    - 項目一
+
+- company:
+    name: 衛生福利部疾病管制署
+    url: "https://www.cdc.gov.tw/"
+    location: 台北市中正區
+    # logo: /images/sections/experiences/company2.jpg
+    overview: 簡介
+  positions:
+  - designation: 研發替代役
+    start: Nov 2023
+    end: May 2025
+    responsibilities:
+    - 以 Python、R、SQL 為核心技術，搭配 Jenkins 自動化排程工具，設計並維護符合業務需求的 ELT 流程，確保資料處理高效穩定
+    - 主導開發與維護即時儀表板，使用工具包含 Python Dash、R Shiny、Azure Power BI 與 Google Looker Studio，提供決策者即時資訊，縮短決策時間
+    - 運用 Azure Database、Azure APP Service、GCP Bigquery 與 GCP VM 等多項雲端服務，支援與維護 4 項關鍵應用服務（如：人口密集機構傳染病監視、毒蛇鼬獾咬傷救急資訊站等），提升系統穩定性與可靠性
+    - 導入 Python Gradio 框架與 Whisper 語音模型，開發語音辨識與文字生成系統，並降低人工轉錄錯誤
+
+- company:
+    name: 翔安生醫科技股份有限公司
+    url: "https://www.acusense.com.tw/"
+    location: 台南市新市區
+    logo: /images/sections/experiences/acusense-logo.png
+    overview: 簡介
+  positions:
+  - designation: AI工程師
+    start: Aug 2021
+    responsibilities:
+    - 使用 Python 結合 Scikit-learn、Pytorch 等資料科學模組，建置時間序列與 AI 預測模型，成功提升低血壓風險預測的準確性與早期預警能力，協助臨床醫師進行決策。
+    - 開發並維護透析低血壓預警系統，前端採用 ReactJS 框架，後端使用 Python Flask，資料庫則結合 MS SQL 與 PostgreSQL，系統具備資料即時傳輸與視覺化預警功能，支援醫療人員快速反應，並持續進行功能改版以滿足醫療單位需求。
+    - 使用容器化技術 Docker 包裹透析低血壓系統，快速導入醫院並上線。
+    - 根據客戶需求，開發特定領域的網路爬蟲專案，成功爬取並結構化大量醫療與市場資訊，協助業務單位進行數據分析與決策。
+    - 負責大型語言模型開發與部署，並將其產品化
+  - designation: 實習生
+    start: Aug 2021
+    end: July 2021
+    responsibilities:
+    - 使用 Python 結合 Scikit-learn、Pytorch 等資料科學模組，建置時間序列與 AI 預測模型，成功提升低血壓風險預測的準確性與早期預警能力，協助臨床醫師進行決策。
+    - 開發並維護透析低血壓預警系統，前端採用 ReactJS 框架，後端使用 Python Flask，資料庫則結合 MS SQL 與 PostgreSQL，系統具備資料即時傳輸與視覺化預警功能，支援醫療人員快速反應，並持續進行功能改版以滿足醫療單位需求。
+    - 使用容器化技術 Docker 包裹透析低血壓系統，快速導入醫院並上線。
+    - 根據客戶需求，開發特定領域的網路爬蟲專案，成功爬取並結構化大量醫療與市場資訊，協助業務單位進行數據分析與決策。
+    - 負責大型語言模型開發與部署，並將其產品化

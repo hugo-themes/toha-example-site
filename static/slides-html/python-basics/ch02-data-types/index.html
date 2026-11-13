@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 02: 基本資料型態與型態轉換 (Data Types & Type Casting)</title>
+  <style>
+    :root {
+      --bg-main: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --text-main: #2d2926;
+      --text-muted: #57534e;
+      --border-color: #e7e5e4;
+      --primary: #c2410c;
+      --primary-light: #ffedd5;
+      --accent-amber: #b45309;
+      --accent-teal: #0d9488;
+      --accent-blue: #1e3a8a;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 10px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.7;
+      font-size: 16px;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+
+    /* 標題與版頭 */
+    header.lecture-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .unit-tag {
+      display: inline-block;
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.875rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h1.unit-title {
+      font-family: "Georgia", "Noto Serif TC", serif;
+      font-size: 2.35rem;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .unit-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .unit-meta span strong {
+      color: var(--text-main);
+    }
+
+    /* 章節骨架 */
+    section.chapter-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    h2.chapter-title {
+      font-family: "Georgia", "Noto Serif TC", serif;
+      font-size: 1.65rem;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h3.sub-title {
+      font-size: 1.25rem;
+      color: var(--accent-blue);
+      margin: 1.75rem 0 1rem 0;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+      color: var(--text-main);
+    }
+
+    /* 表格設計 */
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0 2rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    table.spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    table.spec-table th {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.spec-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    table.spec-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.spec-table tr:nth-child(even) {
+      background-color: #fdfdfc;
+    }
+
+    /* 程式碼區塊 */
+    .code-block {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0 2rem 0;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.925rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .code-block code {
+      color: inherit;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    code.inline-code {
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      background-color: var(--bg-subtle);
+      color: var(--primary);
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9em;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* 互動動態管線沙盒 */
+    .sandbox-card {
+      background-color: var(--bg-subtle);
+      border: 1px solid #dfd8cc;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin: 2rem 0;
+    }
+
+    .sandbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px dashed #d1c7b7;
+      padding-bottom: 0.75rem;
+    }
+
+    .sandbox-tag {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .pipeline-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pipeline-stage {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stage-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stage-number {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .stage-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .control-label {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .interactive-input, .interactive-select {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+
+    .interactive-btn {
+      background-color: var(--accent-teal);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease;
+      margin-top: auto;
+    }
+
+    .interactive-btn:hover {
+      background-color: #0f766e;
+    }
+
+    .memory-visual {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.85rem;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .memory-slot {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .memory-slot.highlight {
+      border-left-color: var(--accent-teal);
+      background: #f0fdfa;
+    }
+
+    .memory-slot.error {
+      border-left-color: var(--danger);
+      background: #fef2f2;
+    }
+
+    .terminal-visual {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.85rem;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .terminal-output {
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    .terminal-status {
+      font-size: 0.75rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .status-badge.ok {
+      background-color: rgba(21, 128, 61, 0.3);
+      color: #4ade80;
+    }
+
+    .status-badge.fail {
+      background-color: rgba(185, 28, 28, 0.3);
+      color: #f87171;
+    }
+
+    /* 實作驗證題 */
+    .practice-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: #fff;
+    }
+
+    .practice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .practice-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    .io-spec {
+      background-color: var(--bg-subtle);
+      border-left: 3px solid var(--accent-amber);
+      padding: 0.85rem 1.25rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    .io-spec strong {
+      color: var(--accent-amber);
+    }
+
+    /* 頁尾免責宣告 */
+    footer.disclaimer-footer {
+      border-top: 1px solid var(--border-color);
+      padding-top: 2rem;
+      margin-top: 4rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.7;
+    }
+
+    footer.disclaimer-footer p {
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 第一章：純量資料型態與記憶體模型 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">一、 純量資料型態規格與記憶體模型</h2>
+    <p>
+      Python 直譯器在執行程式時，會依據賦值內容自動推導並在記憶體堆疊（Heap）中配置相對應的物件。Python 屬於「強型別動態語言」（Strongly and Dynamically Typed Language），變數本身僅是持有記憶體參照的「標籤」（Reference），而型態資訊與不可變約束則綁定於實體物件本體上。
+    </p>
+
+    <h3 class="sub-title">1.1 五大純量型態規格矩陣</h3>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>型態名稱</th>
+            <th>類型標識</th>
+            <th>可變性 (Mutability)</th>
+            <th>典型賦值範例</th>
+            <th>直譯器儲存本質與限制</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>整數 (Integer)</strong></td>
+            <td><code class="inline-code">int</code></td>
+            <td>不可變 (Immutable)</td>
+            <td><code class="inline-code">a = 42</code>, <code class="inline-code">b = -10</code></td>
+            <td>任意精度整數（Arbitrary-precision），無 32/64 位元溢位限制。</td>
+          </tr>
+          <tr>
+            <td><strong>浮點數 (Float)</strong></td>
+            <td><code class="inline-code">float</code></td>
+            <td>不可變 (Immutable)</td>
+            <td><code class="inline-code">pi = 3.14159</code>, <code class="inline-code">z = 0.0</code></td>
+            <td>遵循 IEEE 754 雙精度標準（64-bit），存在二進位小數微小精度誤差。</td>
+          </tr>
+          <tr>
+            <td><strong>布林值 (Boolean)</strong></td>
+            <td><code class="inline-code">bool</code></td>
+            <td>不可變 (Immutable)</td>
+            <td><code class="inline-code">is_active = True</code></td>
+            <td>為 <code class="inline-code">int</code> 的子類別，僅有 <code class="inline-code">True</code> (1) 與 <code class="inline-code">False</code> (0) 兩種單例狀態。</td>
+          </tr>
+          <tr>
+            <td><strong>字串 (String)</strong></td>
+            <td><code class="inline-code">str</code></td>
+            <td>不可變 (Immutable)</td>
+            <td><code class="inline-code">msg = "Python"</code></td>
+            <td>Unicode 字元有序序列；無法直接透過索引進行就地（in-place）修改。</td>
+          </tr>
+          <tr>
+            <td><strong>空值 (NoneType)</strong></td>
+            <td><code class="inline-code">NoneType</code></td>
+            <td>不可變 (Immutable)</td>
+            <td><code class="inline-code">result = None</code></td>
+            <td>表示值不存在或未定義，為全域唯一的單例物件（Singleton）。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-title">1.2 最小可執行範例</h3>
+    <div class="code-block">
+      <code># 純量型態定義與 type() 檢驗
+age = 25
+temperature = -3.5
+is_connected = True
+user_name = "Alice"
+empty_payload = None
+
+print("age type:", type(age))
+print("temperature type:", type(temperature))
+print("is_connected type:", type(is_connected))
+print("user_name type:", type(user_name))
+print("empty_payload type:", type(empty_payload))</code>
+    </div>
+  </section>
+
+  <!-- 第二章：強制型態轉換機制 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">二、 強制型態轉換機制與規則 (Type Casting)</h2>
+    <p>
+      在處理終端輸入（預設為 <code class="inline-code">str</code>）或跨型態計算時，必須透過型態建構函式進行顯式（Explicit）強制型態轉換。若輸入字串之詞法結構不符合目標型態規格，直譯器將立即中斷並拋出例外。
+    </p>
+
+    <h3 class="sub-title">2.1 型態轉換約束與真值測試規則</h3>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>目標函式</th>
+            <th>引數合法來源範例</th>
+            <th>成功轉換結果</th>
+            <th>引發例外與非法情況</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline-code">int(x)</code></td>
+            <td><code class="inline-code">"42"</code>, <code class="inline-code">3.8</code>, <code class="inline-code">True</code></td>
+            <td><code class="inline-code">42</code>, <code class="inline-code">3</code> (無條件捨去小數), <code class="inline-code">1</code></td>
+            <td><code class="inline-code">int("3.14")</code> 或 <code class="inline-code">int("abc")</code> 拋出 <code class="inline-code">ValueError</code>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">float(x)</code></td>
+            <td><code class="inline-code">"3.14"</code>, <code class="inline-code">"10"</code>, <code class="inline-code">5</code></td>
+            <td><code class="inline-code">3.14</code>, <code class="inline-code">10.0</code>, <code class="inline-code">5.0</code></td>
+            <td><code class="inline-code">float("abc")</code> 或無效字元字串拋出 <code class="inline-code">ValueError</code>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str(x)</code></td>
+            <td>任何物件 (<code class="inline-code">100</code>, <code class="inline-code">3.14</code>, <code class="inline-code">None</code>)</td>
+            <td><code class="inline-code">"100"</code>, <code class="inline-code">"3.14"</code>, <code class="inline-code">"None"</code></td>
+            <td>安全無副作用，一律調用物件內部 <code class="inline-code">__str__()</code> 方法。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">bool(x)</code></td>
+            <td>各型態之值</td>
+            <td><code class="inline-code">False</code> 或 <code class="inline-code">True</code></td>
+            <td><strong>Falsy 純量值</strong>：<code class="inline-code">0</code>, <code class="inline-code">0.0</code>, <code class="inline-code">""</code> (空字串), <code class="inline-code">None</code>，其餘皆為 <code class="inline-code">True</code>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 動態管線實驗室 1 -->
+    <div class="sandbox-card">
+      <div class="sandbox-header">
+        <span class="sandbox-tag">Dynamic Laboratory 01 • 三階段因果動態管線</span>
+        <span style="font-size:0.85rem; color:var(--text-muted);">型態轉換直譯器檢驗沙盒</span>
+      </div>
+
+      <div class="pipeline-grid" id="pipeline-casting">
+        <!-- 階段一：語法輸入 -->
+        <div class="pipeline-stage">
+          <div class="stage-title">
+            <span>階段 1：輸入語法 (Input Syntax)</span>
+            <span class="stage-number">1</span>
+          </div>
+          <div class="stage-content">
+            <div class="control-group">
+              <label class="control-label" for="cast-input-val">原始值 (Literal Value)</label>
+              <input type="text" id="cast-input-val" class="interactive-input" value="128" placeholder="例如: 128, 3.14, abc">
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="cast-input-type">原始資料型態</label>
+              <select id="cast-input-type" class="interactive-select">
+                <option value="str">字串型態 (str)</option>
+                <option value="int">整數型態 (int)</option>
+                <option value="float">浮點數型態 (float)</option>
+                <option value="bool">布林型態 (bool)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="cast-target-type">目標轉換函式</label>
+              <select id="cast-target-type" class="interactive-select">
+                <option value="int">int()</option>
+                <option value="float">float()</option>
+                <option value="str">str()</option>
+                <option value="bool">bool()</option>
+              </select>
+            </div>
+            <button class="interactive-btn" id="btn-run-cast">執行轉型管線</button>
+          </div>
+        </div>
+
+        <!-- 階段二：直譯器驗證與機制 -->
+        <div class="pipeline-stage">
+          <div class="stage-title">
+            <span>階段 2：直譯器機制 (Mechanism)</span>
+            <span class="stage-number">2</span>
+          </div>
+          <div class="stage-content">
+            <div class="memory-visual" id="cast-mechanism-visual">
+              <div class="memory-slot">
+                <span>狀態：</span>
+                <span>等待直譯器輸入...</span>
+              </div>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0;">
+              直譯器會先驗證語彙標記，符合規範後於 Heap 配置新型態物件，並重新綁定參照。
+            </p>
+          </div>
+        </div>
+
+        <!-- 階段三：最終成果 -->
+        <div class="pipeline-stage">
+          <div class="stage-title">
+            <span>階段 3：最終成果 (Terminal/State)</span>
+            <span class="stage-number">3</span>
+          </div>
+          <div class="stage-content">
+            <div class="terminal-visual">
+              <div class="terminal-output" id="cast-terminal-output">&gt;&gt;&gt; 等待程式執行...</div>
+              <div class="terminal-status">
+                <span>執行狀態:</span>
+                <span class="status-badge ok" id="cast-status-badge">READY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第三章：字串常用方法與不可變性 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">三、 字串方法規格與處理管線</h2>
+    <p>
+      字串屬於<strong>不可變物件（Immutable Object）</strong>。所有字串方法（Method）對字串進行處理時，<strong>絕不修改原始字串本體</strong>，而是依據運算規則生成一個全新的字串物件並回傳。
+    </p>
+
+    <h3 class="sub-title">3.1 字串核心方法規格矩陣</h3>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>分類標籤</th>
+            <th>方法名稱與簽名</th>
+            <th>回傳型態</th>
+            <th>功能描述與行為約束</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="3"><strong>大小寫處理</strong></td>
+            <td><code class="inline-code">str.upper()</code></td>
+            <td><code class="inline-code">str</code></td>
+            <td>回傳所有英文字元皆轉為大寫之新字串。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str.lower()</code></td>
+            <td><code class="inline-code">str</code></td>
+            <td>回傳所有英文字元皆轉為小寫之新字串。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str.title()</code></td>
+            <td><code class="inline-code">str</code></td>
+            <td>回傳每個單字首字大寫、其餘小寫之新字串。</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>搜尋與替換</strong></td>
+            <td><code class="inline-code">str.find(sub)</code></td>
+            <td><code class="inline-code">int</code></td>
+            <td>回傳子字串 <code class="inline-code">sub</code> 首次出現之正向索引；未找到時回傳 <code class="inline-code">-1</code>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str.replace(old, new)</code></td>
+            <td><code class="inline-code">str</code></td>
+            <td>將字串中所有 <code class="inline-code">old</code> 子字串替換為 <code class="inline-code">new</code> 並回傳新字串。</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>修剪與拆分</strong></td>
+            <td><code class="inline-code">str.strip()</code></td>
+            <td><code class="inline-code">str</code></td>
+            <td>移除字串<strong>開頭與結尾</strong>的所有空白字元（包含 <code class="inline-code">\n</code>, <code class="inline-code">\t</code>, 空格）。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str.split(sep=None)</code></td>
+            <td><code class="inline-code">list[str]</code></td>
+            <td>依據分隔符 <code class="inline-code">sep</code> 拆分字串並回傳子字串序列。</td>
+          </tr>
+          <tr>
+            <td rowspan="3"><strong>狀態判定</strong></td>
+            <td><code class="inline-code">str.isdigit()</code></td>
+            <td><code class="inline-code">bool</code></td>
+            <td>若字串非空且<strong>所有字元皆為純數字（0-9）</strong>則回傳 <code class="inline-code">True</code>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str.isalpha()</code></td>
+            <td><code class="inline-code">bool</code></td>
+            <td>若字串非空且所有字元皆為字母則回傳 <code class="inline-code">True</code>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">str.startswith(prefix)</code></td>
+            <td><code class="inline-code">bool</code></td>
+            <td>檢查字串是否以指定的字首 <code class="inline-code">prefix</code> 開頭。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 動態管線實驗室 2 -->
+    <div class="sandbox-card">
+      <div class="sandbox-header">
+        <span class="sandbox-tag">Dynamic Laboratory 02 • 字串不可變性與方法動態管線</span>
+        <span style="font-size:0.85rem; color:var(--text-muted);">記憶體非就地修改演示沙盒</span>
+      </div>
+
+      <div class="pipeline-grid" id="pipeline-string">
+        <!-- 階段一 -->
+        <div class="pipeline-stage">
+          <div class="stage-title">
+            <span>階段 1：輸入字串與方法</span>
+            <span class="stage-number">1</span>
+          </div>
+          <div class="stage-content">
+            <div class="control-group">
+              <label class="control-label" for="str-input-val">原始字串變數 (raw_text)</label>
+              <input type="text" id="str-input-val" class="interactive-input" value="  python 3.12  ">
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="str-method-select">選擇套用方法</label>
+              <select id="str-method-select" class="interactive-select">
+                <option value="strip">.strip() (修剪頭尾空白)</option>
+                <option value="upper">.upper() (轉大寫)</option>
+                <option value="replace">.replace("python", "Rust")</option>
+                <option value="isdigit">.isdigit() (檢驗純數字)</option>
+                <option value="split">.split() (以空白拆分)</option>
+              </select>
+            </div>
+            <button class="interactive-btn" id="btn-run-string">套用字串方法</button>
+          </div>
+        </div>
+
+        <!-- 階段二 -->
+        <div class="pipeline-stage">
+          <div class="stage-title">
+            <span>階段 2：不可變記憶體機制</span>
+            <span class="stage-number">2</span>
+          </div>
+          <div class="stage-content">
+            <div class="memory-visual" id="str-mechanism-visual">
+              <div class="memory-slot">
+                <span>raw_text：</span>
+                <span>"  python 3.12  "</span>
+              </div>
+              <div class="memory-slot highlight">
+                <span>new_obj：</span>
+                <span>等待方法產生新物件...</span>
+              </div>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0;">
+              原始變數 <code class="inline-code">raw_text</code> 所指向的記憶體內容完全不受影響。
+            </p>
+          </div>
+        </div>
+
+        <!-- 階段三 -->
+        <div class="pipeline-stage">
+          <div class="stage-title">
+            <span>階段 3：回傳成果檢視</span>
+            <span class="stage-number">3</span>
+          </div>
+          <div class="stage-content">
+            <div class="terminal-visual">
+              <div class="terminal-output" id="str-terminal-output">&gt;&gt;&gt; 等待操作執行...</div>
+              <div class="terminal-status">
+                <span>狀態：</span>
+                <span class="status-badge ok" id="str-status-badge">IMMUTABLE VERIFIED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">3.2 最小可執行範例</h3>
+    <div class="code-block">
+      <code># 字串方法與不可變性驗證
+raw_input_data = "   kenichi_andy   "
+
+# 1. 執行清理（產生新字串）
+cleaned_data = raw_input_data.strip()
+
+# 2. 轉為大寫規格（產生新字串）
+normalized_data = cleaned_data.upper()
+
+# 3. 原始字串維持不變
+print("原始字串值:", repr(raw_input_data))
+print("修剪後字串:", repr(cleaned_data))
+print("規格化字串:", repr(normalized_data))
+
+# 4. 狀態檢驗
+phone_number = "0983481181"
+print("是否為純數字字串:", phone_number.isdigit())</code>
+    </div>
+  </section>
+
+  <!-- 第四章：邊界條件與常見錯誤排查 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">四、 邊界條件與常見錯誤排查 (Edge Cases & Exceptions)</h2>
+    <p>
+      在轉型與字串操作時，初學者最常因為未預期的資料輸入引發程式中斷崩潰。下表整理常見例外狀況與排查標準：
+    </p>
+
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>例外型態 (Exception)</th>
+            <th>引發錯誤的典型程式碼</th>
+            <th>直譯器底層原因分析</th>
+            <th>防範解法與標準修復寫法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline-code">ValueError</code></td>
+            <td><code class="inline-code">age = int("25.5")</code><br><code class="inline-code">num = int("abc")</code></td>
+            <td><code class="inline-code">int()</code> 無法將含有小數點或非數字字符的字串直接轉為整數。</td>
+            <td>先轉為浮點數 <code class="inline-code">int(float("25.5"))</code>，或使用 <code class="inline-code">str.isdigit()</code> 預先檢驗。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">TypeError</code></td>
+            <td><code class="inline-code">total = "NT$" + 100</code></td>
+            <td>Python 嚴格禁止字串（<code class="inline-code">str</code>）與整數（<code class="inline-code">int</code>）直接以 <code class="inline-code">+</code> 運算子串接。</td>
+            <td>顯式轉型：<code class="inline-code">"NT$" + str(100)</code>，或改用 f-string：<code class="inline-code">f"NT${100}"</code>。</td>
+          </tr>
+          <tr>
+            <td><code class="inline-code">AttributeError</code></td>
+            <td><code class="inline-code">val = 100</code><br><code class="inline-code">val.strip()</code></td>
+            <td>純量整數 <code class="inline-code">int</code> 型態物件未定義 <code class="inline-code">.strip()</code> 方法。</td>
+            <td>確認操作物件為字串型態，或先轉型 <code class="inline-code">str(val).strip()</code>。</td>
+          </tr>
+          <tr>
+            <td><strong>布林轉型混淆</strong></td>
+            <td><code class="inline-code">flag = bool("False")</code><br>結果為 <code class="inline-code">True</code></td>
+            <td>非空字串長度大於 0，在真值檢驗中一律判定為 <code class="inline-code">True</code>。</td>
+            <td>字串內容比對：<code class="inline-code">flag = (input_str == "True")</code>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 第五章：課堂實作驗證題 -->
+  <section class="chapter-section">
+    <h2 class="chapter-title">五、 課堂實作驗證題 (Hands-on Practice)</h2>
+
+    <!-- 實作題 1 -->
+    <div class="practice-card">
+      <div class="practice-header">
+        <span class="practice-title">實作題 01：使用者註冊資料清洗與規格化工具</span>
+        <span class="unit-tag" style="background:#e0f2fe; color:#0369a1;">基礎字串方法</span>
+      </div>
+      <p>
+        <strong>題目描述：</strong>系統從終端接收到使用者輸入的「使用者名稱」與「電子郵件地址」，資料前後可能包含多餘的空白，且大小寫不一致。請撰寫一段程式碼完成資料清洗。
+      </p>
+      <div class="io-spec">
+        <strong>輸入 / 輸出規格 (I/O Spec)：</strong><br>
+        1. 使用者名稱去除兩端空白後，將每個單字字首轉為大寫（Title Case）。<br>
+        2. 電子郵件去除兩端空白後，全數轉換為小寫格式（Lower Case）。<br>
+        3. 依規格格式化輸出清洗後結果。
+      </div>
+      <div class="code-block">
+        <code># 測試資料 (可直接使用變數賦值驗證)
+raw_username = "   alan turing   "
+raw_email = "  ALAN.Turing@Example.COM  "
+
+# --- 請於此處撰寫清洗邏輯 ---
+clean_username = raw_username.strip().title()
+clean_email = raw_email.strip().lower()
+
+print(f"規格化姓名: '{clean_username}'")
+print(f"規格化信箱: '{clean_email}'")
+
+# [預期輸出]
+# 規格化姓名: 'Alan Turing'
+# 規格化信箱: 'alan.turing@example.com'</code>
+      </div>
+    </div>
+
+    <!-- 實作題 2 -->
+    <div class="practice-card">
+      <div class="practice-header">
+        <span class="practice-title">實作題 02：數值安全檢驗與轉型計算器</span>
+        <span class="unit-tag" style="background:#fef3c7; color:#92400e;">型態防禦與轉換</span>
+      </div>
+      <p>
+        <strong>題目描述：</strong>從終端接收購買數量字串（例如 <code class="inline-code">" 15 "</code>）與單價字串（例如 <code class="inline-code">"30.5"</code>），請先清除數量兩端的空白，並使用字串方法檢驗數量是否為合法純數字字串。若是，則將數量轉為 <code class="inline-code">int</code>、單價轉為 <code class="inline-code">float</code>，並計算總金額。
+      </p>
+      <div class="io-spec">
+        <strong>輸入 / 輸出規格 (I/O Spec)：</strong><br>
+        1. 輸出數量之純數字驗證狀態（布林值）。<br>
+        2. 若驗證成功，輸出總金額（<code class="inline-code">數量 * 單價</code>）。
+      </div>
+      <div class="code-block">
+        <code># 測試輸入
+raw_quantity = " 12 "
+raw_price = "45.0"
+
+# --- 清洗與安全驗證 ---
+cleaned_qty = raw_quantity.strip()
+is_valid_qty = cleaned_qty.isdigit()
+
+print(f"數量字串是否合法: {is_valid_qty}")
+
+# 型態轉換與數值運算
+qty = int(cleaned_qty)
+price = float(raw_price)
+total_amount = qty * price
+
+print(f"購買總金額: {total_amount}")
+
+# [預期輸出]
+# 數量字串是否合法: True
+# 購買總金額: 540.0</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 官方免責聲明與權益宣示 -->
+  <footer class="disclaimer-footer">
+    <p><strong>免責聲明與權益宣示</strong></p>
+    <p>
+      本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。
+    </p>
+    <p>
+      如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。
+    </p>
+  </footer>
+</div>
+
+<!-- 動態沙盒 JavaScript 原生隔離封裝 -->
+<script>
+(function() {
+  // --- 沙盒 1：型態轉換直譯器檢驗 ---
+  const castInputVal = document.getElementById('cast-input-val');
+  const castInputType = document.getElementById('cast-input-type');
+  const castTargetType = document.getElementById('cast-target-type');
+  const btnRunCast = document.getElementById('btn-run-cast');
+  const castMechanismVisual = document.getElementById('cast-mechanism-visual');
+  const castTerminalOutput = document.getElementById('cast-terminal-output');
+  const castStatusBadge = document.getElementById('cast-status-badge');
+
+  btnRunCast.addEventListener('click', function() {
+    const rawVal = castInputVal.value;
+    const fromType = castInputType.value;
+    const targetType = castTargetType.value;
+
+    let parsedInitialValue;
+    // 解析輸入值型態
+    try {
+      if (fromType === 'str') {
+        parsedInitialValue = String(rawVal);
+      } else if (fromType === 'int') {
+        parsedInitialValue = parseInt(rawVal, 10);
+        if (isNaN(parsedInitialValue)) throw new Error('Invalid int literal');
+      } else if (fromType === 'float') {
+        parsedInitialValue = parseFloat(rawVal);
+        if (isNaN(parsedInitialValue)) throw new Error('Invalid float literal');
+      } else if (fromType === 'bool') {
+        parsedInitialValue = (rawVal.trim().toLowerCase() === 'true' || rawVal === '1');
+      }
+    } catch (e) {
+      renderError(castMechanismVisual, castTerminalOutput, castStatusBadge,
+        `無法初始化原始變數為 ${fromType} 型態。`, `SyntaxError: invalid literal for ${fromType}`);
+      return;
+    }
+
+    // 模擬 Python 轉型邏輯
+    try {
+      let resultVal;
+      let mechanismDetail = '';
+
+      if (targetType === 'int') {
+        if (fromType === 'str') {
+          const trimmed = rawVal.trim();
+          if (!/^-?\d+$/.test(trimmed)) {
+            throw new Error(`ValueError: invalid literal for int() with base 10: '${rawVal}'`);
+          }
+          resultVal = parseInt(trimmed, 10);
+          mechanismDetail = `字串語彙分析通過 ➔ 解析為十進位整數 ➔ 配置 int 物件 (${resultVal})`;
+        } else if (fromType === 'float') {
+          resultVal = Math.trunc(parsedInitialValue);
+          mechanismDetail = `截斷小數部分 (Truncation) ➔ 配置 int 物件 (${resultVal})`;
+        } else if (fromType === 'bool') {
+          resultVal = parsedInitialValue ? 1 : 0;
+          mechanismDetail = `布林值映射: ${parsedInitialValue} ➔ ${resultVal}`;
+        } else {
+          resultVal = parsedInitialValue;
+          mechanismDetail = `本體已為 int ➔ 傳回原參照`;
+        }
+      } else if (targetType === 'float') {
+        if (fromType === 'str') {
+          const trimmed = rawVal.trim();
+          if (isNaN(Number(trimmed)) || trimmed === '') {
+            throw new Error(`ValueError: could not convert string to float: '${rawVal}'`);
+          }
+          resultVal = parseFloat(trimmed);
+          mechanismDetail = `字串解析為 IEEE 754 浮點數 ➔ 配置 float 物件 (${resultVal.toFixed(1)})`;
+        } else if (fromType === 'int') {
+          resultVal = parsedInitialValue * 1.0;
+          mechanismDetail = `數值提升 (Promotion) ➔ 配置 float 物件 (${resultVal.toFixed(1)})`;
+        } else if (fromType === 'bool') {
+          resultVal = parsedInitialValue ? 1.0 : 0.0;
+          mechanismDetail = `布林值提升: ${parsedInitialValue} ➔ ${resultVal.toFixed(1)}`;
+        } else {
+          resultVal = parsedInitialValue;
+          mechanismDetail = `本體已為 float ➔ 傳回原參照`;
+        }
+      } else if (targetType === 'str') {
+        resultVal = String(parsedInitialValue);
+        mechanismDetail = `調用 __str__() 序列化 ➔ 建立 Unicode 字串物件 ("${resultVal}")`;
+      } else if (targetType === 'bool') {
+        if (fromType === 'str') {
+          resultVal = rawVal.length > 0;
+          mechanismDetail = `字串真值測試: 長度 ${rawVal.length} ${resultVal ? '> 0 (True)' : '== 0 (False)'}`;
+        } else if (fromType === 'int' || fromType === 'float') {
+          resultVal = parsedInitialValue !== 0;
+          mechanismDetail = `數值真值測試: ${parsedInitialValue} ${resultVal ? '!= 0 (True)' : '== 0 (False)'}`;
+        } else {
+          resultVal = Boolean(parsedInitialValue);
+          mechanismDetail = `布林直譯器真值評估 ➔ ${resultVal}`;
+        }
+      }
+
+      // 成功渲染
+      castMechanismVisual.innerHTML = `
+        <div class="memory-slot">
+          <span>來源物件:</span>
+          <span>${fromType} (${JSON.stringify(parsedInitialValue)})</span>
+        </div>
+        <div class="memory-slot highlight">
+          <span>轉換機制:</span>
+          <span>${mechanismDetail}</span>
+        </div>
+      `;
+
+      castTerminalOutput.textContent = `>>> target_val = ${targetType}(source_val)\n>>> print(target_val)\n${resultVal}\n>>> type(target_val)\n<class '${targetType}'>`;
+      castStatusBadge.className = 'status-badge ok';
+      castStatusBadge.textContent = 'SUCCESS';
+
+    } catch (err) {
+      renderError(castMechanismVisual, castTerminalOutput, castStatusBadge,
+        `轉換失敗：直譯器拒絕不合法的型態字面值。`, err.message);
+    }
+  });
+
+  function renderError(visualEl, termEl, badgeEl, mechText, errorMsg) {
+    visualEl.innerHTML = `
+      <div class="memory-slot error">
+        <span>異常攔截:</span>
+        <span>${mechText}</span>
+      </div>
+    `;
+    termEl.textContent = `Traceback (most recent call last):\n  File "<stdin>", line 1, in <module>\n${errorMsg}`;
+    badgeEl.className = 'status-badge fail';
+    badgeEl.textContent = 'EXCEPTION';
+  }
+
+  // --- 沙盒 2：字串不可變性與方法演示 ---
+  const strInputVal = document.getElementById('str-input-val');
+  const strMethodSelect = document.getElementById('str-method-select');
+  const btnRunString = document.getElementById('btn-run-string');
+  const strMechanismVisual = document.getElementById('str-mechanism-visual');
+  const strTerminalOutput = document.getElementById('str-terminal-output');
+  const strStatusBadge = document.getElementById('str-status-badge');
+
+  btnRunString.addEventListener('click', function() {
+    const raw = strInputVal.value;
+    const method = strMethodSelect.value;
+    let result;
+    let methodCallCode = '';
+
+    if (method === 'strip') {
+      result = raw.trim();
+      methodCallCode = `raw_text.strip()`;
+    } else if (method === 'upper') {
+      result = raw.toUpperCase();
+      methodCallCode = `raw_text.upper()`;
+    } else if (method === 'replace') {
+      result = raw.replace(/python/g, 'Rust');
+      methodCallCode = `raw_text.replace("python", "Rust")`;
+    } else if (method === 'isdigit') {
+      result = /^\d+$/.test(raw.trim());
+      methodCallCode = `raw_text.isdigit()`;
+    } else if (method === 'split') {
+      const parts = raw.trim().split(/\s+/);
+      result = JSON.stringify(parts);
+      methodCallCode = `raw_text.split()`;
+    }
+
+    strMechanismVisual.innerHTML = `
+      <div class="memory-slot">
+        <span>raw_text (原記憶體位址):</span>
+        <span>${JSON.stringify(raw)} (不變)</span>
+      </div>
+      <div class="memory-slot highlight">
+        <span>新生成物件 (全新記憶體槽位):</span>
+        <span>${typeof result === 'boolean' ? result : JSON.stringify(result)}</span>
+      </div>
+    `;
+
+    strTerminalOutput.textContent = `>>> raw_text = ${JSON.stringify(raw)}\n>>> new_obj = ${methodCallCode}\n>>> print("new_obj:", ${typeof result === 'string' && method !== 'split' ? JSON.stringify(result) : result})\nnew_obj: ${typeof result === 'string' && method !== 'split' ? result : result}\n>>> print("raw_text 維持不變:", ${JSON.stringify(raw)})\nraw_text 維持不變: ${raw}`;
+    strStatusBadge.className = 'status-badge ok';
+    strStatusBadge.textContent = 'IMMUTABLE VERIFIED';
+  });
+})();
+</script>
+
+</body>
+</html>

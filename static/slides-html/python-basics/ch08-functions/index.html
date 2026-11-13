@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 08：函式宣告、參數架構與模組化封裝 - 教師互動講義</title>
+  <style>
+    :root {
+      --bg-color: #fbf9f4;
+      --text-color: #2d2926;
+      --text-muted: #5c554e;
+      --card-bg: #ffffff;
+      --border-color: #e6dfd3;
+      --primary-navy: #1e3a8a;
+      --terracotta: #c2410c;
+      --amber: #b45309;
+      --forest-green: #15803d;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --terminal-bg: #0f172a;
+      --highlight-yellow: #fef08a;
+      --danger-red: #dc2626;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-code: "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-main);
+      font-size: 16px;
+      line-height: 1.75;
+      letter-spacing: 0.015em;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* 頂部標頭 */
+    .header-section {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 28px;
+      margin-bottom: 40px;
+    }
+    .badge {
+      display: inline-block;
+      background: #e0e7ff;
+      color: var(--primary-navy);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--primary-navy);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .sub-intro {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 920px;
+    }
+
+    /* 章節標題 */
+    h2 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--primary-navy);
+      margin: 48px 0 20px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 1.2em;
+      background: var(--terracotta);
+      border-radius: 2px;
+    }
+    h3 {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin: 28px 0 14px 0;
+    }
+    p { margin-bottom: 16px; }
+
+    .info-callout {
+      background: #fff;
+      border-left: 4px solid var(--primary-navy);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 24px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      border-top: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .info-callout.amber {
+      border-left-color: var(--amber);
+      background: #fffbeb;
+    }
+
+    /* 靜態程式碼區塊 */
+    .code-wrapper {
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      overflow-x: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    pre {
+      font-family: var(--font-code);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--code-text);
+      white-space: pre;
+    }
+    code {
+      font-family: var(--font-code);
+      font-size: 0.92em;
+    }
+    p code, li code, td code {
+      background: #f1ede4;
+      color: #9a3412;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e2dacd;
+    }
+
+    /* 語法著色 */
+    .c-kw { color: #f472b6; font-weight: bold; }
+    .c-fn { color: #60a5fa; }
+    .c-str { color: #a7f3d0; }
+    .c-num { color: #fde047; }
+    .c-com { color: #94a3b8; font-style: italic; }
+
+    /* 表格設計 */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 24px 0;
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    th {
+      background: #f4eee3;
+      color: var(--text-color);
+      font-weight: 700;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background-color: #faf7f0; }
+
+    ul, ol { margin: 12px 0 20px 26px; }
+    li { margin-bottom: 8px; }
+
+    /* ========================================================
+       動態教具通用樣式
+    ======================================================== */
+    .interactive-widget {
+      background: var(--card-bg);
+      border: 1.5px solid #dcd3c3;
+      border-radius: 12px;
+      margin: 32px 0 44px 0;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    }
+    .widget-header {
+      background: #f4efe6;
+      border-bottom: 1px solid #dcd3c3;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .widget-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--primary-navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .widget-tag {
+      background: var(--primary-navy);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+    .widget-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: #ffffff;
+      color: var(--text-color);
+      border: 1px solid #c9beae;
+      padding: 6px 13px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn:hover {
+      background: #f0e9dd;
+      border-color: #a89a85;
+    }
+    .btn.primary {
+      background: var(--primary-navy);
+      color: #ffffff;
+      border-color: var(--primary-navy);
+    }
+    .btn.primary:hover { background: #152a65; }
+    .btn.active {
+      background: var(--terracotta);
+      color: #ffffff;
+      border-color: var(--terracotta);
+    }
+    .widget-body {
+      padding: 24px;
+      background: #fbf9f4;
+    }
+    .mini-terminal {
+      background: var(--terminal-bg);
+      color: #a7f3d0;
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      border-radius: 6px;
+      padding: 12px 16px;
+      min-height: 80px;
+      max-height: 160px;
+      overflow-y: auto;
+      border: 1px solid #334155;
+      margin-top: 16px;
+      line-height: 1.55;
+    }
+    .mini-terminal-title {
+      color: #94a3b8;
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px dashed #334155;
+      padding-bottom: 4px;
+    }
+
+    /* 程式碼容器 (保證 4 空格縮排) */
+    .code-box-pre {
+      background: var(--code-bg);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--font-code);
+      font-size: 0.92rem;
+      color: #e2e8f0;
+      position: relative;
+    }
+    .code-line-row {
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .code-line-row.active {
+      background: #334155;
+      border-left: 3.5px solid #38bdf8;
+    }
+    .code-line-row.dead {
+      color: #64748b;
+      text-decoration: line-through;
+      background: rgba(239, 68, 68, 0.12);
+    }
+    .code-num {
+      width: 28px;
+      color: #64748b;
+      user-select: none;
+      font-size: 0.82rem;
+    }
+    .code-text-content {
+      white-space: pre; /* 關鍵：嚴格保持 4 空格縮排 */
+    }
+
+    /* ========================================================
+       動態教具一：執行順序與呼叫跳轉（動態光束與游標）
+    ======================================================== */
+    .jump-stage-grid {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 960px) {
+      .jump-stage-grid { grid-template-columns: 1fr; }
+    }
+    .jump-visual-canvas {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .jump-portal-card {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 14px 18px;
+      background: #f8fafc;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .jump-portal-card.active {
+      border-color: var(--primary-navy);
+      background: #eff6ff;
+      border-style: solid;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+    }
+    .jump-portal-card.callee.active {
+      border-color: var(--forest-green);
+      background: #f0fdf4;
+    }
+    .jump-portal-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .jump-wire-box {
+      height: 70px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .jump-light-beam {
+      width: 4px;
+      height: 100%;
+      background: #cbd5e1;
+      position: relative;
+      border-radius: 2px;
+    }
+    .jump-light-packet {
+      width: 22px;
+      height: 22px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      position: absolute;
+      left: -9px;
+      top: 0;
+      opacity: 0;
+      box-shadow: 0 0 12px var(--terracotta);
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    /* ========================================================
+       動態教具二：參數插槽與引數對齊發射台（物理位移發射動畫）
+    ======================================================== */
+    .align-launchpad-container {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .launch-tier {
+      position: relative;
+      padding: 14px;
+      border-radius: 8px;
+      min-height: 88px;
+    }
+    .launch-tier.def-tier {
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      margin-bottom: 54px; /* 中間留空供方塊在空中飛行 */
+    }
+    .launch-tier.call-tier {
+      background: #fff7ed;
+      border: 1.5px solid #fed7aa;
+    }
+    .tier-header-label {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .tier-desc-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tier-desc-line1 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.35;
+      letter-spacing: 0.03em;
+    }
+    .tier-desc-line2 {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #64748b;
+      line-height: 1.35;
+    }
+    .tier-code-pill {
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1e293b;
+      background: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+    .slots-row, .args-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      position: relative;
+    }
+    /* 上層槽位 (Slot) */
+    .param-slot {
+      width: 155px;
+      height: 60px;
+      border: 2px dashed #64748b;
+      border-radius: 8px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-family: var(--font-code);
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+    .param-slot.locked {
+      border-style: solid;
+      border-color: var(--forest-green);
+      background: #f0fdf4;
+      box-shadow: 0 4px 10px rgba(21, 128, 61, 0.15);
+    }
+    .slot-tag-name {
+      font-size: 0.82rem;
+      color: var(--primary-navy);
+    }
+    .slot-default-plate {
+      position: absolute;
+      bottom: -10px;
+      background: var(--amber);
+      color: #fff;
+      font-size: 0.68rem;
+      padding: 1px 7px;
+      border-radius: 4px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .slot-default-plate.pop-up {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 下層引數實體方塊 (可發射移動) */
+    .arg-block {
+      width: 155px;
+      height: 48px;
+      border: 1.5px solid var(--terracotta);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--terracotta);
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(194, 65, 12, 0.12);
+      transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      z-index: 5;
+    }
+
+    /* 語法防呆警報重金屬閘門 (Syntax Barrier) */
+    .syntax-barrier {
+      position: absolute;
+      top: 96px;
+      left: 6%;
+      width: 88%;
+      height: 50px;
+      background: repeating-linear-gradient(45deg, #b91c1c, #b91c1c 15px, #18181b 15px, #18181b 30px);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(185, 28, 28, 0.4);
+      z-index: 20;
+      transform: translateY(-80px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    .syntax-barrier.slam-down {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* 計算結果看板 */
+    .calc-dashboard {
+      margin-top: 16px;
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .calc-dashboard.err {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    /* ========================================================
+       動態教具三：return 實體出料 vs print 側邊排氣
+    ======================================================== */
+    .pipeline-stage {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 18px;
+      position: relative;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* 原料進料漏斗與原料方塊 */
+    .hopper-chute {
+      background: #f1f5f9;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      min-height: 52px;
+    }
+    .hopper-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .material-block {
+      background: #fed7aa;
+      border: 1.5px solid var(--terracotta);
+      color: #9a3412;
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 5px 14px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(194, 65, 12, 0.15);
+      transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      z-index: 8;
+    }
+
+    /* 加工艙本體 */
+    .chamber-box {
+      background: #f8fafc;
+      border: 2px solid #64748b;
+      border-radius: 8px;
+      padding: 18px;
+      position: relative;
+      margin-top: 14px;
+      transition: all 0.3s;
+    }
+    .chamber-box.power-on {
+      background: #eff6ff;
+      border-color: var(--primary-navy);
+      box-shadow: 0 0 16px rgba(30, 58, 138, 0.15);
+    }
+    .chamber-box.dead-lock {
+      background: #fef2f2;
+      border-color: var(--danger-red);
+    }
+    .exhaust-chimney {
+      position: absolute;
+      top: -22px;
+      right: 28px;
+      width: 44px;
+      height: 22px;
+      background: #475569;
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      justify-content: center;
+    }
+    .exhaust-smoke {
+      position: absolute;
+      bottom: 24px;
+      background: rgba(148, 163, 184, 0.95);
+      color: #0f172a;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      padding: 3px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(0);
+      transition: all 0.5s ease-out;
+      pointer-events: none;
+    }
+    .exhaust-smoke.puff {
+      opacity: 1;
+      transform: translateY(-28px);
+    }
+
+    /* 底部輸送帶與出料口 */
+    .conveyor-track {
+      height: 74px;
+      border-top: 2px dashed #cbd5e1;
+      margin-top: 14px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .conveyor-belt {
+      position: absolute;
+      bottom: 14px;
+      left: 0;
+      width: 62%;
+      height: 12px;
+      background: #475569;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .conveyor-belt::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(90deg, #334155, #334155 10px, #64748b 10px, #64748b 20px);
+      animation: rollConveyor 1s linear infinite;
+    }
+    @keyframes rollConveyor {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-20px); }
+    }
+
+    /* 實體產出包裹（可移動） */
+    .output-parcel {
+      width: 100px;
+      height: 40px;
+      background: var(--forest-green);
+      color: #ffffff;
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.22);
+      position: absolute;
+      bottom: 24px;
+      left: 10px;
+      opacity: 0;
+      transform: scale(0.7);
+      transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 10;
+    }
+    .output-parcel.slide-out {
+      opacity: 1;
+      transform: scale(1);
+      left: calc(100% - 195px);
+    }
+
+    /* print 產生的幽靈 None 標籤 */
+    .none-ghost-parcel {
+      width: 100px;
+      height: 40px;
+      background: #fef2f2;
+      border: 1.5px dashed #ef4444;
+      color: #dc2626;
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      position: absolute;
+      bottom: 24px;
+      left: 10px;
+      opacity: 0;
+      transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 9;
+    }
+    .none-ghost-parcel.slide-out {
+      opacity: 1;
+      left: calc(100% - 195px);
+    }
+
+    /* 接收端變數名牌 */
+    .receiver-box {
+      width: 175px;
+      height: 56px;
+      border: 2px solid var(--terracotta);
+      background: #fff7ed;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    /* ========================================================
+       動態教具四：呼叫堆疊架 (Call Stack Rack)
+    ======================================================== */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 860px) {
+      .stack-grid { grid-template-columns: 1fr; }
+    }
+    .rack-frame {
+      border: 3px solid #64748b;
+      border-top: none;
+      background: #f8fafc;
+      border-radius: 0 0 10px 10px;
+      height: 280px;
+      display: flex;
+      flex-direction: column-reverse;
+      padding: 10px;
+      gap: 10px;
+      position: relative;
+    }
+    .stack-plate {
+      background: #e0e7ff;
+      border: 1.5px solid var(--primary-navy);
+      border-radius: 6px;
+      padding: 10px;
+      color: var(--primary-navy);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      animation: dropPlate 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes dropPlate {
+      0% { transform: translateY(-50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .scope-inspector {
+      background: #ffffff;
+      border: 1px solid #d8cfc0;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .scope-tier {
+      padding: 10px 14px;
+      border-radius: 6px;
+      border-left: 4px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 0.88rem;
+    }
+
+    /* 版權宣告 */
+    .legal-footer {
+      border-top: 2px solid var(--border-color);
+      padding-top: 28px;
+      margin-top: 60px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .legal-footer strong { color: var(--text-color); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ========================================================
+       8-1 函式宣告與真實執行順序
+  ======================================================== -->
+  <section>
+    <h2>8-1 函式宣告、語法定義與呼叫跳轉流程</h2>
+    <p>
+      在電腦科學中，函式是一段被具名封裝的陳述式區塊，其核心目的在於<strong>抽象化（Abstraction）</strong>與<strong>程式碼重用（Code Reuse）</strong>。
+    </p>
+
+    <h3>1. 函式宣告語法原型與 PEP 8 命名規範</h3>
+    <p>
+      Python 透過保留字 <code>def</code>（Define）進行函式宣告。函式名稱遵循<strong>蛇形命名法（snake_case）</strong>，內部程式碼區塊<strong>嚴格採用 4 個半形空格縮排</strong>。
+    </p>
+
+    <div class="code-wrapper">
+      <pre><code><span class="c-com"># 範例 3：無參數函式定義與直接呼叫</span>
+<span class="c-kw">def</span> <span class="c-fn">say_hello</span>():
+    print(<span class="c-str">"Hello, World!"</span>)
+
+say_hello()
+
+<span class="c-com"># 範例 4：帶參數函式定義與呼叫</span>
+<span class="c-kw">def</span> <span class="c-fn">add</span>(a, b):
+    <span class="c-kw">return</span> a + b
+
+add(<span class="c-num">5</span>, <span class="c-num">3</span>)</code></pre>
+    </div>
+
+    <!-- 動態示範一：函式呼叫與指令指標跳轉模擬器 -->
+    <div class="interactive-widget" id="widget-machine-container">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-tag">動態示範一</span>
+          函式定義與呼叫跳轉流程（定義註冊 ➔ 呼叫發動 ➔ 指標躍入 ➔ 回傳折返）
+        </div>
+        <div class="widget-controls">
+          <button type="button" class="btn primary" id="btn-jump-step">⏭ 下一步 (Step)</button>
+          <button type="button" class="btn" id="btn-jump-reset">🔄 重新開始 (Reset)</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <div class="jump-stage-grid">
+          <!-- 左側程式碼指針監控（4 格縮排嚴格保持） -->
+          <div class="code-box-pre">
+            <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:4px;">
+              PYTHON 程式碼與指令指標 (IP)
+            </div>
+            <div id="code-lines-1">
+              <div class="code-line-row" id="line-1-1"><span class="code-num">1</span><span class="code-text-content"><span class="c-kw">def</span> <span class="c-fn">add</span>(a, b):</span></div>
+              <div class="code-line-row" id="line-1-2"><span class="code-num">2</span><span class="code-text-content">    <span class="c-kw">return</span> a + b</span></div>
+              <div class="code-line-row" style="height:14px;"></div>
+              <div class="code-line-row" id="line-1-4"><span class="code-num">4</span><span class="code-text-content">result = add(<span class="c-num">5</span>, <span class="c-num">3</span>)</span></div>
+              <div class="code-line-row" id="line-1-5"><span class="code-num">5</span><span class="code-text-content">print(f<span class="c-str">"計算結果: {result}"</span>)</span></div>
+            </div>
+          </div>
+
+          <!-- 右側跳轉管線畫布 -->
+          <div class="jump-visual-canvas">
+            <!-- 上方函式定義端 (Callee) -->
+            <div class="jump-portal-card callee" id="portal-callee">
+              <div class="jump-portal-title">
+                <span>【函式定義端 (Callee)】Line 1 ~ 2</span>
+                <span id="callee-badge" style="font-family:var(--font-code);">待機中</span>
+              </div>
+              <div style="font-family:var(--font-code); font-weight:700; color:var(--primary-navy);">
+                def add(a=5, b=3) ➔ 計算 5 + 3 = 8
+              </div>
+            </div>
+
+            <!-- 中間跳轉光束軌道 -->
+            <div class="jump-wire-box">
+              <div class="jump-light-beam">
+                <div class="jump-light-packet" id="jump-packet">▶</div>
+              </div>
+              <div style="position:absolute; right:20px; font-size:0.8rem; color:var(--text-muted);" id="jump-path-status">
+                等待直譯器推進...
+              </div>
+            </div>
+
+            <!-- 下方呼叫端 (Caller) -->
+            <div class="jump-portal-card" id="portal-caller">
+              <div class="jump-portal-title">
+                <span>【主程式呼叫端 (Caller)】Line 4</span>
+                <span id="caller-badge" style="font-family:var(--font-code);">等待指標</span>
+              </div>
+              <div style="font-family:var(--font-code); font-weight:700;" id="caller-line-content">
+                result = add(5, 3)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-terminal">
+          <div class="mini-terminal-title">直譯器指令指標 (Instruction Pointer) 軌跡紀錄</div>
+          <div id="terminal-stdout-1">【就緒】點擊「下一步」，觀察直譯器如何先讀取 def 註冊名稱、略過內部縮排，直到主程式呼叫才真正跳轉！</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 離散狀態追蹤表 -->
+    <h3>2. 離散狀態追蹤表：函式宣告與呼叫時序</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>步驟 (Step)</th>
+            <th>評估陳述句</th>
+            <th>指標位置</th>
+            <th>直譯器底層行為</th>
+            <th>函式主體是否執行？</th>
+            <th>主程式變數狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1（定義）</td>
+            <td><code>def add(a, b):</code></td>
+            <td>第 1 行</td>
+            <td>在記憶體建立函式物件，標記入口位址</td>
+            <td><strong>否（完全不執行內部，自動略過縮排！）</strong></td>
+            <td><em>(尚未建立)</em></td>
+          </tr>
+          <tr>
+            <td>2（呼叫）</td>
+            <td><code>result = add(5, 3)</code></td>
+            <td>第 4 行</td>
+            <td>推進至主程式，看到呼叫運算子 <code>()</code>，準備跳轉</td>
+            <td>即將躍入</td>
+            <td>等待回傳</td>
+          </tr>
+          <tr>
+            <td>3（跳轉執行）</td>
+            <td><code>return a + b</code></td>
+            <td>第 2 行</td>
+            <td><strong>指標實體跳入函式！</strong>形式參數接收引數 5 與 3，計算 5 + 3 = 8</td>
+            <td><strong>是（正式執行運算）</strong></td>
+            <td>等待回傳</td>
+          </tr>
+          <tr>
+            <td>4（回傳賦值）</td>
+            <td><code>result = 8</code></td>
+            <td>回到第 4 行</td>
+            <td>函式結束退出，將成果 8 交給 result 變數</td>
+            <td>函式已退場銷毀</td>
+            <td><code>result = 8</code></td>
+          </tr>
+          <tr>
+            <td>5（接續推進）</td>
+            <td><code>print(result)</code></td>
+            <td>第 5 行</td>
+            <td>主程式往下推進，終端機輸出計算結果</td>
+            <td>—</td>
+            <td><code>result = 8</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       8-2 參數設計與引數對齊發射台
+  ======================================================== -->
+  <section>
+    <h2>8-2 參數設計與引數對齊發射協定</h2>
+    <p>
+      在 Python 中，必須嚴格區分<strong>參數</strong>與<strong>引數</strong>：
+    </p>
+    <ul>
+      <li><strong>形式參數（Parameter）</strong>：在 <code>def</code> 宣告函式時定義的變數名稱（如 <code>def subtract(a, b):</code> 中的 <code>a</code> 與 <code>b</code>）。</li>
+      <li><strong>實際引數（Argument）</strong>：在呼叫函式時真正傳入的數值或物件（如 <code>subtract(10, 5)</code> 中的 <code>10</code> 與 <code>5</code>）。</li>
+    </ul>
+
+    <!-- 動態示範二：參數插槽與引數對齊發射台 -->
+    <div class="interactive-widget" id="widget-launchpad-container">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-tag">動態示範二</span>
+          參數插槽與引數對齊發射台（範例對照、雙軌升空、磁吸交叉與防呆閘門）
+        </div>
+        <div class="widget-controls">
+          <button type="button" class="btn active" id="btn-mode-pos1">範例 5：位置引數 (10, 5)</button>
+          <button type="button" class="btn" id="btn-mode-pos2">範例 5：位置寫反 (5, 10)</button>
+          <button type="button" class="btn" id="btn-mode-kw">範例 6：關鍵字磁吸 (b=5, a=10)</button>
+          <button type="button" class="btn" id="btn-mode-err">陷阱：違規語法 (a=10, 5)</button>
+          <button type="button" class="btn" id="btn-mode-def1">範例 9：預設參數 (缺省補位)</button>
+          <button type="button" class="btn" id="btn-mode-def2">範例 9：覆寫預設值</button>
+          <button type="button" class="btn primary" id="btn-fire-align">🚀 發射對齊 (Launch & Bind)</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <div class="jump-stage-grid">
+          <!-- 左側：教材對應之完整範例程式碼 (嚴格保持 4 格縮排) -->
+          <div class="code-box-pre">
+            <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:4px; display:flex; justify-content:space-between;">
+              <span>PYTHON 範例程式碼</span>
+              <span id="code-mode-badge" style="color:#fde047; font-weight:700;">範例 5：位置參數</span>
+            </div>
+            <div id="code-lines-2">
+              <!-- JS 動態生成，呈現對應範例 5、6、9、陷阱之完整函式定義與呼叫語法 -->
+            </div>
+          </div>
+
+          <!-- 右側：雙軌對齊發射台 -->
+          <div class="align-launchpad-container">
+            <!-- 重金屬防呆閘門 -->
+            <div class="syntax-barrier" id="syntax-barrier-gate">
+              ⚠️ 語法防呆阻絕：SyntaxError: positional argument follows keyword argument
+            </div>
+
+            <!-- 上軌：函式宣告定義形式參數插槽 -->
+            <div class="launch-tier def-tier">
+              <div class="tier-header-label">
+                <div class="tier-desc-block">
+                  <span class="tier-desc-line1" style="color:var(--primary-navy);">【上軌：函式宣告定義 (Definition)】</span>
+                  <span class="tier-desc-line2">形式參數 (Parameters) 插槽</span>
+                </div>
+                <span id="def-signature-text" class="tier-code-pill">def subtract(a, b):</span>
+              </div>
+              <div class="slots-row">
+                <div class="param-slot" id="slot-0">
+                  <span class="slot-tag-name" id="slot-0-name">[ 槽位 a ]</span>
+                  <span style="font-size:0.75rem; color:#64748b;" id="slot-0-val">等待注入...</span>
+                  <div class="slot-default-plate" id="slot-0-defplate">預設值補位</div>
+                </div>
+                <div class="param-slot" id="slot-1">
+                  <span class="slot-tag-name" id="slot-1-name">[ 槽位 b ]</span>
+                  <span style="font-size:0.75rem; color:#64748b;" id="slot-1-val">等待注入...</span>
+                  <div class="slot-default-plate" id="slot-1-defplate">預設: "Hello"</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 下軌：主程式呼叫端實際引數發射台 -->
+            <div class="launch-tier call-tier">
+              <div class="tier-header-label">
+                <div class="tier-desc-block">
+                  <span class="tier-desc-line1" style="color:var(--terracotta);">【下軌：主程式呼叫端 (Call)】</span>
+                  <span class="tier-desc-line2">實際引數 (Arguments) 發射台</span>
+                </div>
+                <span id="call-code-text" class="tier-code-pill">subtract(10, 5)</span>
+              </div>
+              <div class="args-row">
+                <div class="arg-block" id="arg-0">10</div>
+                <div class="arg-block" id="arg-1">5</div>
+              </div>
+            </div>
+
+            <!-- 計算與回傳看板 -->
+            <div class="calc-dashboard" id="calc-dashboard-panel">
+              <span id="calc-dash-formula">運算式：a - b</span>
+              <span id="calc-dash-result">待發射</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-terminal">
+          <div class="mini-terminal-title">引數注入與直譯器對齊日誌</div>
+          <div id="terminal-stdout-2">點選上方模式，再點擊「🚀 發射對齊」，觀察引數如何以物理位移升空注入上方參數槽位！</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>常見參數設計型態規格</h3>
+    <ul>
+      <li><strong>位置參數（Positional Arguments）</strong>：最常見的形式，呼叫端傳入引數的順序必須與定義時完全一致。</li>
+      <li><strong>關鍵字參數（Keyword Arguments）</strong>：呼叫時明確寫出 <code>參數名稱=值</code>，傳入的順序可以隨意對調。</li>
+      <li><strong>預設參數（Default Arguments）</strong>：定義函式時為參數指定預設值。<strong>鐵律：有預設值的參數必須排在非預設參數的後方！</strong></li>
+    </ul>
+  </section>
+
+  <!-- ========================================================
+       8-3 函式產出機制：return 與 print 對比
+  ======================================================== -->
+  <section>
+    <h2>8-3 函式產出機制：return 與 print 的本質差異</h2>
+    <p>
+      初學者最常犯的觀念錯誤之一，就是分不清<strong>「印出在螢幕上（<code>print</code>）」</strong>與<strong>「交出計算結果（<code>return</code>）」</strong>的根本差異：
+    </p>
+
+    <!-- 動態示範三：return 與 print 的本質差異 -->
+    <div class="interactive-widget" id="widget-return-print-container">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-tag">動態示範三</span>
+          return 實體出料 vs print 側邊排氣對比（原料進料 ➔ 加工運算 ➔ 成品輸送帶出料 vs 冒煙排氣）
+        </div>
+        <div class="widget-controls">
+          <button type="button" class="btn active" id="btn-scene-return">情境 A：return 計算出料 (實質產出)</button>
+          <button type="button" class="btn" id="btn-scene-print">情境 B：print 僅印出無回傳 (交付 None)</button>
+          <button type="button" class="btn" id="btn-scene-deadcode">情境 C：return 提早終止（死碼斷電）</button>
+          <button type="button" class="btn primary" id="btn-pipeline-step">⏭ 下一步 (Step)</button>
+          <button type="button" class="btn" id="btn-pipeline-reset">🔄 重新開始 (Reset)</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <div class="jump-stage-grid">
+          <!-- 左側程式碼監控 -->
+          <div class="code-box-pre">
+            <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:4px; display:flex; justify-content:space-between;">
+              <span>PYTHON 程式碼與指令指標 (IP)</span>
+              <span id="pipeline-code-badge" style="color:#60a5fa; font-weight:700;">情境 A：return 出料</span>
+            </div>
+            <div id="code-lines-3">
+              <!-- JS 動態生成，保證 4 格縮排 -->
+            </div>
+          </div>
+
+          <!-- 右側實體工廠機台畫布（完整進料、加工、出料與排氣動態） -->
+          <div class="pipeline-stage">
+            <div style="font-size:0.85rem; font-weight:700; color:var(--primary-navy); display:flex; justify-content:space-between; align-items:center;">
+              <span>函式加工機台內部運作</span>
+              <span id="pipeline-status-text" style="color:var(--terracotta); font-weight:700;">待機中</span>
+            </div>
+
+            <!-- 頂部：進料漏斗與原料方塊 (Input Material Block) -->
+            <div class="hopper-chute">
+              <div class="hopper-label">原料進料斗 (Arg: score)</div>
+              <div class="material-block" id="material-block">score = 95</div>
+            </div>
+
+            <!-- 中間：封閉加工艙本體 -->
+            <div class="chamber-box" id="chamber-body">
+              <div style="font-size:0.8rem; font-weight:700; color:var(--primary-navy); margin-bottom:4px; display:flex; justify-content:space-between;">
+                <span>⚙️ 封閉加工艙內部</span>
+                <span id="chamber-sub-status" style="font-size:0.75rem; color:#64748b;">待機中</span>
+              </div>
+              <div class="exhaust-chimney">
+                <div class="exhaust-smoke" id="exhaust-smoke">💨 stdout: 成績登錄 95</div>
+              </div>
+              <div id="chamber-status" style="font-family:var(--font-code); font-weight:700; color:#64748b;">
+                尚未進入函式（等待呼叫）
+              </div>
+            </div>
+
+            <!-- 底部：出料輸送帶與接收變數 (Conveyor & Output Parcels) -->
+            <div class="conveyor-track">
+              <div class="conveyor-belt"></div>
+              <!-- 實體產出包裹（可平滑移動至 receiver-box） -->
+              <div class="output-parcel" id="output-parcel">📦 114.0</div>
+              <!-- print 情境產出的空值幽靈標籤 -->
+              <div class="none-ghost-parcel" id="none-ghost-parcel">👻 None</div>
+              <!-- 主程式接收端變數 -->
+              <div class="receiver-box" id="receiver-box-el">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--terracotta);">主程式接收變數</div>
+                <div style="font-family:var(--font-code); font-weight:700; font-size:0.95rem;" id="receiver-val">result = ?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-terminal">
+          <div class="mini-terminal-title">直譯器出料行為與 stdout 紀錄</div>
+          <div id="terminal-stdout-3">點擊「下一步」觀察：原料如何注入加工艙，以及 return 如何走輸送帶將資料交棒給變數！</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>比較項目</th>
+            <th><code>print()</code> 函式</th>
+            <th><code>return</code> 陳述句</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>本質用途</strong></td>
+            <td>純粹將文字字串輸出到螢幕終端機供人類肉眼閱讀</td>
+            <td>結束函式，將計算成果交付給等號左側的變數</td>
+          </tr>
+          <tr>
+            <td><strong>變數接收結果</strong></td>
+            <td><code>res = print(10)</code> ➔ <strong><code>res</code> 拿到 <code>None</code>！</strong></td>
+            <td><code>res = calculate(10)</code> ➔ <strong><code>res</code> 拿到實體數值！</strong></td>
+          </tr>
+          <tr>
+            <td><strong>後續可否做運算？</strong></td>
+            <td><strong>完全不行！</strong>（拿 <code>None</code> 去加減乘除會直接引發 <code>TypeError</code> 崩潰）</td>
+            <td><strong>完全可以！</strong>（回傳值可繼續參與後續所有運算）</td>
+          </tr>
+          <tr>
+            <td><strong>對函式流程的影響</strong></td>
+            <td>印出後繼續順利執行下一行</td>
+            <td><strong>立即阻絕並結束函式</strong>，其下方未執行的程式碼成為無效死碼（Dead Code）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>多個回傳值本質：元組自動封裝與解構</h3>
+    <p>
+      Python 允許在 <code>return</code> 後面寫多個數值（如 <code>return x, y</code>），直譯器底層實質上是自動將其打包成一個不可變的<strong>元組（Tuple）</strong>，呼叫端可使用多個變數同時解構接收：
+    </p>
+
+    <div class="code-wrapper">
+      <pre><code><span class="c-kw">def</span> <span class="c-fn">get_point</span>():
+    x = <span class="c-num">10</span>
+    y = <span class="c-num">20</span>
+    <span class="c-kw">return</span> x, y  <span class="c-com"># 底層自動封裝為元組 (10, 20)</span>
+
+<span class="c-com"># 多變數解構賦值</span>
+x_coord, y_coord = get_point()
+print(x_coord)  <span class="c-com"># 10</span>
+print(y_coord)  <span class="c-com"># 20</span></code></pre>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       8-4 變數作用域與呼叫堆疊
+  ======================================================== -->
+  <section>
+    <h2>8-4 變數有效範圍與呼叫堆疊生命週期</h2>
+    <p>
+      函式內部宣告的變數稱為<strong>區域變數（Local Variable）</strong>，僅在函式執行期間存在；外部宣告的為<strong>全域變數（Global Variable）</strong>。
+      每次呼叫函式時，直譯器會在<strong>呼叫堆疊（Call Stack）</strong>上推入（Push）一個專屬的記憶體訊框（Stack Frame），函式執行完畢遇到 <code>return</code> 時，該訊框立即彈出（Pop）並徹底銷毀！
+    </p>
+
+    <!-- 動態示範四：呼叫堆疊與變數生命週期 -->
+    <div class="interactive-widget" id="widget-stack-container">
+      <div class="widget-header">
+        <div class="widget-title">
+          <span class="widget-tag">動態示範四</span>
+          呼叫堆疊架（Call Stack）與變數生命週期（訊框推入、區域變數與彈出銷毀）
+        </div>
+        <div class="widget-controls">
+          <button type="button" class="btn primary" id="btn-stack-push">➕ 呼叫函式 (推入訊框 Push)</button>
+          <button type="button" class="btn" id="btn-stack-pop">➖ 遇 return 結束 (彈出銷毀 Pop)</button>
+          <button type="button" class="btn" id="btn-stack-reset">🔄 重新開始 (Reset)</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <div class="stack-grid">
+          <!-- 垂直堆疊架 -->
+          <div>
+            <div style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">
+              記憶體呼叫堆疊架 (Call Stack)
+            </div>
+            <div class="rack-frame" id="call-stack-rack">
+              <div class="stack-plate" style="background:#cbd5e1; border-color:#64748b;">
+                【主程式底層】Global Frame
+              </div>
+            </div>
+          </div>
+
+          <!-- 作用域檢視窗 -->
+          <div class="scope-inspector">
+            <div style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">
+              當前活躍變數與有效範圍
+            </div>
+            <div class="scope-tier" id="scope-local">
+              <strong>區域變數 (Local Scope)</strong>：<span id="scope-local-vars">(尚無函式執行)</span>
+            </div>
+            <div class="scope-tier" id="scope-global">
+              <strong>全域變數 (Global Scope)</strong>：<code>TAX_RATE = 0.05</code>, <code>version = "1.0"</code>
+            </div>
+            <div class="scope-tier" id="scope-builtin">
+              <strong>內建名稱 (Built-in)</strong>：<code>print()</code>, <code>len()</code>, <code>range()</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-terminal">
+          <div class="mini-terminal-title">堆疊空間動態紀錄</div>
+          <div id="terminal-stdout-4">【狀態】主程式執行中。點擊「呼叫函式」觀察專屬記憶體空間的建立與銷毀！</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       8-5 常見陷阱與避坑指南
+  ======================================================== -->
+  <section>
+    <h2>8-5 常見陷阱與避坑指南</h2>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>典型錯誤情境</th>
+            <th>錯誤程式碼範例</th>
+            <th>直譯器報錯原因</th>
+            <th>正確寫法與解法</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>關鍵字引數後面接位置引數</strong></td>
+            <td><code>subtract(a=10, 5)</code></td>
+            <td><code>SyntaxError: positional argument follows keyword argument</code>。順序產生嚴重歧義！</td>
+            <td>位置引數必須一律排在關鍵字引數前方：<code>subtract(10, b=5)</code>。</td>
+          </tr>
+          <tr>
+            <td><strong>把 print 當作 return 接收</strong></td>
+            <td><code>res = print(10)<br>total = res + 5</code></td>
+            <td><code>TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'</code>。<code>print</code> 回傳值固定為 <code>None</code>！</td>
+            <td>函式需要交付數值時務必使用 <code>return</code>。</td>
+          </tr>
+          <tr>
+            <td><strong>可變物件作為預設參數</strong></td>
+            <td><code>def add_item(x, lst=[]):</code></td>
+            <td>預設串列只會在定義時建立一次，所有呼叫者會共用同一個串列！</td>
+            <td>使用 <code>None</code> 作為預設值，內部再初始化：<code>if lst is None: lst = []</code>。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       8-6 課堂實作演練
+  ======================================================== -->
+  <section>
+    <h2>8-6 課堂實作演練</h2>
+
+    <div class="info-callout">
+      <h3>實作題：多功能長方體規格計算機</h3>
+      <p><strong>規格說明：</strong></p>
+      <ol>
+        <li>設計函式 <code>calculate_box(length, width, height=1)</code>。</li>
+        <li>計算底面積（長 × 寬）與總體積（長 × 寬 × 高）。</li>
+        <li>以<strong>多值回傳</strong>方式同時交出：<code>area, volume</code>。</li>
+      </ol>
+      <div class="code-wrapper">
+        <pre><code><span class="c-kw">def</span> <span class="c-fn">calculate_box</span>(length, width, height=<span class="c-num">1</span>):
+    area = length * width
+    volume = area * height
+    <span class="c-kw">return</span> area, volume
+
+<span class="c-com"># 1. 使用預設高度 (height=1)</span>
+base_area, vol1 = calculate_box(<span class="c-num">5</span>, <span class="c-num">4</span>)
+print(f"底面積: {base_area}, 體積: {vol1}")
+
+<span class="c-com"># 2. 關鍵字指定高度</span>
+_, vol2 = calculate_box(<span class="c-num">5</span>, <span class="c-num">4</span>, height=<span class="c-num">3</span>)
+print(f"新體積: {vol2}")</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 官方免責聲明與權益宣示 -->
+  <footer class="legal-footer">
+    <p><strong>免責聲明與權益宣示</strong></p>
+    <p>
+      本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。
+      如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。
+    </p>
+  </footer>
+
+</div>
+
+<script>
+// ========================================================
+// 教具一：8-1 函式定義與呼叫跳轉流程模擬器
+// ========================================================
+(function() {
+  const line1 = document.getElementById("line-1-1");
+  const line2 = document.getElementById("line-1-2");
+  const line4 = document.getElementById("line-1-4");
+  const line5 = document.getElementById("line-1-5");
+
+  const portalCallee = document.getElementById("portal-callee");
+  const portalCaller = document.getElementById("portal-caller");
+  const calleeBadge = document.getElementById("callee-badge");
+  const callerBadge = document.getElementById("caller-badge");
+  const callerLineContent = document.getElementById("caller-line-content");
+  const jumpPacket = document.getElementById("jump-packet");
+  const jumpPathStatus = document.getElementById("jump-path-status");
+  const terminalOut = document.getElementById("terminal-stdout-1");
+
+  const btnStep = document.getElementById("btn-jump-step");
+  const btnReset = document.getElementById("btn-jump-reset");
+
+  let step = 0;
+
+  function clearHighlights() {
+    [line1, line2, line4, line5].forEach(l => l.className = "code-line-row");
+    portalCallee.className = "jump-portal-card callee";
+    portalCaller.className = "jump-portal-card";
+    jumpPacket.style.opacity = "0";
+    jumpPacket.style.top = "0";
+  }
+
+  function resetWidget() {
+    step = 0;
+    clearHighlights();
+    calleeBadge.textContent = "待機中";
+    callerBadge.textContent = "等待指標";
+    callerLineContent.textContent = "result = add(5, 3)";
+    callerLineContent.style.color = "var(--text-color)";
+    jumpPathStatus.textContent = "等待直譯器推進...";
+    terminalOut.innerHTML = "【就緒】點擊「下一步」，觀察直譯器如何先讀取 def 註冊名稱、略過內部縮排，直到主程式呼叫才真正跳轉！";
+  }
+
+  function stepWidget() {
+    step++;
+    clearHighlights();
+
+    if (step === 1) {
+      // Step 1: Line 1 定義函式
+      line1.classList.add("active");
+      portalCallee.classList.add("active");
+      calleeBadge.textContent = "註冊函式藍圖";
+      jumpPathStatus.textContent = "略過縮排主體，不執行內部！";
+      terminalOut.innerHTML = `<strong>步驟 1（定義階段）Line 1</strong>：<br>直譯器讀取 <code>def add(a, b):</code>，在全域記憶體中註冊函式名稱 <code>add</code>。<br>⚠️ <strong>關鍵特性：直譯器在此自動跳過縮排區塊（第 2 行），內部完全不執行！</strong>`;
+    } else if (step === 2) {
+      // Step 2: Line 4 主程式呼叫
+      line4.classList.add("active");
+      portalCaller.classList.add("active");
+      callerBadge.textContent = "執行呼叫 ()";
+      jumpPathStatus.textContent = "看到括號 ()，指令指標準備躍入函式！";
+      terminalOut.innerHTML += `<br><br><strong>步驟 2（主程式呼叫）Line 4</strong>：<br>指標推進至主程式 <code>result = add(5, 3)</code>。<br>碰到呼叫運算子 <code>()</code>，直譯器準備將引數 5, 3 傳遞給函式，指令指標即將跳轉！`;
+    } else if (step === 3) {
+      // Step 3: 指標跳轉進入 Line 2
+      line2.classList.add("active");
+      portalCallee.classList.add("active");
+      calleeBadge.textContent = "指標跳轉進入！執行中";
+      
+      // 光束向上躍入動畫
+      jumpPacket.style.opacity = "1";
+      jumpPacket.textContent = "⬆";
+      jumpPacket.style.top = "0";
+      setTimeout(() => {
+        jumpPacket.style.top = "-50px";
+      }, 50);
+
+      jumpPathStatus.textContent = "指標躍入函式內部，計算 a + b = 8";
+      terminalOut.innerHTML += `<br><br><strong>步驟 3（指標跳入函式）Line 2</strong>：<br>指令指標<strong>真正躍入第 2 行內部</strong>！參數槽位 <code>a=5, b=3</code>，執行加法運算 <code>5 + 3 = 8</code>。`;
+    } else if (step === 4) {
+      // Step 4: 回到 Line 4 完成賦值
+      line4.classList.add("active");
+      portalCaller.classList.add("active");
+      callerBadge.textContent = "return 成果交接";
+      
+      // 光束向下折返動畫
+      jumpPacket.style.opacity = "1";
+      jumpPacket.textContent = "⬇";
+      jumpPacket.style.top = "-50px";
+      setTimeout(() => {
+        jumpPacket.style.top = "50px";
+      }, 50);
+
+      callerLineContent.innerHTML = `result = <span style="color:var(--forest-green); font-size:1.15rem;">8</span> (交棒成功)`;
+      jumpPathStatus.textContent = "帶值 8 折返呼叫端，完成賦值！";
+      terminalOut.innerHTML += `<br><br><strong>步驟 4（return 帶值折返）回到 Line 4</strong>：<br>函式執行 <code>return 8</code>，攜帶成果退場，將 <code>8</code> 精確交接給等號左側的 <code>result</code> 變數！`;
+    } else if (step === 5) {
+      // Step 5: Line 5 主程式印出
+      line5.classList.add("active");
+      portalCaller.classList.add("active");
+      callerBadge.textContent = "主程式接續推進";
+      jumpPathStatus.textContent = "主程式正常推進，輸出計算結果。";
+      terminalOut.innerHTML += `<br><br><strong>步驟 5（接續推進）Line 5</strong>：<br>主程式繼續執行下一行 <code>print(...)</code>，終端機輸出「計算結果: 8」。完整執行時序圓滿結束！`;
+    } else {
+      resetWidget();
+    }
+  }
+
+  btnStep.addEventListener("click", stepWidget);
+  btnReset.addEventListener("click", resetWidget);
+  resetWidget();
+})();
+
+// ========================================================
+// 教具二：8-2 參數插槽與引數對齊發射台 (物理位移發射動畫)
+// ========================================================
+(function() {
+  const codeLines2 = document.getElementById("code-lines-2");
+  const codeModeBadge = document.getElementById("code-mode-badge");
+  const defSigText = document.getElementById("def-signature-text");
+  const callCodeText = document.getElementById("call-code-text");
+  const slot0 = document.getElementById("slot-0");
+  const slot1 = document.getElementById("slot-1");
+  const slot0Name = document.getElementById("slot-0-name");
+  const slot1Name = document.getElementById("slot-1-name");
+  const slot0Val = document.getElementById("slot-0-val");
+  const slot1Val = document.getElementById("slot-1-val");
+  const slot0Defplate = document.getElementById("slot-0-defplate");
+  const slot1Defplate = document.getElementById("slot-1-defplate");
+
+  const arg0 = document.getElementById("arg-0");
+  const arg1 = document.getElementById("arg-1");
+  const barrierGate = document.getElementById("syntax-barrier-gate");
+
+  const calcDashPanel = document.getElementById("calc-dashboard-panel");
+  const calcDashFormula = document.getElementById("calc-dash-formula");
+  const calcDashResult = document.getElementById("calc-dash-result");
+  const terminalOut = document.getElementById("terminal-stdout-2");
+
+  const btnPos1 = document.getElementById("btn-mode-pos1");
+  const btnPos2 = document.getElementById("btn-mode-pos2");
+  const btnKw = document.getElementById("btn-mode-kw");
+  const btnErr = document.getElementById("btn-mode-err");
+  const btnDef1 = document.getElementById("btn-mode-def1");
+  const btnDef2 = document.getElementById("btn-mode-def2");
+  const btnFire = document.getElementById("btn-fire-align");
+
+  let currentMode = "pos1";
+
+  const MODES = {
+    pos1: {
+      btn: btnPos1,
+      badge: "範例 5：位置參數",
+      codeSnippet: [
+        '<span class="c-com"># 範例 5：位置參數（循序傳入）</span>',
+        '<span class="c-kw">def</span> <span class="c-fn">subtract</span>(a, b):',
+        '    <span class="c-kw">return</span> a - b',
+        '',
+        'result = subtract(<span class="c-num">10</span>, <span class="c-num">5</span>)  <span class="c-com"># a=10, b=5</span>'
+      ],
+      defSig: "def subtract(a, b):",
+      callCode: "result = subtract(10, 5)",
+      slots: [{ name: "[ 槽位 a ]", def: "" }, { name: "[ 槽位 b ]", def: "" }],
+      args: [{ text: "10" }, { text: "5" }],
+      anim: {
+        arg0: "translateY(-136px)",
+        arg1: "translateY(-136px)"
+      },
+      resultFormula: "計算式：a - b = 10 - 5",
+      resultVal: "回傳值: 5",
+      isError: false,
+      log: "✔ 【範例 5：位置引數】依括號物理順序，第 1 個值 <code>10</code> 垂直升空進入 <code>a</code>，第 2 個值 <code>5</code> 進入 <code>b</code>。<br>計算：<code>10 - 5 = 5</code>。"
+    },
+    pos2: {
+      btn: btnPos2,
+      badge: "範例 5：位置寫反",
+      codeSnippet: [
+        '<span class="c-com"># 範例 5 陷阱：位置順序決定賦值對象</span>',
+        '<span class="c-kw">def</span> <span class="c-fn">subtract</span>(a, b):',
+        '    <span class="c-kw">return</span> a - b',
+        '',
+        'result = subtract(<span class="c-num">5</span>, <span class="c-num">10</span>)  <span class="c-com"># a=5, b=10！結果顛倒</span>'
+      ],
+      defSig: "def subtract(a, b):",
+      callCode: "result = subtract(5, 10)",
+      slots: [{ name: "[ 槽位 a ]", def: "" }, { name: "[ 槽位 b ]", def: "" }],
+      args: [{ text: "5" }, { text: "10" }],
+      anim: {
+        arg0: "translateY(-136px)",
+        arg1: "translateY(-136px)"
+      },
+      resultFormula: "計算式：a - b = 5 - 10",
+      resultVal: "回傳值: -5",
+      isError: false,
+      log: "⚠️ 【位置寫反】雖然傳入相同數字，但因物理順序互換：<br>• <code>a</code> 注入 5，<code>b</code> 注入 10。<br>計算結果完全顛倒：<code>5 - 10 = -5</code>！"
+    },
+    kw: {
+      btn: btnKw,
+      badge: "範例 6：關鍵字參數",
+      codeSnippet: [
+        '<span class="c-com"># 範例 6：關鍵字參數（順序可任意）</span>',
+        '<span class="c-kw">def</span> <span class="c-fn">subtract</span>(a, b):',
+        '    <span class="c-kw">return</span> a - b',
+        '',
+        'result = subtract(b=<span class="c-num">5</span>, a=<span class="c-num">10</span>)  <span class="c-com"># 磁吸鎖定！</span>'
+      ],
+      defSig: "def subtract(a, b):",
+      callCode: "result = subtract(b=5, a=10)",
+      slots: [{ name: "[ 槽位 a ]", def: "" }, { name: "[ 槽位 b ]", def: "" }],
+      args: [{ text: "b = 5" }, { text: "a = 10" }],
+      anim: {
+        arg0: "translate(171px, -136px)",
+        arg1: "translate(-171px, -136px)"
+      },
+      resultFormula: "計算式：a - b = 10 - 5",
+      resultVal: "回傳值: 5",
+      isError: false,
+      log: "✔ 【範例 6：關鍵字引數磁吸跨越】呼叫端具名 <code>b=5, a=10</code>：<br>• 方塊在空中劃出 <strong>X 型交叉軌跡</strong>，依名稱磁吸鎖定各自的槽位！<br>• <code>a</code> 依然精準拿到 10，<code>b</code> 拿到 5，不受書寫順序影響！"
+    },
+    err: {
+      btn: btnErr,
+      badge: "常見陷阱：違規語法",
+      codeSnippet: [
+        '<span class="c-com"># 常見陷阱：位置引數排在關鍵字後方</span>',
+        '<span class="c-kw">def</span> <span class="c-fn">subtract</span>(a, b):',
+        '    <span class="c-kw">return</span> a - b',
+        '',
+        'result = subtract(a=<span class="c-num">10</span>, <span class="c-num">5</span>)  <span class="c-com"># ❌ 觸發 SyntaxError</span>'
+      ],
+      defSig: "def subtract(a, b):",
+      callCode: "result = subtract(a=10, 5)  # 違法語法！",
+      slots: [{ name: "[ 槽位 a ]", def: "" }, { name: "[ 槽位 b ]", def: "" }],
+      args: [{ text: "a = 10" }, { text: "5 (無名引數)" }],
+      anim: {
+        arg0: "translateY(-40px)",
+        arg1: "translateY(-40px)"
+      },
+      resultFormula: "語法錯誤：SyntaxError",
+      resultVal: "執行中斷！",
+      isError: true,
+      log: "<span style='color:#f87171;'>❌ 【嚴重語法防呆阻絕】直譯器立即崩潰拋出：<br><code>SyntaxError: positional argument follows keyword argument</code><br>原因：前面已經具名 <code>a=10</code>，後面又給無名引數 <code>5</code>，造成位置槽位產生嚴重混淆！<strong>鐵律：位置引數永遠必須排在關鍵字引數前面！</strong></span>"
+    },
+    def1: {
+      btn: btnDef1,
+      badge: "範例 9：默認參數值 (缺省)",
+      codeSnippet: [
+        '<span class="c-com"># 範例 9：默認參數值（預設值）</span>',
+        '<span class="c-kw">def</span> <span class="c-fn">greet</span>(name, message=<span class="c-str">"Hello"</span>):',
+        '    print(f<span class="c-str">"{message}, {name}!"</span>)',
+        '',
+        'greet(<span class="c-str">"Alice"</span>)  <span class="c-com"># 未傳 message，自動使用預設值</span>'
+      ],
+      defSig: "def greet(name, message='Hello'):",
+      callCode: "greet('Alice')",
+      slots: [{ name: "[ 槽位 name ]", def: "" }, { name: "[ 槽位 message ]", def: "預設: 'Hello'" }],
+      args: [{ text: "'Alice'" }, { text: "(缺省未傳)" }],
+      anim: {
+        arg0: "translateY(-136px)",
+        arg1: "none"
+      },
+      resultFormula: "字串格式化：f'{message}, {name}!'",
+      resultVal: "'Hello, Alice!'",
+      isError: false,
+      log: "✔ 【範例 9：預設參數自動補位】呼叫端只傳入一個引數 <code>'Alice'</code>：<br>• <code>'Alice'</code> 升空注入 <code>name</code>。<br>• <code>message</code> 槽位檢測到無資料注入，底部<strong>預設值擋板 'Hello' 自動彈起補位</strong>！"
+    },
+    def2: {
+      btn: btnDef2,
+      badge: "範例 9：覆寫默認參數值",
+      codeSnippet: [
+        '<span class="c-com"># 範例 9：傳入引數覆蓋預設值</span>',
+        '<span class="c-kw">def</span> <span class="c-fn">greet</span>(name, message=<span class="c-str">"Hello"</span>):',
+        '    print(f<span class="c-str">"{message}, {name}!"</span>)',
+        '',
+        'greet(<span class="c-str">"Bob"</span>, message=<span class="c-str">"Hi"</span>)  <span class="c-com"># 明確指定 "Hi" 覆蓋</span>'
+      ],
+      defSig: "def greet(name, message='Hello'):",
+      callCode: "greet('Bob', message='Hi')",
+      slots: [{ name: "[ 槽位 name ]", def: "" }, { name: "[ 槽位 message ]", def: "預設: 'Hello'" }],
+      args: [{ text: "'Bob'" }, { text: "message='Hi'" }],
+      anim: {
+        arg0: "translateY(-136px)",
+        arg1: "translateY(-136px)"
+      },
+      resultFormula: "字串格式化：f'{message}, {name}!'",
+      resultVal: "'Hi, Bob!'",
+      isError: false,
+      log: "✔ 【範例 9：覆寫預設值】呼叫端明確傳入 <code>message='Hi'</code>：<br>• 傳入引數具有最高優先權，直接壓制並覆蓋原預設值，產出 <code>'Hi, Bob!'</code>！"
+    }
+  };
+
+  function renderCodeBox(snippet) {
+    let html = "";
+    snippet.forEach((line, idx) => {
+      html += `
+        <div class="code-line-row">
+          <span class="code-num">${idx + 1}</span>
+          <span class="code-text-content">${line}</span>
+        </div>
+      `;
+    });
+    codeLines2.innerHTML = html;
+  }
+
+  function selectMode(key) {
+    currentMode = key;
+    const cfg = MODES[key];
+    [btnPos1, btnPos2, btnKw, btnErr, btnDef1, btnDef2].forEach(b => b.className = "btn");
+    cfg.btn.className = "btn active";
+
+    codeModeBadge.textContent = cfg.badge;
+    renderCodeBox(cfg.codeSnippet);
+
+    // 還原發射台狀態
+    arg0.style.transform = "none";
+    arg1.style.transform = "none";
+    arg0.style.opacity = "1";
+    arg1.style.opacity = key === "def1" ? "0.35" : "1";
+
+    slot0.className = "param-slot";
+    slot1.className = "param-slot";
+    slot0Val.textContent = "等待注入...";
+    slot1Val.textContent = "等待注入...";
+    slot0Defplate.classList.remove("pop-up");
+    slot1Defplate.classList.remove("pop-up");
+    barrierGate.classList.remove("slam-down");
+
+    defSigText.textContent = cfg.defSig;
+    callCodeText.textContent = cfg.callCode;
+
+    slot0Name.textContent = cfg.slots[0].name;
+    slot1Name.textContent = cfg.slots[1].name;
+    arg0.textContent = cfg.args[0].text;
+    arg1.textContent = cfg.args[1].text;
+
+    calcDashPanel.className = "calc-dashboard";
+    calcDashFormula.textContent = cfg.resultFormula;
+    calcDashResult.textContent = "等待發射對齊...";
+    terminalOut.innerHTML = `【已載入 ${cfg.badge}】${cfg.log}<br>👉 點擊「🚀 發射對齊 (Launch & Bind)」觀看實體升空對接！`;
+  }
+
+  function fireLaunch() {
+    const cfg = MODES[currentMode];
+    if (cfg.isError) {
+      arg0.style.transform = cfg.anim.arg0;
+      arg1.style.transform = cfg.anim.arg1;
+      setTimeout(() => {
+        barrierGate.classList.add("slam-down");
+        calcDashPanel.className = "calc-dashboard err";
+        calcDashResult.textContent = cfg.resultVal;
+        terminalOut.innerHTML = cfg.log;
+      }, 250);
+      return;
+    }
+
+    arg0.style.transform = cfg.anim.arg0;
+    if (cfg.anim.arg1 !== "none") {
+      arg1.style.transform = cfg.anim.arg1;
+    }
+
+    setTimeout(() => {
+      slot0.classList.add("locked");
+      slot0Val.textContent = `注入: ${cfg.args[0].text}`;
+
+      if (currentMode === "def1") {
+        slot1.classList.add("locked");
+        slot1Val.textContent = "使用預設值";
+        slot1Defplate.classList.add("pop-up");
+      } else if (currentMode === "def2") {
+        slot1.classList.add("locked");
+        slot1Val.textContent = "注入: 'Hi' (覆蓋)";
+      } else {
+        slot1.classList.add("locked");
+        slot1Val.textContent = `注入: ${cfg.args[1].text}`;
+      }
+
+      calcDashPanel.className = "calc-dashboard";
+      calcDashFormula.textContent = cfg.resultFormula;
+      calcDashResult.textContent = cfg.resultVal;
+      terminalOut.innerHTML = cfg.log;
+    }, 600);
+  }
+
+  btnPos1.addEventListener("click", () => selectMode("pos1"));
+  btnPos2.addEventListener("click", () => selectMode("pos2"));
+  btnKw.addEventListener("click", () => selectMode("kw"));
+  btnErr.addEventListener("click", () => selectMode("err"));
+  btnDef1.addEventListener("click", () => selectMode("def1"));
+  btnDef2.addEventListener("click", () => selectMode("def2"));
+  btnFire.addEventListener("click", fireLaunch);
+
+  selectMode("pos1");
+})();
+
+// ========================================================
+// 教具三：8-3 return 實體出料 vs print 側邊排氣對比
+// ========================================================
+(function() {
+  const codeLines = document.getElementById("code-lines-3");
+  const pipelineCodeBadge = document.getElementById("pipeline-code-badge");
+  const materialBlock = document.getElementById("material-block");
+  const chamberBody = document.getElementById("chamber-body");
+  const chamberSubStatus = document.getElementById("chamber-sub-status");
+  const exhaustSmoke = document.getElementById("exhaust-smoke");
+  const outputParcel = document.getElementById("output-parcel");
+  const noneGhostParcel = document.getElementById("none-ghost-parcel");
+  const receiverBoxEl = document.getElementById("receiver-box-el");
+  const receiverVal = document.getElementById("receiver-val");
+  const chamberStatus = document.getElementById("chamber-status");
+  const pipelineStatusText = document.getElementById("pipeline-status-text");
+  const terminalOut = document.getElementById("terminal-stdout-3");
+
+  const btnSceneReturn = document.getElementById("btn-scene-return");
+  const btnScenePrint = document.getElementById("btn-scene-print");
+  const btnSceneDeadcode = document.getElementById("btn-scene-deadcode");
+  const btnStep = document.getElementById("btn-pipeline-step");
+  const btnReset = document.getElementById("btn-pipeline-reset");
+
+  let scene = "return";
+  let step = 0;
+
+  const SCENARIOS = {
+    return: {
+      badge: "情境 A：return 出料",
+      lines: [
+        { text: '<span class="c-kw">def</span> <span class="c-fn">calculate</span>(score):' },
+        { text: '    <span class="c-kw">return</span> score * <span class="c-num">1.2</span>' },
+        { text: 'result = calculate(<span class="c-num">95</span>)  <span class="c-com"># 主程式呼叫</span>' },
+        { text: 'print(f<span class="c-str">"收到結果: {result}"</span>)' }
+      ]
+    },
+    print: {
+      badge: "情境 B：print 無回傳",
+      lines: [
+        { text: '<span class="c-kw">def</span> <span class="c-fn">calculate</span>(score):' },
+        { text: '    print(f<span class="c-str">"成績登錄: {score}"</span>)' },
+        { text: 'result = calculate(<span class="c-num">95</span>)  <span class="c-com"># 主程式呼叫</span>' },
+        { text: 'print(f<span class="c-str">"收到結果: {result}"</span>)' }
+      ]
+    },
+    deadcode: {
+      badge: "情境 C：return 提早終止 (死碼)",
+      lines: [
+        { text: '<span class="c-kw">def</span> <span class="c-fn">calculate</span>(score):' },
+        { text: '    <span class="c-kw">return</span> <span class="c-str">"及格出料"</span>' },
+        { text: '    print(<span class="c-str">"這行永遠不會執行"</span>)' },
+        { text: 'result = calculate(<span class="c-num">95</span>)  <span class="c-com"># 主程式呼叫</span>' }
+      ]
+    }
+  };
+
+  function renderCode(activeLineIdx, deadLineIdx = -1) {
+    const list = SCENARIOS[scene].lines;
+    let html = '';
+    list.forEach((item, idx) => {
+      const isActive = idx === activeLineIdx;
+      const isDead = idx === deadLineIdx;
+      html += `
+        <div class="code-line-row ${isActive ? 'active' : ''} ${isDead ? 'dead' : ''}">
+          <span class="code-num">${idx + 1}</span>
+          <span class="code-text-content">${item.text}</span>
+        </div>
+      `;
+    });
+    codeLines.innerHTML = html;
+  }
+
+  function resetWidget() {
+    step = 0;
+    pipelineCodeBadge.textContent = SCENARIOS[scene].badge;
+    renderCode(-1);
+
+    // 重設原料方塊位置
+    materialBlock.style.transform = "none";
+    materialBlock.style.opacity = "1";
+    materialBlock.textContent = "score = 95";
+
+    // 重設加工艙與排氣
+    chamberBody.className = "chamber-box";
+    chamberSubStatus.textContent = "待機中";
+    chamberStatus.textContent = "尚未進入函式（等待呼叫）";
+    chamberStatus.style.color = "#64748b";
+    exhaustSmoke.className = "exhaust-smoke";
+
+    // 重設出料包裹與輸送帶
+    outputParcel.className = "output-parcel";
+    outputParcel.textContent = scene === "deadcode" ? "📦 及格出料" : "📦 114.0";
+    noneGhostParcel.className = "none-ghost-parcel";
+
+    // 重設接收端名牌
+    receiverVal.textContent = "result = ?";
+    receiverVal.style.color = "var(--text-color)";
+    receiverBoxEl.style.borderColor = "var(--terracotta)";
+    receiverBoxEl.style.background = "#fff7ed";
+
+    pipelineStatusText.textContent = "待機中";
+    terminalOut.innerHTML = `【就緒】已載入 ${SCENARIOS[scene].badge}。點擊「下一步」逐步觀察：原料如何注入加工艙，以及資料如何輸送出料！`;
+  }
+
+  function stepWidget() {
+    step++;
+
+    if (scene === "return") {
+      if (step === 1) {
+        renderCode(0);
+        pipelineStatusText.textContent = "步驟 1：定義註冊中";
+        terminalOut.innerHTML = `<strong>步驟 1（定義階段）Line 1</strong>：直譯器讀取 <code>def calculate(score):</code> 宣告，在記憶體標記函式藍圖，自動略過內部縮排。`;
+      } else if (step === 2) {
+        renderCode(2);
+        pipelineStatusText.textContent = "步驟 2：呼叫發動，原料注入！";
+        // 原料方塊平滑滑入下方加工艙
+        materialBlock.style.transform = "translateY(58px)";
+        chamberSubStatus.textContent = "原料 score 注入";
+        terminalOut.innerHTML += `<br><br><strong>步驟 2（呼叫階段）Line 3</strong>：主程式呼叫 <code>calculate(95)</code>，實際引數 <code>95</code> 化作實體原料方塊，從進料斗<strong>垂直滑入加工艙</strong>！`;
+      } else if (step === 3) {
+        renderCode(1);
+        chamberBody.classList.add("power-on");
+        chamberSubStatus.textContent = "正在運算";
+        chamberStatus.textContent = "運算進行中：95 * 1.2 = 114.0";
+        chamberStatus.style.color = "var(--primary-navy)";
+        pipelineStatusText.textContent = "步驟 3：加工艙通電運算";
+        terminalOut.innerHTML += `<br><br><strong>步驟 3（運算階段）Line 2</strong>：指令指標躍入第 2 行，加工艙通電運算 <code>95 * 1.2 = 114.0</code>。`;
+      } else if (step === 4) {
+        renderCode(2);
+        // 出料包裹由出料口滑出，沿輸送帶滑入接收變數 box
+        outputParcel.classList.add("slide-out");
+        chamberBody.classList.remove("power-on");
+        chamberSubStatus.textContent = "出料完畢";
+        chamberStatus.textContent = "出料完畢，函式退場銷毀";
+        pipelineStatusText.textContent = "步驟 4：輸送帶出料，交付變數！";
+
+        setTimeout(() => {
+          receiverVal.textContent = "result = 114.0";
+          receiverVal.style.color = "var(--forest-green)";
+          receiverBoxEl.style.borderColor = "var(--forest-green)";
+          receiverBoxEl.style.background = "#f0fdf4";
+        }, 550);
+
+        terminalOut.innerHTML += `<br><br><strong>步驟 4（return 出料交接）回到 Line 3</strong>：<code>return</code> 將成品包裹 <code>114.0</code> 推上輸送帶，<strong>實體滑入並交付給主程式變數 <code>result</code></strong>！`;
+      } else if (step === 5) {
+        renderCode(3);
+        pipelineStatusText.textContent = "步驟 5：主程式接續推進";
+        terminalOut.innerHTML += `<br><br><strong>步驟 5（接續運算）Line 4</strong>：主程式順利印出 <code>收到結果: 114.0</code>。變數取得實體數值，後續可正常參與加減乘除！`;
+      } else {
+        resetWidget();
+      }
+    } else if (scene === "print") {
+      if (step === 1) {
+        renderCode(0);
+        pipelineStatusText.textContent = "步驟 1：定義註冊";
+        terminalOut.innerHTML = `<strong>步驟 1（定義階段）Line 1</strong>：直譯器讀取 <code>def</code> 宣告，略過內部縮排。`;
+      } else if (step === 2) {
+        renderCode(2);
+        pipelineStatusText.textContent = "步驟 2：呼叫發動，原料注入";
+        materialBlock.style.transform = "translateY(58px)";
+        terminalOut.innerHTML += `<br><br><strong>步驟 2（呼叫階段）Line 3</strong>：主程式執行 <code>result = calculate(95)</code>，原料注入加工艙。`;
+      } else if (step === 3) {
+        renderCode(1);
+        chamberBody.classList.add("power-on");
+        exhaustSmoke.classList.add("puff");
+        chamberSubStatus.textContent = "排氣中";
+        chamberStatus.textContent = "print() 執行：向螢幕噴射文字煙霧...";
+        pipelineStatusText.textContent = "步驟 3：排氣孔噴煙，出料口空無一物！";
+        terminalOut.innerHTML += `<br><br><strong>步驟 3（print 側邊排氣）Line 2</strong>：執行 <code>print()</code>，字串從頂部煙囪飄向螢幕。<br>⚠️ <strong>注意：下方輸送帶空空如也，完全沒有任何資料包裹產出！</strong>`;
+      } else if (step === 4) {
+        renderCode(2);
+        chamberBody.classList.remove("power-on");
+        noneGhostParcel.classList.add("slide-out");
+        chamberSubStatus.textContent = "無 return";
+        chamberStatus.textContent = "無 return，預設交出 None";
+        pipelineStatusText.textContent = "步驟 4：接收端僅獲得 None！";
+
+        setTimeout(() => {
+          receiverVal.textContent = "result = None";
+          receiverVal.style.color = "var(--danger-red)";
+          receiverBoxEl.style.borderColor = "var(--danger-red)";
+          receiverBoxEl.style.background = "#fef2f2";
+        }, 550);
+
+        terminalOut.innerHTML += `<br><br><strong>步驟 4（無 return 的代價）回到 Line 3</strong>：因為函式沒有寫 <code>return</code>，直譯器預設只能吐出幽靈標籤 <code>None</code>！變數 <code>result</code> 只能接到空無一物的 <code>None</code>。`;
+      } else if (step === 5) {
+        renderCode(3);
+        pipelineStatusText.textContent = "步驟 5：接續運算將引發崩潰！";
+        terminalOut.innerHTML += `<br><br><span style="color:#f87171;"><strong>步驟 5（嚴重崩潰警告）Line 4</strong>：若後續拿 <code>result + 10</code> 進行運算，直譯器將立即崩潰：<code>TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'</code>！</span>`;
+      } else {
+        resetWidget();
+      }
+    } else if (scene === "deadcode") {
+      if (step === 1) {
+        renderCode(0);
+        pipelineStatusText.textContent = "步驟 1：定義註冊";
+        terminalOut.innerHTML = `<strong>步驟 1</strong>：定義函式，略過內部。`;
+      } else if (step === 2) {
+        renderCode(3);
+        pipelineStatusText.textContent = "步驟 2：呼叫發動";
+        materialBlock.style.transform = "translateY(58px)";
+        terminalOut.innerHTML += `<br><br><strong>步驟 2</strong>：主程式呼叫 <code>calculate(95)</code>，原料注入。`;
+      } else if (step === 3) {
+        renderCode(1);
+        chamberBody.classList.add("dead-lock");
+        outputParcel.classList.add("slide-out");
+        chamberSubStatus.textContent = "遇 return 終止";
+        chamberStatus.textContent = "遇 return！立即出料並切斷機台電源！";
+        pipelineStatusText.textContent = "步驟 3：遇 return 提早終止，機台斷電！";
+        terminalOut.innerHTML += `<br><br><strong>步驟 3</strong>：執行第 2 行 <code>return "及格出料"</code>，成品包裹立刻滑出，<strong>函式控制流在這一刻徹底終止並退場！</strong>`;
+      } else if (step === 4) {
+        renderCode(3, 2);
+        receiverVal.textContent = 'result="及格出料"';
+        receiverVal.style.color = "var(--forest-green)";
+        receiverBoxEl.style.borderColor = "var(--forest-green)";
+        receiverBoxEl.style.background = "#f0fdf4";
+        pipelineStatusText.textContent = "步驟 4：下方死碼斷電反灰！";
+        terminalOut.innerHTML += `<br><br><span style="color:#f87171;"><strong>步驟 4（死碼展示）</strong>：第 3 行的 <code>print("這行永遠不會執行")</code> 遭到斷電反灰，成為永遠無法執行的<strong>無效死碼 (Dead Code)</strong>！</span>`;
+      } else {
+        resetWidget();
+      }
+    }
+  }
+
+  btnSceneReturn.addEventListener("click", () => {
+    scene = "return";
+    btnSceneReturn.className = "btn active";
+    btnScenePrint.className = "btn";
+    btnSceneDeadcode.className = "btn";
+    resetWidget();
+  });
+  btnScenePrint.addEventListener("click", () => {
+    scene = "print";
+    btnSceneReturn.className = "btn";
+    btnScenePrint.className = "btn active";
+    btnSceneDeadcode.className = "btn";
+    resetWidget();
+  });
+  btnSceneDeadcode.addEventListener("click", () => {
+    scene = "deadcode";
+    btnSceneReturn.className = "btn";
+    btnScenePrint.className = "btn";
+    btnSceneDeadcode.className = "btn active";
+    resetWidget();
+  });
+
+  btnStep.addEventListener("click", stepWidget);
+  btnReset.addEventListener("click", resetWidget);
+  resetWidget();
+})();
+
+// ========================================================
+// 教具四：8-4 呼叫堆疊架 (Call Stack) 與生命週期
+// ========================================================
+(function() {
+  const rack = document.getElementById("call-stack-rack");
+  const localVars = document.getElementById("scope-local-vars");
+  const terminal = document.getElementById("terminal-stdout-4");
+  const btnPush = document.getElementById("btn-stack-push");
+  const btnPop = document.getElementById("btn-stack-pop");
+  const btnReset = document.getElementById("btn-stack-reset");
+
+  let depth = 0;
+
+  function renderStack() {
+    if (depth === 0) {
+      rack.innerHTML = `
+        <div class="stack-plate" style="background:#cbd5e1; border-color:#64748b;">
+          【主程式底層】Global Frame
+        </div>
+      `;
+      localVars.textContent = "(尚無函式執行)";
+      terminal.innerHTML = "【狀態】主程式執行中，尚未呼叫自訂函式。";
+    } else if (depth === 1) {
+      rack.innerHTML = `
+        <div class="stack-plate" style="background:#cbd5e1; border-color:#64748b;">
+          【主程式底層】Global Frame
+        </div>
+        <div class="stack-plate">
+          訊框 1: calculate_tax(amount=1000)
+        </div>
+      `;
+      localVars.innerHTML = `<code>amount = 1000</code>, <code>tax = 50.0</code>`;
+      terminal.innerHTML = `
+        ▶ <strong>Push 建立訊框</strong>：呼叫 <code>calculate_tax(1000)</code>！<br>
+        • 在堆疊頂端配置專屬記憶體訊框，存放區域變數 <code>amount</code>。<br>
+        • 函式需要 <code>TAX_RATE</code> 時，區域找不到便向外穿透至全域 (Global) 檢索。
+      `;
+    } else if (depth === 2) {
+      rack.innerHTML = `
+        <div class="stack-plate" style="background:#cbd5e1; border-color:#64748b;">
+          【主程式底層】Global Frame
+        </div>
+        <div class="stack-plate">
+          訊框 1: calculate_tax(amount=1000)
+        </div>
+        <div class="stack-plate" style="background:#fef3c7; border-color:#d97706; color:#92400e;">
+          訊框 2: format_currency(val=50.0)
+        </div>
+      `;
+      localVars.innerHTML = `<code>val = 50.0</code> (當前訊框)`;
+      terminal.innerHTML = `
+        ▶ <strong>Push 巢狀呼叫</strong>：內部又呼叫了 <code>format_currency(50.0)</code>！<br>
+        • 堆疊再加蓋一層訊框，訊框 1 暫停等待。<br>
+        • 區域變數焦點切換至 <code>val</code>，此時不可直接存取訊框 1 變數。
+      `;
+    }
+  }
+
+  btnPush.addEventListener("click", () => {
+    if (depth < 2) {
+      depth++;
+      renderStack();
+    } else {
+      terminal.innerHTML += `<br><span style="color:#eab308;">⚠️ 示範已達上限（兩層巢狀呼叫）。</span>`;
+    }
+  });
+
+  btnPop.addEventListener("click", () => {
+    if (depth > 0) {
+      depth--;
+      terminal.innerHTML = `▶ <strong>Pop 釋放訊框</strong>：遇到 <code>return</code>，該層堆疊訊框立即彈出並徹底銷毀！其內部的區域變數隨之消滅。`;
+      setTimeout(renderStack, 150);
+    } else {
+      terminal.innerHTML = `⚠️ 最底層為全域主程式，不可銷毀。`;
+    }
+  });
+
+  btnReset.addEventListener("click", () => {
+    depth = 0;
+    renderStack();
+  });
+})();
+</script>
+
+</body>
+</html>

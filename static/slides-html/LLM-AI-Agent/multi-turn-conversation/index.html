@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent 多輪對話基礎概論：AI 是如何接話的？ (講師課堂教學版)</title>
+  <style>
+    /* 全域風格：溫暖出版品風格 (Warm Editorial Style) */
+    :root {
+      --bg-primary: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f4efe6;
+      --text-main: #2d2926;
+      --text-muted: #5c554e;
+      --primary: #1e3a8a;          /* 深海藍 */
+      --accent-terracotta: #c2410c;    /* 赤陶紅 */
+      --accent-amber: #b45309;         /* 古銅琥珀 */
+      --accent-sage: #0d9488;          /* 灰綠色 */
+      --accent-purple: #7c3aed;        /* 亮紫 (LLM 運算) */
+      --border-color: #e5dec9;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --shadow-sm: 0 2px 8px rgba(45, 41, 38, 0.05);
+      --shadow-md: 0 6px 20px rgba(45, 41, 38, 0.08);
+      --font-serif: "Noto Serif TC", Georgia, "Songti TC", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      --font-mono: "JetBrains Mono", Consolas, Monaco, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.75;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 寬螢幕自適應容器 */
+    .lecture-container {
+      width: 100%;
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 40px 24px 80px 24px;
+    }
+
+    /* 講義頁首 */
+    header.lecture-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 26px;
+      margin-bottom: 36px;
+    }
+
+    .badge-wrapper {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-primary { background-color: var(--primary); color: #ffffff; }
+    .badge-amber { background-color: var(--accent-amber); color: #ffffff; }
+
+    h1.lecture-title {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .lecture-subtitle {
+      font-size: 16.5px;
+      color: var(--text-muted);
+    }
+
+    /* 章節標題 */
+    h2.section-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      color: var(--primary);
+      border-left: 5px solid var(--accent-terracotta);
+      padding-left: 14px;
+      margin-top: 45px;
+      margin-bottom: 18px;
+    }
+
+    h3.subsection-title {
+      font-size: 17.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-bottom: 16px;
+      text-align: justify;
+    }
+
+    /* 講師導引區塊 */
+    .instructor-guide {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 5px solid var(--primary);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 15px;
+    }
+
+    .instructor-guide strong {
+      color: var(--primary);
+    }
+
+    .concept-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 24px 0;
+    }
+
+    @media (max-width: 768px) {
+      .concept-card-grid { grid-template-columns: 1fr; }
+    }
+
+    .concept-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .concept-card h4 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ========================================================
+       動態動畫實驗室 (Dynamic Pipeline Animation Lab)
+       ======================================================== */
+    .lab-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 26px;
+      margin: 30px 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .lab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .lab-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      font-size: 14.5px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-next {
+      background-color: var(--accent-terracotta);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(194, 65, 12, 0.3);
+    }
+    .btn-next:hover { background-color: #9a3412; }
+    .btn-next:disabled { background-color: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+
+    .btn-reset {
+      background-color: #64748b;
+      color: #ffffff;
+    }
+    .btn-reset:hover { background-color: #475569; }
+
+    /* 動畫展示舞台 (Stage) */
+    .animation-stage {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 24px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 240px;
+      gap: 20px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 900px) {
+      .stage-grid { grid-template-columns: 1fr; }
+    }
+
+    /* 左側來源區 (當前輸入 + 歷史記憶) */
+    .source-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .source-block {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px 14px;
+      transition: all 0.3s ease;
+    }
+
+    .source-block.highlight {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .source-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .label-input { color: #f97316; }
+    .label-memory { color: #38bdf8; }
+
+    .source-content {
+      font-size: 13.5px;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+
+    /* 中間傳送軌道與流動封包 */
+    .pipeline-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 140px;
+    }
+
+    .pipeline-track {
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      position: relative;
+      overflow: visible;
+    }
+
+    /* 動畫打包封包 (Traveling Packet) */
+    .packet-payload {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: linear-gradient(135deg, #f97316, #7c3aed);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      transform: translateX(0) scale(0.8);
+      transition: none;
+      z-index: 5;
+    }
+
+    /* 封包流動動畫 Class */
+    .packet-payload.moving {
+      opacity: 1;
+      animation: travelToLLM 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes travelToLLM {
+      0% {
+        left: 0%;
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      80% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        left: calc(100% - 30px);
+        transform: scale(0.6);
+        opacity: 0;
+      }
+    }
+
+    .pipeline-status-text {
+      margin-top: 16px;
+      font-size: 12.5px;
+      color: #94a3b8;
+      font-family: var(--font-mono);
+      text-align: center;
+    }
+
+    /* 右側 LLM 大腦運算端 */
+    .llm-column {
+      background: #1e293b;
+      border: 2px solid #475569;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .llm-column.active-brain {
+      border-color: #a855f7;
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+      animation: pulseGlow 1s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+      to { box-shadow: 0 0 24px rgba(168, 85, 247, 0.8); }
+    }
+
+    .llm-icon {
+      font-size: 32px;
+      margin-bottom: 6px;
+      display: inline-block;
+    }
+
+    .llm-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #c084fc;
+    }
+
+    .llm-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* 下方對話模擬結果展示 (Chat Screen) */
+    .chat-preview-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .chat-preview-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .chat-bubble-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .chat-msg {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      max-width: 85%;
+      line-height: 1.5;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      background-color: #dbeafe;
+      color: #1e3a8a;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.ai {
+      align-self: flex-start;
+      background-color: #ffffff;
+      color: var(--text-main);
+      border: 1px solid #cbd5e1;
+      border-bottom-left-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 頁尾版權宣告 */
+    footer.lecture-footer {
+      border-top: 1px solid var(--border-color);
+      margin-top: 60px;
+      padding-top: 26px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="lecture-container">
+
+  <!-- 講義頂部標題 -->
+  <header class="lecture-header">
+    <h1 class="lecture-title">AI 多輪對話基礎概論：AI 是如何接話的？</h1>
+    <p class="lecture-subtitle">用最簡單的「封包打包運送」模型，看懂聊天機器人的上下文原理</p>
+  </header>
+
+  <!-- 一、 核心觀念解析 -->
+  <section>
+    <h2 class="section-title">一、 核心觀念解析</h2>
+
+    <div class="instructor-guide">
+      <strong>🎙️ 課堂 3 分鐘破冰提問：</strong><br>
+      「當我們問 AI：『我想買人體工學椅』，AI 推薦了兩款；接著我們追問：『那它多少錢？』—— 大家想想看，AI 為什麼會知道『它』是指剛才的那張椅子，而不是昨天聊到的筆電？」<br>
+      <em>教學目標：打破『AI 天生有記憶力』的直覺，用生活化模型理解『整包一起送』的真相。</em>
+    </div>
+
+    <div class="concept-card-grid">
+      <div class="concept-card">
+        <h4>❌ 使用者的直覺想像</h4>
+        <p style="font-size: 14.5px; color: var(--text-muted); margin: 0;">
+          以為 AI 大腦像人類一樣，會自己記住剛才講過的每一句話，隨時能在大腦抽屜裡翻找記憶。
+        </p>
+      </div>
+      <div class="concept-card">
+        <h4>⭕ 真實的工程運作</h4>
+        <p style="font-size: 14.5px; color: var(--text-muted); margin: 0;">
+          <strong>AI 其實每次都在「失憶」！</strong> 之所以能流暢接話，是因為系統在背後把<strong>「過去的對話記憶」加上「你現在說的新問題」整包打包好</strong>，一次重新送進 AI 大腦裡！
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 二、 動態動畫演示：把「記憶 + 輸入」送入 LLM -->
+  <section>
+    <h2 class="section-title">二、 動態流程演示：封包打包與傳送</h2>
+    <p>
+      點擊下方按鈕推進對話輪次，觀察畫面上的<strong>「當前輸入」</strong>與<strong>「歷史記憶」</strong>如何動態組合成一個完整封包，並透過動畫軌道直接流進 AI 大腦中！
+    </p>
+
+    <!-- 互動實驗室本體 -->
+    <div class="lab-card">
+      <div class="lab-header">
+        <div class="lab-title">
+          <span>🎬 多輪對話流向動態動畫實驗室</span>
+        </div>
+      </div>
+
+      <!-- 控制按鈕 -->
+      <div class="btn-group">
+        <button id="btnNext" class="btn btn-next" onclick="window.dialogLab.stepForward()">
+          ▶ 推進下一輪對話 (Next Round)
+        </button>
+        <button class="btn btn-reset" onclick="window.dialogLab.reset()">
+          ↺ 重置對話
+        </button>
+      </div>
+
+      <!-- 動畫舞台 -->
+      <div class="animation-stage">
+        <div class="stage-grid">
+          
+          <!-- 左側：輸入與記憶來源 -->
+          <div class="source-column">
+            <!-- 當前輸入 -->
+            <div id="boxCurrentInput" class="source-block">
+              <div class="source-label label-input">💬 當輪最新輸入 (User Input)</div>
+              <div id="textCurrentInput" class="source-content">你好，我想挑選一款輕薄筆電。</div>
+            </div>
+
+            <!-- 累積記憶 -->
+            <div id="boxMemory" class="source-block">
+              <div class="source-label label-memory">📦 過去對話記憶 (Chat Memory)</div>
+              <div id="textMemory" class="source-content" style="color: #94a3b8; font-style: italic;">（目前為第一輪，尚無歷史紀錄）</div>
+            </div>
+          </div>
+
+          <!-- 中間：打包傳送管線 (帶動畫效果) -->
+          <div class="pipeline-column">
+            <!-- 飛行中的封包 -->
+            <div id="flyingPacket" class="packet-payload">
+              <span>📦 打包【記憶 + 最新問題】送出中...</span>
+            </div>
+            
+            <div class="pipeline-track"></div>
+            <div id="pipelineStatus" class="pipeline-status-text">待命發送中...</div>
+          </div>
+
+          <!-- 右側：LLM AI 運算大腦 -->
+          <div id="llmBrain" class="llm-column">
+            <div class="llm-icon">🧠</div>
+            <div class="llm-title">LLM 運算大腦</div>
+            <div class="llm-desc" id="brainStatus">等待接收完整封包</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 下方：對話模擬螢幕 -->
+      <div class="chat-preview-box">
+        <div class="chat-preview-title">
+          <span>📱 聊天室畫面 (使用者看到的流暢體驗)</span>
+          <span id="roundIndicator" style="color: var(--accent-terracotta); font-weight: 700;">第 1 輪對話</span>
+        </div>
+        <div id="chatStream" class="chat-bubble-stream">
+          <!-- 動態插入對話泡泡 -->
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 三、 觀念小結口訣 -->
+  <section>
+    <h2 class="section-title">三、 課堂教學口訣</h2>
+    <div style="background-color: #fdf2f8; border: 1px solid #fbcfe8; border-left: 5px solid #db2777; border-radius: 6px; padding: 18px 20px; font-size: 15.5px;">
+      <strong>💡 講師帶領學生記住的 1 句話：</strong><br>
+      「AI 大腦本身不記事情，每次發問，都是系統把『過去的聊天紀錄』和『你現在問的話』打包成整份劇本送給 AI，AI 才能無縫接話！」
+    </div>
+  </section>
+
+  <!-- 頁尾免責聲明與權益宣示 -->
+  <footer class="lecture-footer">
+    <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">免責聲明與權益宣示</div>
+    <p>
+      本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+      如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。
+    </p>
+  </footer>
+
+</div>
+
+<!-- 原生 JavaScript 動態動畫與狀態控制 -->
+<script>
+(function() {
+  // 對話劇本清單
+  const rounds = [
+    {
+      round: 1,
+      userInput: "你好，我想挑選一台 14 吋的輕薄筆電。",
+      memory: "（首輪發問，無歷史記憶）",
+      packetSummary: "【第 1 輪輸入】",
+      aiReply: "您好！推薦您可以參考 Asus Zenbook 14 與 Acer Swift Go 14。"
+    },
+    {
+      round: 2,
+      userInput: "那 Acer 那台目前的售價是多少？",
+      memory: "第 1 輪：使用者問輕薄筆電 ➔ AI 推薦了 Asus 與 Acer 兩款",
+      packetSummary: "【第 1 輪記憶 + 第 2 輪追問】",
+      aiReply: "Acer Swift Go 14 目前的市售價格約為新台幣 28,900 元。"
+    },
+    {
+      round: 3,
+      userInput: "那它重量多重？",
+      memory: "第 1 輪：推薦 Asus / Acer<br>第 2 輪：Acer 售價 $28,900",
+      packetSummary: "【第 1~2 輪記憶 + 第 3 輪追問】",
+      aiReply: "Acer Swift Go 14 的機身重量約為 1.32 kg，非常適合隨身攜帶！"
+    }
+  ];
+
+  let currentStep = 0;
+  let isAnimating = false;
+
+  // DOM 元素
+  const btnNext = document.getElementById("btnNext");
+  const textInput = document.getElementById("textCurrentInput");
+  const textMemory = document.getElementById("textMemory");
+  const boxInput = document.getElementById("boxCurrentInput");
+  const boxMemory = document.getElementById("boxMemory");
+  const flyingPacket = document.getElementById("flyingPacket");
+  const pipelineStatus = document.getElementById("pipelineStatus");
+  const llmBrain = document.getElementById("llmBrain");
+  const brainStatus = document.getElementById("brainStatus");
+  const chatStream = document.getElementById("chatStream");
+  const roundIndicator = document.getElementById("roundIndicator");
+
+  function renderInitialView() {
+    const data = rounds[currentStep];
+    textInput.innerHTML = data.userInput;
+    textMemory.innerHTML = data.memory;
+    roundIndicator.textContent = `第 ${data.round} 輪對話`;
+    pipelineStatus.textContent = "準備就緒，點擊上方按鈕開始傳送...";
+    brainStatus.textContent = "等待接收完整封包";
+    flyingPacket.className = "packet-payload";
+    llmBrain.classList.remove("active-brain");
+  }
+
+  window.dialogLab = {
+    stepForward: function() {
+      if (isAnimating) return;
+      if (currentStep >= rounds.length) {
+        alert("已經演示完 3 輪對話囉！點擊「重置對話」可以重新開始。");
+        return;
+      }
+
+      isAnimating = true;
+      btnNext.disabled = true;
+
+      const data = rounds[currentStep];
+      
+      // 1. 高亮左側：準備打包
+      boxInput.classList.add("highlight");
+      boxMemory.classList.add("highlight");
+      pipelineStatus.textContent = "⚡ 正在將【記憶 + 當前輸入】打包成完整封包...";
+      flyingPacket.textContent = `📦 打包中：${data.packetSummary}`;
+
+      // 2. 觸發飛行送入 LLM 動畫
+      setTimeout(() => {
+        flyingPacket.classList.add("moving");
+        pipelineStatus.textContent = "🚀 正在將完整資料送進 AI 大腦運算...";
+      }, 400);
+
+      // 3. LLM 大腦收到封包，開始發光運算
+      setTimeout(() => {
+        llmBrain.classList.add("active-brain");
+        brainStatus.textContent = "🧠 AI 大腦讀取完整脈絡思考中...";
+      }, 1400);
+
+      // 4. 生成回覆並呈現在聊天室
+      setTimeout(() => {
+        // 新增使用者對話泡泡
+        const userBubble = document.createElement("div");
+        userBubble.className = "chat-msg user";
+        userBubble.textContent = `🙋‍♂️：${data.userInput}`;
+        chatStream.appendChild(userBubble);
+
+        // 新增 AI 對話泡泡
+        const aiBubble = document.createElement("div");
+        aiBubble.className = "chat-msg ai";
+        aiBubble.textContent = `🤖：${data.aiReply}`;
+        chatStream.appendChild(aiBubble);
+
+        // 捲動至最底
+        chatStream.scrollTop = chatStream.scrollHeight;
+
+        // 重置狀態
+        boxInput.classList.remove("highlight");
+        boxMemory.classList.remove("highlight");
+        llmBrain.classList.remove("active-brain");
+        flyingPacket.classList.remove("moving");
+        brainStatus.textContent = "✅ 回覆完成";
+        pipelineStatus.textContent = `第 ${data.round} 輪對話成功傳送並獲得回覆！`;
+
+        currentStep++;
+        isAnimating = false;
+        btnNext.disabled = false;
+
+        // 如果還有下一輪，預先更新左側欄位
+        if (currentStep < rounds.length) {
+          const nextData = rounds[currentStep];
+          textInput.innerHTML = nextData.userInput;
+          textMemory.innerHTML = nextData.memory;
+          roundIndicator.textContent = `即將進入：第 ${nextData.round} 輪對話`;
+        } else {
+          roundIndicator.textContent = `已完成全部 3 輪對話演示`;
+          btnNext.textContent = "✔ 演示完畢 (可點重置)";
+        }
+      }, 2300);
+    },
+
+    reset: function() {
+      currentStep = 0;
+      isAnimating = false;
+      btnNext.disabled = false;
+      btnNext.textContent = "▶ 推進下一輪對話 (Next Round)";
+      chatStream.innerHTML = "";
+      renderInitialView();
+    }
+  };
+
+  // 初始載入
+  renderInitialView();
+})();
+</script>
+
+</body>
+</html>

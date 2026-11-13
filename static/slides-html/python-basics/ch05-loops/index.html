@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 5：迭代控制與迴圈運作 —— 教師專業互動講義</title>
+  <style>
+    /* -------------------------------------------------------------
+       溫暖出版品風格 (Warm Editorial Style) 變數系統
+       ------------------------------------------------------------- */
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-subtle: #f3efe6;
+      --text-main: #2d2926;
+      --text-muted: #6b635b;
+      --border-color: #e5dec9;
+      --border-accent: #d8cdb2;
+      
+      --accent-terracotta: #c2410c;
+      --accent-amber: #b45309;
+      --accent-navy: #1e3a8a;
+      --accent-green: #15803d;
+      --accent-red: #b91c1c;
+      --accent-cyan: #0284c7;
+
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --code-highlight: #334155;
+      --code-active-line: rgba(245, 158, 11, 0.28);
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-soft: 0 4px 18px rgba(45, 41, 38, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.75;
+      padding: 2.5rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .editorial-container {
+      width: 100%;
+      max-width: 1140px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    header.lesson-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+    .module-tag {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent-terracotta);
+      background-color: #ffedd5;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 0.8rem;
+    }
+    h1.lesson-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin-bottom: 0.8rem;
+    }
+    p.lesson-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    section.lesson-section {
+      margin-bottom: 3.8rem;
+    }
+    h2.section-heading {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--accent-navy);
+      border-left: 4px solid var(--accent-terracotta);
+      padding-left: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    p {
+      margin-bottom: 1.1rem;
+      font-size: 1.02rem;
+    }
+    .metaphor-box {
+      background-color: var(--bg-subtle);
+      border-left: 4px solid var(--accent-amber);
+      padding: 1.1rem 1.4rem;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin: 1.25rem 0;
+      font-size: 0.98rem;
+    }
+    .metaphor-box strong {
+      color: var(--accent-amber);
+    }
+
+    pre.code-block {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      padding: 1.2rem 1.4rem;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      margin: 1rem 0 1.5rem 0;
+      line-height: 1.6;
+    }
+    code.inline-code {
+      font-family: var(--font-mono);
+      background-color: var(--bg-subtle);
+      color: var(--accent-terracotta);
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9em;
+    }
+
+    /* 互動舞台通用容器 */
+    .interactive-stage {
+      background-color: #faf7f0;
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      margin: 2.2rem 0;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+    .stage-title {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .stage-title .badge {
+      font-size: 0.75rem;
+      background: var(--accent-navy);
+      color: #ffffff;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .controls-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    button.action-btn {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-accent);
+      padding: 0.55rem 1.15rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    button.action-btn:hover {
+      background-color: #f1ebd8;
+      border-color: var(--accent-amber);
+    }
+    button.action-btn.btn-primary {
+      background-color: var(--accent-terracotta);
+      color: #ffffff;
+      border-color: var(--accent-terracotta);
+    }
+    button.action-btn.btn-primary:hover {
+      background-color: #9a3412;
+    }
+    button.action-btn.active-tab {
+      background-color: var(--accent-navy);
+      color: #ffffff;
+      border-color: var(--accent-navy);
+    }
+    button.action-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .dual-pane {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.4rem;
+      align-items: stretch;
+      margin-top: 1.2rem;
+    }
+    @media (max-width: 920px) {
+      .dual-pane { grid-template-columns: 1fr; }
+    }
+
+    .trace-pane {
+      background-color: var(--code-bg);
+      border-radius: var(--radius-md);
+      padding: 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--code-text);
+    }
+    .code-line {
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, border-left 0.2s ease;
+      display: flex;
+    }
+    .code-line.active {
+      background-color: var(--code-active-line);
+      border-left: 3px solid #f59e0b;
+      color: #fbbf24;
+      font-weight: bold;
+    }
+    .terminal-pane {
+      background-color: #0f172a;
+      border-radius: var(--radius-md);
+      padding: 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #38bdf8;
+      display: flex;
+      flex-direction: column;
+    }
+    .terminal-header {
+      font-size: 0.75rem;
+      color: #64748b;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .terminal-content {
+      flex: 1;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      min-height: 130px;
+      max-height: 200px;
+    }
+
+    /* -------------------------------------------------------------
+       輸送帶與物理軌道系統樣式（完全置中與無遮擋）
+       ------------------------------------------------------------- */
+    .conveyor-system-container {
+      background-color: #ede5d5;
+      border-radius: var(--radius-md);
+      border: 1px solid #d9cdb6;
+      padding: 1.2rem 1rem 1.4rem 1rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .belt-assembly {
+      position: relative;
+      width: 100%;
+      height: 165px;
+    }
+    .station-signboard {
+      position: absolute;
+      top: 6px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .station-tag {
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      white-space: nowrap;
+    }
+    .station-tag.bg-blue { background-color: var(--accent-navy); }
+    .station-tag.bg-cyan { background-color: var(--accent-cyan); }
+    .station-tag.bg-amber { background-color: var(--accent-amber); }
+    .station-tag.bg-green { background-color: var(--accent-green); }
+    .station-tag.bg-red { background-color: var(--accent-red); }
+
+    .station-pointer {
+      width: 2px;
+      height: 28px;
+      background-color: var(--accent-terracotta);
+      position: relative;
+    }
+    .station-pointer::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: -4px;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--accent-terracotta);
+    }
+
+    /* 加工艙外罩 */
+    .processing-chamber-hood {
+      position: absolute;
+      top: 83px; 
+      transform: translateX(-50%);
+      width: 76px;
+      height: 76px;
+      border: 2px dashed #0284c7;
+      background: rgba(2, 132, 199, 0.08);
+      border-radius: 10px;
+      z-index: 8;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .processing-chamber-hood.active {
+      background: rgba(2, 132, 199, 0.28);
+      border-color: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.7);
+    }
+
+    /* continue 高空旁路滑道：橫跨 28% 至 62% */
+    .bypass-track {
+      position: absolute;
+      top: 48px;
+      left: 28%;
+      width: 34%;
+      height: 42px;
+      border-top: 3px dashed #b45309;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      display: none;
+      pointer-events: none;
+      z-index: 12;
+    }
+    .bypass-track.active {
+      display: block;
+    }
+    .bypass-label {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #b45309;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 1px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 15;
+    }
+
+    .belt-track {
+      position: absolute;
+      bottom: 6px;
+      left: 0;
+      width: 100%;
+      height: 76px;
+      background: linear-gradient(180deg, #475569 0%, #334155 100%);
+      border-radius: 38px;
+      box-shadow: inset 0 3px 8px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .belt-surface {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 28px,
+        rgba(255, 255, 255, 0.05) 28px,
+        rgba(255, 255, 255, 0.05) 30px
+      );
+      top: 0;
+      left: 0;
+    }
+    .belt-surface.moving {
+      animation: beltRoll 1s linear infinite;
+    }
+    @keyframes beltRoll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-30px); }
+    }
+
+    .package-train {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    /* 修正：top: 13px 實現完全垂直置中 (76px - 50px) / 2 = 13px */
+    .belt-package {
+      position: absolute;
+      top: 13px; 
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #ffffff;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 800;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+      border: 2px solid #ffffff;
+      transform: translateX(-50%);
+      transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s ease, transform 0.3s ease, opacity 0.4s ease, background 0.3s ease;
+    }
+    .belt-package .package-tag {
+      font-size: 0.65rem;
+      background: #1e3a8a;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-top: 1px;
+      display: none;
+    }
+    .belt-package.bound .package-tag { display: block; }
+    .belt-package.processing {
+      border-color: #38bdf8;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+      transform: translateX(-50%) scale(1.08);
+    }
+    .belt-package.bypassing {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.8);
+      transform: translateX(-50%) scale(0.95);
+    }
+    .belt-package.inspected {
+      border-color: #ef4444;
+      background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+      transform: translateX(-50%) scale(1.08);
+    }
+
+    /* break 安全防護大閘門 */
+    .safety-gate {
+      position: absolute;
+      top: 76px;
+      width: 14px;
+      height: 80px;
+      background: repeating-linear-gradient(
+        45deg,
+        #dc2626,
+        #dc2626 8px,
+        #ffffff 8px,
+        #ffffff 16px
+      );
+      border-radius: 3px;
+      z-index: 15;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5);
+      transform-origin: top;
+      transform: translateX(-50%) scaleY(0);
+      transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .safety-gate.slammed {
+      transform: translateX(-50%) scaleY(1);
+    }
+    .alarm-siren {
+      background-color: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .alarm-siren.active {
+      display: flex;
+      animation: pulseAlert 0.7s infinite alternate;
+    }
+    @keyframes pulseAlert {
+      from { opacity: 0.6; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1.04); }
+    }
+
+    /* -------------------------------------------------------------
+       while 迴圈專屬環狀折返軌道系統
+       ------------------------------------------------------------- */
+    .while-circuit-assembly {
+      position: relative;
+      width: 100%;
+      height: 230px;
+      background-color: #ede5d5;
+      border-radius: var(--radius-md);
+      border: 1px solid #d9cdb6;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .circuit-top-track {
+      position: absolute;
+      top: 75px;
+      left: 5%;
+      width: 90%;
+      height: 60px;
+      background: #334155;
+      border-radius: 30px;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
+    }
+    .circuit-return-track {
+      position: absolute;
+      bottom: 22px;
+      left: 18%;
+      width: 66%;
+      height: 38px;
+      background: #475569;
+      border-radius: 19px;
+      border: 2px dashed #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5e1;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      pointer-events: none;
+    }
+    .curve-guide-right {
+      position: absolute;
+      right: 7%;
+      top: 105px;
+      width: 45px;
+      height: 75px;
+      border-right: 4px dashed #94a3b8;
+      border-bottom: 4px dashed #94a3b8;
+      border-bottom-right-radius: 35px;
+      pointer-events: none;
+    }
+    .curve-guide-left {
+      position: absolute;
+      left: 10%;
+      bottom: 38px;
+      width: 50px;
+      height: 75px;
+      border-left: 4px dashed #94a3b8;
+      border-top: 4px dashed #94a3b8;
+      border-top-left-radius: 35px;
+      pointer-events: none;
+    }
+
+    .sentry-barrier {
+      position: absolute;
+      top: 70px;
+      left: 22%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 70px;
+      background-color: #15803d;
+      border-radius: 4px;
+      z-index: 12;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(21, 128, 61, 0.5);
+    }
+    .sentry-barrier.locked {
+      background-color: #b91c1c;
+      box-shadow: 0 0 14px rgba(185, 28, 28, 0.8);
+    }
+
+    .infinite-toggle-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #991b1b;
+      cursor: pointer;
+      user-select: none;
+    }
+    .infinite-toggle-wrapper input {
+      cursor: pointer;
+    }
+
+    /* -------------------------------------------------------------
+       雙重巢狀迴圈：二維矩陣掃描儀
+       ------------------------------------------------------------- */
+    .matrix-scanner-container {
+      background-color: #ede5d5;
+      border-radius: var(--radius-md);
+      border: 1px solid #d9cdb6;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .scanner-dashboard {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .gauge-card {
+      background: #ffffff;
+      padding: 0.75rem 1.2rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .gauge-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .gauge-val {
+      font-family: var(--font-mono);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-terracotta);
+    }
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .matrix-cell {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 1rem 0.5rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      transition: all 0.25s ease;
+    }
+    .matrix-cell .coord {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    .matrix-cell .expr {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #334155;
+    }
+    .matrix-cell.scanning {
+      border-color: #f59e0b;
+      background: #fef3c7;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      transform: scale(1.04);
+    }
+    .matrix-cell.done {
+      border-color: #10b981;
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    .status-summary {
+      margin-top: 1rem;
+      padding: 0.8rem 1.1rem;
+      background-color: #ffffff;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .status-summary strong { color: var(--text-main); }
+
+    .exercise-card {
+      border: 1px solid var(--border-accent);
+      background-color: #fffdf9;
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .exercise-card h4 {
+      color: var(--accent-navy);
+      font-size: 1.08rem;
+      margin-bottom: 0.5rem;
+    }
+    .exercise-card ul {
+      padding-left: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    footer.disclaimer-section {
+      border-top: 2px solid var(--border-color);
+      margin-top: 4rem;
+      padding-top: 2rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    footer.disclaimer-section h4 {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="editorial-container">
+    <!-- 單元 1 -->
+    <section class="lesson-section">
+      <h2 class="section-heading">一、迭代概念與重複執行機制 (Iteration Fundamentals)</h2>
+      <p>在程式架構中，若需要多次執行相同的運算或輸出任務，手動編寫重複的陳述式會讓程式碼變得冗長且難以維護。直譯器提供了自動重複執行的結構，能根據特定規則或條件，反覆執行同一組程式碼區塊。</p>
+      
+      <div class="metaphor-box">
+        <strong>💡 觀念聚焦：迴圈與迭代的本質</strong><br>
+        「迴圈 (Loop)」是指包含重複執行邏輯的程式結構；而每次從資料來源取出一個元素，並完整執行該區塊陳述式的過程，就稱為一次<strong>「迭代 (Iteration)」</strong>。
+      </div>
+
+      <p>Python 提供兩種基本的迴圈語法結構：</p>
+      <ul style="padding-left: 1.4rem; margin-bottom: 1rem;">
+        <li><strong><code>for</code> 計數迴圈</strong>：適合已知迭代次數，或需要依序走訪可迭代物件（Iterable，如字串、串列或整數序列）的情境。</li>
+        <li><strong><code>while</code> 條件迴圈</strong>：適合執行次數不固定，單純依照布林條件式的真假值，來決定是否繼續執行的情境。</li>
+      </ul>
+    </section>
+
+    <!-- 單元 2 -->
+    <section class="lesson-section">
+      <h2 class="section-heading">二、序列產生器 range() 與 for 計數迴圈走訪</h2>
+      <p>走訪連續整數數列時，通常會搭配內建的 <code>range()</code> 函式。直譯器嚴格遵守<strong>「包頭不包尾」</strong>（包含起始值、不包含終止值）的邊界規則。例如 <code>range(5)</code> 產生的整數序列為 <code>0, 1, 2, 3, 4</code>。</p>
+      
+      <pre class="code-block">for i in range(5):
+    print(i)</pre>
+
+      <div class="interactive-stage" id="stage-for-conveyor">
+        <div class="stage-title">
+          <span>直譯器機制：四段式指令管線與變數標籤綁定模擬器</span>
+          <span class="badge">for 迴圈管線</span>
+        </div>
+
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>操作導引：</strong>這裡將資料走訪的過程具象化為四段式管線。元素由隊列進入後，會在<strong>工位 1</strong> 綁定變數識別標籤（<code>i = X</code>），接著平移到<strong>工位 2（加工工位）</strong>執行 <code>print(i)</code> 並輸出到終端機，最後放行移出。
+        </p>
+
+        <div class="controls-row">
+          <button class="action-btn btn-primary" id="btn-for-next">▶ 單步執行 (Step Next)</button>
+          <button class="action-btn" id="btn-for-auto">⚡ 自動播放 (Auto)</button>
+          <button class="action-btn" id="btn-for-reset">↺ 重新放置元素</button>
+        </div>
+
+        <div class="conveyor-system-container">
+          <div class="belt-assembly">
+            <div class="station-signboard" style="left: 26%;">
+              <div class="station-tag bg-cyan">工位 2：執行 print(i)</div>
+              <div class="station-pointer"></div>
+            </div>
+            <div class="processing-chamber-hood" id="chamber-hood" style="left: 26%;"></div>
+
+            <div class="station-signboard" style="left: 62%;">
+              <div class="station-tag bg-blue" id="sensor-for-label">工位 1：變數 i 標籤綁定</div>
+              <div class="station-pointer"></div>
+            </div>
+
+            <div class="belt-track">
+              <div class="belt-surface moving" id="belt-for-surface"></div>
+              <div class="package-train" id="package-for-train"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dual-pane">
+          <div class="trace-pane">
+            <div class="code-line" id="line-for-1">for i in range(5):</div>
+            <div class="code-line" id="line-for-2">&nbsp;&nbsp;&nbsp;&nbsp;print(i)</div>
+            <div class="code-line" id="line-for-3"># 迴圈走訪完畢，離開結構</div>
+          </div>
+          <div class="terminal-pane">
+            <div class="terminal-header">
+              <span>TERMINAL - stdout</span>
+              <span>Python 3.11</span>
+            </div>
+            <div class="terminal-content" id="term-for-output"></div>
+          </div>
+        </div>
+
+        <div class="status-summary">
+          <span id="status-for-text">管線準備就緒，點擊「單步執行」觀察變數標籤綁定與程式碼區塊執行的時序。</span>
+          <span id="step-for-counter" style="font-family: var(--font-mono); font-weight: 700;">Step: 0 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 單元 3 -->
+    <section class="lesson-section">
+      <h2 class="section-heading">三、前置條件控制：while 迴圈與終止條件設計</h2>
+      <p><code>while</code> 屬於前置條件控制結構。直譯器在每次進入迴圈主體前，都會先評估條件式的布林值：若為 <code>True</code> 就放行進入；執行完區塊最後一行陳述式後，<strong>控制流程會折返回開頭重新評估</strong>；一旦條件結果為 <code>False</code>，就會終止迴圈並離開結構。</p>
+
+      <pre class="code-block">count = 0
+while count &lt; 5:
+    print(f"計數：{count}")
+    count += 1</pre>
+
+      <div class="metaphor-box">
+        <strong>⚠️ 常見邏輯錯誤：無窮迴圈（Infinite Loop）</strong><br>
+        若迴圈主體內漏寫了 <code>count += 1</code> 這類推進狀態的陳述式，<code>count</code> 會恆為 <code>0</code>，導致 <code>count &lt; 5</code> 永遠是 <code>True</code>。直譯器將無法脫離這個結構，造成程式卡死無法停止。撰寫 <code>while</code> 迴圈時，務必確保內部有讓條件趨向 <code>False</code> 的變更邏輯。
+      </div>
+
+      <div class="interactive-stage" id="stage-while-circuit">
+        <div class="stage-title">
+          <span>直譯器機制：前置條件評估、狀態推進與流程折返模擬器</span>
+          <span class="badge">while 迴圈環道</span>
+        </div>
+
+        <div class="controls-row">
+          <button class="action-btn btn-primary" id="btn-while-next">▶ 單步執行 (Step Next)</button>
+          <button class="action-btn" id="btn-while-auto">⚡ 自動折返 (Auto)</button>
+          <button class="action-btn" id="btn-while-reset">↺ 重新初始化</button>
+          <label class="infinite-toggle-wrapper">
+            <input type="checkbox" id="chk-while-bug">
+            <span>⚠️ 模擬邏輯缺失：漏寫 count += 1（驗證無窮迴圈）</span>
+          </label>
+        </div>
+
+        <div class="while-circuit-assembly">
+          <div class="station-signboard" style="left: 22%;">
+            <div class="station-tag bg-green" id="sentry-tag">條件檢驗：while count &lt; 5</div>
+            <div class="station-pointer"></div>
+          </div>
+          <div class="sentry-barrier" id="sentry-gate"></div>
+
+          <div class="station-signboard" style="left: 52%;">
+            <div class="station-tag bg-cyan">處理工位：print(count)</div>
+            <div class="station-pointer"></div>
+          </div>
+          <div class="processing-chamber-hood" id="while-chamber-hood" style="left: 52%; top: 62px;"></div>
+
+          <div class="station-signboard" style="left: 82%;">
+            <div class="station-tag bg-amber" id="step-tag">狀態推進：count += 1</div>
+            <div class="station-pointer"></div>
+          </div>
+
+          <div class="circuit-top-track"></div>
+          <div class="curve-guide-right"></div>
+          <div class="circuit-return-track">◀ ◀ ◀ &nbsp; 底層折返軌道（跳回 while 開頭重新評估） &nbsp; ◀ ◀ ◀</div>
+          <div class="curve-guide-left"></div>
+
+          <div class="belt-package bound" id="while-pkg" style="left: -60px; top: 80px; z-index: 20;">
+            <span id="while-num-text">0</span>
+            <span class="package-tag" id="while-pkg-tag">count=0</span>
+          </div>
+        </div>
+
+        <div class="dual-pane">
+          <div class="trace-pane">
+            <div class="code-line" id="wline-1">count = 0</div>
+            <div class="code-line" id="wline-2">while count &lt; 5:</div>
+            <div class="code-line" id="wline-3">&nbsp;&nbsp;&nbsp;&nbsp;print(f"計數：{count}")</div>
+            <div class="code-line" id="wline-4">&nbsp;&nbsp;&nbsp;&nbsp;count += 1</div>
+            <div class="code-line" id="wline-5"># 條件為 False，離開 while 迴圈</div>
+          </div>
+          <div class="terminal-pane">
+            <div class="terminal-header">
+              <span>TERMINAL - stdout</span>
+              <span>Python 3.11</span>
+            </div>
+            <div class="terminal-content" id="term-while-output"></div>
+          </div>
+        </div>
+
+        <div class="status-summary">
+          <span id="status-while-text">點擊「單步執行」，觀察直譯器如何在每次迭代末端「實體折返」至頂部條件閘門。</span>
+          <span id="step-while-counter" style="font-family: var(--font-mono); font-weight: 700;">狀態: 待機中</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 單元 4 -->
+    <section class="lesson-section">
+      <h2 class="section-heading">四、流程中斷控制：break、continue 與 pass 陳述式</h2>
+      <p>在迴圈迭代的過程中，可以使用流程跳躍關鍵字來改變預設的執行順序：</p>
+      <ul style="padding-left: 1.4rem; margin-bottom: 1rem;">
+        <li><strong><code>break</code>（強制中斷）</strong>：立即終止目前所在的迴圈結構，直接跳出並執行後續的程式碼。後續還沒走訪的元素會全數拋棄，不再處理。</li>
+        <li><strong><code>continue</code>（略過當次）</strong>：立即略過本次迭代 <code>continue</code> 後面的剩餘程式碼。直譯器不會終止迴圈，而是直接折返回開頭，呼叫下一個元素進入下一輪迭代。</li>
+        <li><strong><code>pass</code>（空操作佔位）</strong>：單純用來填補語法結構需要的位置，直譯器不會執行任何動作，通常用在構思程式框架時作為結構佔位符。</li>
+      </ul>
+
+      <div class="interactive-stage" id="stage-control-conveyor">
+        <div class="stage-title">
+          <span>直譯器機制：流程跳躍控制（break 立即中斷 vs continue 略過當次）</span>
+          <span class="badge">流程跳躍對照鏡</span>
+        </div>
+
+        <div class="controls-row">
+          <button class="action-btn active-tab" id="btn-mode-break">🛑 break 模式 (中斷迴圈)</button>
+          <button class="action-btn" id="btn-mode-continue">⏩ continue 模式 (略過當次)</button>
+          <span style="border-left: 1px solid var(--border-accent); height: 24px; margin: 0 0.4rem;"></span>
+          <button class="action-btn btn-primary" id="btn-ctrl-next">▶ 單步執行 (Step Next)</button>
+          <button class="action-btn" id="btn-ctrl-reset">↺ 重設目前模式</button>
+          <div class="alarm-siren" id="siren-alert">🚨 BREAK 觸發：流程中斷！</div>
+        </div>
+
+        <div class="conveyor-system-container">
+          <div class="belt-assembly">
+            <div class="station-signboard" style="left: 28%;">
+              <div class="station-tag bg-cyan" id="ctrl-chamber-label">加工工位：print(num)</div>
+              <div class="station-pointer"></div>
+            </div>
+            <div class="processing-chamber-hood" id="ctrl-chamber-hood" style="left: 28%;"></div>
+
+            <div class="station-signboard" style="left: 62%;">
+              <div class="station-tag bg-blue" id="ctrl-sensor-label">條件判斷：if num == 6</div>
+              <div class="station-pointer"></div>
+            </div>
+
+            <div class="bypass-track" id="bypass-track">
+              <span class="bypass-label">⏩ continue 旁路略過</span>
+            </div>
+
+            <div class="safety-gate" id="safety-gate" style="left: calc(62% + 40px);"></div>
+
+            <div class="belt-track">
+              <div class="belt-surface moving" id="belt-ctrl-surface"></div>
+              <div class="package-train" id="package-ctrl-train"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dual-pane">
+          <div class="trace-pane">
+            <div id="ctrl-code-container"></div>
+          </div>
+          <div class="terminal-pane">
+            <div class="terminal-header">
+              <span>TERMINAL - stdout</span>
+              <span>Python 3.11</span>
+            </div>
+            <div class="terminal-content" id="term-ctrl-output"></div>
+          </div>
+        </div>
+
+        <div class="status-summary">
+          <span id="status-ctrl-text">點擊「單步執行」，觀察控制流程的即時分流。</span>
+          <span id="step-ctrl-counter" style="font-family: var(--font-mono); font-weight: 700;">Step: 0 / 8</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 單元 5 -->
+    <section class="lesson-section">
+      <h2 class="section-heading">五、多維資料處理：雙層巢狀迴圈結構 (Nested Loops)</h2>
+      <p>當一個迴圈結構內部又包含了另一個迴圈時，就稱為<strong>「巢狀迴圈 (Nested Loops)」</strong>。外層指標每前進 1 步，內層迴圈就必須完整執行完它定義的所有迭代週期。</p>
+      
+      <div class="metaphor-box">
+        <strong>💡 運作模型：時鐘齒輪運作比</strong><br>
+        外層迴圈就像「時針」，內層迴圈就像「分針」。外層指針每前進 1 個刻度，內層指針就會完整走完一整圈。這種架構常用於多維資料結構、矩陣運算與二維網格排版。
+      </div>
+
+      <pre class="code-block">for i in range(1, 4):
+    for j in range(1, 4):
+        product = i * j
+        print(f"{i}x{j}={product}", end="  ")
+    print()</pre>
+
+      <div class="interactive-stage" id="stage-nested-matrix">
+        <div class="stage-title">
+          <span>直譯器機制：雙軸維度走訪與二維矩陣時序掃描儀</span>
+          <span class="badge">巢狀迴圈掃描</span>
+        </div>
+
+        <div class="controls-row">
+          <button class="action-btn btn-primary" id="btn-nest-next">▶ 單步執行 (Step Next)</button>
+          <button class="action-btn" id="btn-nest-auto">⚡ 自動掃描 (Auto)</button>
+          <button class="action-btn" id="btn-nest-reset">↺ 重新初始化網格</button>
+        </div>
+
+        <div class="matrix-scanner-container">
+          <div class="scanner-dashboard">
+            <div class="gauge-card">
+              <span class="gauge-title">外層指標 (Row):</span>
+              <span class="gauge-val" id="gauge-i">i = -</span>
+            </div>
+            <div class="gauge-card">
+              <span class="gauge-title">內層指標 (Col):</span>
+              <span class="gauge-val" id="gauge-j">j = -</span>
+            </div>
+            <div class="gauge-card">
+              <span class="gauge-title">目前運算式:</span>
+              <span class="gauge-val" id="gauge-calc" style="color: var(--accent-navy);">-</span>
+            </div>
+          </div>
+
+          <div class="matrix-grid">
+            <div class="matrix-cell" id="cell-1-1"><span class="coord">(1, 1)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-1-2"><span class="coord">(1, 2)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-1-3"><span class="coord">(1, 3)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-2-1"><span class="coord">(2, 1)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-2-2"><span class="coord">(2, 2)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-2-3"><span class="coord">(2, 3)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-3-1"><span class="coord">(3, 1)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-3-2"><span class="coord">(3, 2)</span><span class="expr">?</span></div>
+            <div class="matrix-cell" id="cell-3-3"><span class="coord">(3, 3)</span><span class="expr">?</span></div>
+          </div>
+        </div>
+
+        <div class="dual-pane">
+          <div class="trace-pane">
+            <div class="code-line" id="nline-1">for i in range(1, 4):</div>
+            <div class="code-line" id="nline-2">&nbsp;&nbsp;&nbsp;&nbsp;for j in range(1, 4):</div>
+            <div class="code-line" id="nline-3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;product = i * j</div>
+            <div class="code-line" id="nline-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(f"{i}x{j}={product}", end="  ")</div>
+            <div class="code-line" id="nline-5">&nbsp;&nbsp;&nbsp;&nbsp;print()</div>
+            <div class="code-line" id="nline-6"># 雙層迴圈全數執行完畢</div>
+          </div>
+          <div class="terminal-pane">
+            <div class="terminal-header">
+              <span>TERMINAL - stdout</span>
+              <span>Python 3.11</span>
+            </div>
+            <div class="terminal-content" id="term-nest-output"></div>
+          </div>
+        </div>
+
+        <div class="status-summary">
+          <span id="status-nest-text">點擊「單步執行」，觀察當外層 i 固定時，內層 j 如何逐一走訪並輸出計算成果。</span>
+          <span id="step-nest-counter" style="font-family: var(--font-mono); font-weight: 700;">Step: 0 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 單元 6 -->
+    <section class="lesson-section">
+      <h2 class="section-heading">六、課堂實作演練：邏輯建構與驗證</h2>
+      
+      <div class="exercise-card">
+        <h4>任務一：數值猜測與重試機制設計</h4>
+        <p>請運用 <code>while</code> 迴圈搭配條件分支，設計出猜數字的邏輯：</p>
+        <ul>
+          <li>設定秘密目標整數為 <code>7</code>。</li>
+          <li>限制使用者最多嘗試 5 次猜測。</li>
+          <li>每次輸入後給予「太大了！」或「太小了！」的明確數值提示。</li>
+          <li>猜中目標時，印出恭喜訊息並使用 <code>break</code> 終止迴圈；若次數用盡，則輸出挑戰結束的提示。</li>
+        </ul>
+      </div>
+
+      <div class="exercise-card">
+        <h4>任務二：幾何星形金字塔輸出</h4>
+        <p>運用巢狀 <code>for</code> 迴圈與 <code>range()</code>，於終端機輸出 5 層對稱星號金字塔：</p>
+        <pre class="code-block" style="background:#0f172a; margin-top:0.5rem;">    *
+   ***
+  *****
+ *******
+*********</pre>
+      </div>
+    </section>
+
+    <footer class="disclaimer-section">
+      <h4>免責聲明與權益宣示</h4>
+      <p>
+        本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+        如有授權需求，請以 Email 聯繫至：<a href="mailto:andywangkenichi@gmail.com" style="color:var(--accent-terracotta); text-decoration:none; font-weight:600;">andywangkenichi@gmail.com</a>。敬請尊重智慧財產權，避免不當使用。
+      </p>
+    </footer>
+
+  </div>
+
+  <script>
+    /* ==========================================================
+       教具一：for 迴圈四段式流水線輸送帶
+       ========================================================== */
+    (function() {
+      "use strict";
+
+      const btnNext = document.getElementById("btn-for-next");
+      const btnAuto = document.getElementById("btn-for-auto");
+      const btnReset = document.getElementById("btn-for-reset");
+      const train = document.getElementById("package-for-train");
+      const sensorLabel = document.getElementById("sensor-for-label");
+      const hood = document.getElementById("chamber-hood");
+      const term = document.getElementById("term-for-output");
+      const statusText = document.getElementById("status-for-text");
+      const stepCounter = document.getElementById("step-for-counter");
+      const lines = [
+        document.getElementById("line-for-1"),
+        document.getElementById("line-for-2"),
+        document.getElementById("line-for-3")
+      ];
+
+      let step = 0;
+      let autoTimer = null;
+      let packages = [];
+      const totalSteps = 16;
+
+      function init() {
+        train.innerHTML = "";
+        packages = [];
+        for (let i = 0; i < 5; i++) {
+          const pkg = document.createElement("div");
+          pkg.className = "belt-package";
+          pkg.innerHTML = `<span>${i}</span><span class="package-tag">i=${i}</span>`;
+          pkg.style.left = `calc(62% + ${(i + 1) * 68}px)`;
+          pkg.style.top = "13px";
+          train.appendChild(pkg);
+          packages.push(pkg);
+        }
+        sensorLabel.textContent = "工位 1：變數 i 標籤綁定";
+        hood.classList.remove("active");
+        term.textContent = "";
+        step = 0;
+        updateLines(-1);
+        stepCounter.textContent = `Step: 0 / ${totalSteps}`;
+        statusText.textContent = "管線準備就緒，點擊「單步執行」觀察變數標籤綁定與程式碼區塊執行的時序。";
+        btnNext.disabled = false;
+        clearInterval(autoTimer);
+        autoTimer = null;
+        btnAuto.textContent = "⚡ 自動播放 (Auto)";
+      }
+
+      function updateLines(idx) {
+        lines.forEach((l, i) => {
+          if (i === idx) l.classList.add("active");
+          else l.classList.remove("active");
+        });
+      }
+
+      function stepNext() {
+        step++;
+        stepCounter.textContent = `Step: ${step} / ${totalSteps}`;
+
+        if (step >= 1 && step <= 15) {
+          const itemIdx = Math.floor((step - 1) / 3);
+          const subStep = (step - 1) % 3;
+          const curPkg = packages[itemIdx];
+
+          if (subStep === 0) {
+            updateLines(0);
+            hood.classList.remove("active");
+            curPkg.style.left = "62%";
+            curPkg.classList.add("bound");
+            sensorLabel.textContent = `工位 1：已綁定 i = ${itemIdx}`;
+            statusText.textContent = `【取件綁定】從 range(5) 讀取整數 ${itemIdx}，直譯器建立變數綁定「i = ${itemIdx}」。`;
+
+            for (let j = itemIdx + 1; j < 5; j++) {
+              packages[j].style.left = `calc(62% + ${(j - itemIdx) * 68}px)`;
+            }
+          } else if (subStep === 1) {
+            updateLines(1);
+            curPkg.style.left = "26%";
+            curPkg.classList.add("processing");
+            hood.classList.add("active");
+            
+            term.textContent += itemIdx + "\n";
+            term.scrollTop = term.scrollHeight;
+            statusText.textContent = `【執行陳述式】元素進入加工工位，執行 print(${itemIdx})，終端機輸出：${itemIdx}。`;
+          } else if (subStep === 2) {
+            updateLines(1);
+            hood.classList.remove("active");
+            curPkg.classList.remove("processing");
+            curPkg.style.left = "-80px";
+            statusText.textContent = `【完成放行】整數 ${itemIdx} 處理完畢，移出目前處理管線。`;
+          }
+        } else if (step === 16) {
+          updateLines(2);
+          sensorLabel.textContent = "迭代走訪完畢";
+          statusText.textContent = "range(5) 所有元素均走訪完畢，迴圈自然終止。";
+          btnNext.disabled = true;
+          clearInterval(autoTimer);
+          autoTimer = null;
+          btnAuto.textContent = "⚡ 自動播放 (Auto)";
+        }
+      }
+
+      btnNext.addEventListener("click", stepNext);
+      btnReset.addEventListener("click", init);
+      btnAuto.addEventListener("click", function() {
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          this.textContent = "⚡ 自動播放 (Auto)";
+        } else {
+          this.textContent = "⏸ 暫停 (Pause)";
+          autoTimer = setInterval(() => {
+            if (step >= totalSteps) {
+              clearInterval(autoTimer);
+              autoTimer = null;
+              btnAuto.textContent = "⚡ 自動播放 (Auto)";
+            } else {
+              stepNext();
+            }
+          }, 850);
+        }
+      });
+
+      init();
+    })();
+
+
+    /* ==========================================================
+       教具二：while 迴圈閉環折返軌道與無窮迴圈實驗儀
+       ========================================================== */
+    (function() {
+      "use strict";
+
+      const btnNext = document.getElementById("btn-while-next");
+      const btnAuto = document.getElementById("btn-while-auto");
+      const btnReset = document.getElementById("btn-while-reset");
+      const chkBug = document.getElementById("chk-while-bug");
+      const pkg = document.getElementById("while-pkg");
+      const numText = document.getElementById("while-num-text");
+      const pkgTag = document.getElementById("while-pkg-tag");
+      const sentryTag = document.getElementById("sentry-tag");
+      const sentryGate = document.getElementById("sentry-gate");
+      const hood = document.getElementById("while-chamber-hood");
+      const term = document.getElementById("term-while-output");
+      const statusText = document.getElementById("status-while-text");
+      const stepCounter = document.getElementById("step-while-counter");
+      const lines = [
+        document.getElementById("wline-1"),
+        document.getElementById("wline-2"),
+        document.getElementById("wline-3"),
+        document.getElementById("wline-4"),
+        document.getElementById("wline-5")
+      ];
+
+      let count = 0;
+      let phase = 0;
+      let loopCount = 0;
+      let autoTimer = null;
+
+      function updateLines(idx) {
+        lines.forEach((l, i) => {
+          if (i === idx) l.classList.add("active");
+          else l.classList.remove("active");
+        });
+      }
+
+      function init() {
+        count = 0;
+        phase = 0;
+        loopCount = 0;
+        numText.textContent = "0";
+        pkgTag.textContent = "count=0";
+        pkg.style.left = "-60px";
+        pkg.style.top = "80px";
+        pkg.style.opacity = "1";
+        pkg.classList.remove("processing", "inspected");
+        sentryGate.classList.remove("locked");
+        sentryTag.className = "station-tag bg-green";
+        sentryTag.textContent = "條件檢驗：while count < 5";
+        hood.classList.remove("active");
+        term.textContent = "";
+        updateLines(-1);
+        statusText.textContent = "變數初始狀態就緒，點擊「單步執行」開始第一步。";
+        stepCounter.textContent = "狀態: 待機中";
+        btnNext.disabled = false;
+        clearInterval(autoTimer);
+        autoTimer = null;
+        btnAuto.textContent = "⚡ 自動折返 (Auto)";
+      }
+
+      function stepNext() {
+        if (phase === 0) {
+          updateLines(0);
+          pkg.style.left = "8%";
+          pkg.style.top = "80px";
+          statusText.textContent = "執行 count = 0：完成變數初始化，準備進入條件檢驗。";
+          stepCounter.textContent = `迭代第 1 輪 - 初始化`;
+          phase = 1;
+        } else if (phase === 1) {
+          updateLines(1);
+          hood.classList.remove("active");
+          pkg.style.top = "80px";
+          pkg.style.left = "22%";
+
+          const isPass = (count < 5);
+          if (isPass) {
+            sentryGate.classList.remove("locked");
+            sentryTag.className = "station-tag bg-green";
+            sentryTag.textContent = `條件檢驗：${count} < 5 為 True`;
+            statusText.textContent = `【評估條件】目前 count = ${count}，條件 ${count} < 5 結果為 True，允許進入迴圈主體。`;
+            stepCounter.textContent = `迭代第 ${loopCount + 1} 輪 - 條件成立`;
+            phase = 2;
+          } else {
+            sentryGate.classList.add("locked");
+            sentryTag.className = "station-tag bg-red";
+            sentryTag.textContent = `條件檢驗：${count} < 5 為 False`;
+            statusText.textContent = `【條件不成立】目前 count = ${count}，條件 ${count} < 5 結果為 False，流程跳出迴圈。`;
+            phase = 99;
+          }
+        } else if (phase === 2) {
+          updateLines(2);
+          pkg.style.left = "52%";
+          pkg.classList.add("processing");
+          hood.classList.add("active");
+
+          term.textContent += `計數：${count}\n`;
+          term.scrollTop = term.scrollHeight;
+          statusText.textContent = `【執行陳述式】執行 print(f"計數：{count}")，輸出目前數值。`;
+          phase = 3;
+        } else if (phase === 3) {
+          updateLines(3);
+          pkg.classList.remove("processing");
+          hood.classList.remove("active");
+          pkg.style.left = "82%";
+
+          if (chkBug.checked) {
+            statusText.textContent = "⚠️【模擬錯誤】未執行 count += 1，變數狀態未推進，count 恆為 0。";
+            pkg.classList.add("inspected");
+          } else {
+            count += 1;
+            numText.textContent = count;
+            pkgTag.textContent = `count=${count}`;
+            statusText.textContent = `【狀態推進】執行 count += 1，變數值更新為 ${count}。`;
+          }
+          phase = 4;
+        } else if (phase === 4) {
+          updateLines(1);
+          loopCount++;
+
+          if (chkBug.checked && loopCount >= 5) {
+            statusText.textContent = "🚨【無窮迴圈】條件恆為 0 < 5（True），程式無法自行跳出。已啟動安全保護機制暫停。";
+            clearInterval(autoTimer);
+            btnAuto.textContent = "⚡ 自動折返 (Auto)";
+            btnNext.disabled = true;
+            return;
+          }
+
+          pkg.style.top = "172px";
+          pkg.style.left = "50%";
+          statusText.textContent = `【流程折返】第 ${loopCount} 輪陳述式執行完畢，控制指標折返回 while 條件處重新評估。`;
+          
+          setTimeout(() => {
+            pkg.style.left = "22%";
+            setTimeout(() => {
+              phase = 1;
+              if (autoTimer) stepNext();
+            }, 300);
+          }, 350);
+          return;
+        } else if (phase === 99) {
+          updateLines(4);
+          pkg.style.left = "105%";
+          pkg.style.opacity = "0";
+          statusText.textContent = "迴圈終止，直譯器脫離 while 結構並繼續執行後續程式碼。";
+          stepCounter.textContent = "狀態: 正常終止";
+          btnNext.disabled = true;
+          clearInterval(autoTimer);
+          btnAuto.textContent = "⚡ 自動折返 (Auto)";
+        }
+      }
+
+      btnNext.addEventListener("click", stepNext);
+      btnReset.addEventListener("click", init);
+      btnAuto.addEventListener("click", function() {
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          this.textContent = "⚡ 自動折返 (Auto)";
+        } else {
+          this.textContent = "⏸ 暫停 (Pause)";
+          autoTimer = setInterval(() => {
+            if (phase === 99 || btnNext.disabled) {
+              clearInterval(autoTimer);
+              autoTimer = null;
+              btnAuto.textContent = "⚡ 自動折返 (Auto)";
+            } else {
+              stepNext();
+            }
+          }, 950);
+        }
+      });
+
+      init();
+    })();
+
+
+    /* ==========================================================
+       教具三：流程跳躍雙模態教具（順向流動與精準工位對齊）
+       ========================================================== */
+    (function() {
+      "use strict";
+
+      const btnModeBreak = document.getElementById("btn-mode-break");
+      const btnModeContinue = document.getElementById("btn-mode-continue");
+      const btnNext = document.getElementById("btn-ctrl-next");
+      const btnReset = document.getElementById("btn-ctrl-reset");
+      const train = document.getElementById("package-ctrl-train");
+      const term = document.getElementById("term-ctrl-output");
+      const statusText = document.getElementById("status-ctrl-text");
+      const stepCounter = document.getElementById("step-ctrl-counter");
+      const gate = document.getElementById("safety-gate");
+      const siren = document.getElementById("siren-alert");
+      const surface = document.getElementById("belt-ctrl-surface");
+      const bypassTrack = document.getElementById("bypass-track");
+      const sensorLabel = document.getElementById("ctrl-sensor-label");
+      const chamberLabel = document.getElementById("ctrl-chamber-label");
+      const chamberHood = document.getElementById("ctrl-chamber-hood");
+      const codeContainer = document.getElementById("ctrl-code-container");
+
+      let currentMode = "break";
+      let step = 0;
+      let packages = [];
+
+      const breakData = [2, 4, 6, 8, 10];
+      const breakLinesHTML = `
+        <div class="code-line" id="cline-1">numbers = [2, 4, 6, 8, 10]</div>
+        <div class="code-line" id="cline-2">for num in numbers:</div>
+        <div class="code-line" id="cline-3">&nbsp;&nbsp;&nbsp;&nbsp;if num == 6:</div>
+        <div class="code-line" id="cline-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(f"找到目標數字：{num}")</div>
+        <div class="code-line" id="cline-5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break</div>
+        <div class="code-line" id="cline-6">&nbsp;&nbsp;&nbsp;&nbsp;print(f"目前數字：{num}")</div>
+        <div class="code-line" id="cline-7"># 迴圈外部：後續程式碼</div>
+      `;
+
+      const continueData = [1, 2, 3, 4, 5];
+      const continueLinesHTML = `
+        <div class="code-line" id="cline-1">numbers = [1, 2, 3, 4, 5]</div>
+        <div class="code-line" id="cline-2">for num in numbers:</div>
+        <div class="code-line" id="cline-3">&nbsp;&nbsp;&nbsp;&nbsp;if num % 2 != 0:</div>
+        <div class="code-line" id="cline-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue</div>
+        <div class="code-line" id="cline-5">&nbsp;&nbsp;&nbsp;&nbsp;print(f"輸出偶數：{num}")</div>
+        <div class="code-line" id="cline-6"># 迴圈正常走訪結束</div>
+      `;
+
+      function setMode(mode) {
+        currentMode = mode;
+        if (mode === "break") {
+          btnModeBreak.classList.add("active-tab");
+          btnModeContinue.classList.remove("active-tab");
+          bypassTrack.classList.remove("active");
+          sensorLabel.textContent = "條件判斷：if num == 6";
+          chamberLabel.textContent = "加工工位：print(num)";
+          codeContainer.innerHTML = breakLinesHTML;
+        } else {
+          btnModeContinue.classList.add("active-tab");
+          btnModeBreak.classList.remove("active-tab");
+          bypassTrack.classList.add("active");
+          sensorLabel.textContent = "奇數檢驗：if num % 2 != 0";
+          chamberLabel.textContent = "加工工位：print(num)";
+          codeContainer.innerHTML = continueLinesHTML;
+        }
+        init();
+      }
+
+      function updateLines(idx) {
+        const lines = codeContainer.querySelectorAll(".code-line");
+        lines.forEach((l, i) => {
+          if (i === idx) l.classList.add("active");
+          else l.classList.remove("active");
+        });
+      }
+
+      function init() {
+        train.innerHTML = "";
+        packages = [];
+        const dataset = (currentMode === "break") ? breakData : continueData;
+
+        // 待取隊列完全整齊排列於右側外圍（62% 以右），不與任何標籤或加工艙重疊
+        dataset.forEach((val, idx) => {
+          const pkg = document.createElement("div");
+          pkg.className = "belt-package bound";
+          pkg.innerHTML = `<span>${val}</span><span class="package-tag">num=${val}</span>`;
+          pkg.style.left = `calc(62% + ${(idx + 1) * 70}px)`;
+          pkg.style.top = "13px"; // 垂直置中
+          train.appendChild(pkg);
+          packages.push(pkg);
+        });
+
+        gate.classList.remove("slammed");
+        siren.classList.remove("active");
+        surface.classList.add("moving");
+        chamberHood.classList.remove("active");
+        term.textContent = "";
+        step = 0;
+        updateLines(-1);
+        btnNext.disabled = false;
+
+        if (currentMode === "break") {
+          stepCounter.textContent = "Step: 0 / 8";
+          statusText.textContent = "【break 模式】串列 [2, 4, 6, 8, 10] 於右側排隊就緒，點擊單步觀察巡檢流程。";
+        } else {
+          stepCounter.textContent = "Step: 0 / 11";
+          statusText.textContent = "【continue 模式】串列 [1, 2, 3, 4, 5] 於右側排隊就緒，點擊單步觀察高空旁路分流。";
+        }
+      }
+
+      function stepNext() {
+        step++;
+
+        if (currentMode === "break") {
+          stepCounter.textContent = `Step: ${step} / 8`;
+          switch(step) {
+            case 1:
+              updateLines(2); // if num == 6
+              packages[0].style.left = "62%"; // 進入工位 1（檢驗工位）
+              for (let i = 1; i < 5; i++) packages[i].style.left = `calc(62% + ${i * 70}px)`;
+              statusText.textContent = "num = 2 抵達檢驗工位（62%）：2 == 6 為 False，略過 if 分支。";
+              break;
+            case 2:
+              updateLines(5); // print 目前數字: 2
+              packages[0].style.left = "28%"; // 順向向左推進至工位 2（加工工位）
+              packages[0].classList.add("processing");
+              chamberHood.classList.add("active");
+              term.textContent += "目前數字：2\n";
+              statusText.textContent = "推進至加工工位（28%），執行 print(目前數字: 2)，輸出至終端機。";
+              break;
+            case 3:
+              updateLines(2); // num = 4
+              chamberHood.classList.remove("active");
+              packages[0].classList.remove("processing");
+              packages[0].style.left = "-80px"; // 2 移出
+              packages[1].style.left = "62%"; // 4 抵達工位 1
+              for (let i = 2; i < 5; i++) packages[i].style.left = `calc(62% + ${(i - 1) * 70}px)`;
+              statusText.textContent = "num = 4 抵達檢驗工位（62%）：4 == 6 為 False，略過 if 分支。";
+              break;
+            case 4:
+              updateLines(5); // print 目前數字: 4
+              packages[1].style.left = "28%"; // 4 推進至工位 2
+              packages[1].classList.add("processing");
+              chamberHood.classList.add("active");
+              term.textContent += "目前數字：4\n";
+              statusText.textContent = "推進至加工工位（28%），執行 print(目前數字: 4)，輸出至終端機。";
+              break;
+            case 5:
+              updateLines(2); // num = 6
+              chamberHood.classList.remove("active");
+              packages[1].classList.remove("processing");
+              packages[1].style.left = "-80px"; // 4 移出
+              packages[2].style.left = "62%"; // 6 抵達工位 1
+              packages[2].classList.add("inspected");
+              for (let i = 3; i < 5; i++) packages[i].style.left = `calc(62% + ${(i - 2) * 70}px)`;
+              statusText.textContent = "🎯 num = 6 抵達檢驗工位（62%）：6 == 6 結果為 True！進入 if 分支。";
+              break;
+            case 6:
+              updateLines(3); // print 找到目標
+              term.textContent += "找到目標數字：6\n";
+              statusText.textContent = "執行分支指令，輸出「找到目標數字：6」，即刻準備執行 break！";
+              break;
+            case 7:
+              updateLines(4); // break
+              gate.classList.add("slammed"); // 大閘門於 62%+40px 重砸，阻絕後方 8 與 10
+              siren.classList.add("active");
+              surface.classList.remove("moving"); // 輸送帶停轉
+              statusText.textContent = "🛑 執行 break：安全閘門重砸阻隔！輸送帶急停斷電，迴圈強制中斷！";
+              break;
+            case 8:
+              updateLines(6); // 外部程式碼
+              statusText.textContent = "控制流程彈射出迴圈外！被阻擋在閘門外的數字 8 與 10 完全不再處理。";
+              btnNext.disabled = true;
+              break;
+          }
+        } else {
+          // ================= continue 模式時序 (順向由右至左) =================
+          stepCounter.textContent = `Step: ${step} / 11`;
+
+          if (step === 1) {
+            updateLines(2); // 1 抵達工位 1
+            packages[0].style.left = "62%";
+            for (let i = 1; i < 5; i++) packages[i].style.left = `calc(62% + ${i * 70}px)`;
+            statusText.textContent = "num = 1 抵達檢驗工位（62%）：1 % 2 != 0 結果為 True（奇數）！進入 if 分支。";
+          } else if (step === 2) {
+            updateLines(3); // 執行 continue -> 升入高空旁路並向左跨越
+            packages[0].classList.add("bypassing");
+            packages[0].style.top = "-8px"; // 升至旁路高度
+            packages[0].style.left = "28%"; // 橫跨過加工艙上方
+            statusText.textContent = "⏩ 執行 continue！元素 1 升入高空旁路向左跨越，完全略過加工艙！";
+          } else if (step === 3) {
+            updateLines(2); // 1 移出，2 抵達工位 1
+            packages[0].style.left = "-80px";
+            packages[1].style.left = "62%";
+            for (let i = 2; i < 5; i++) packages[i].style.left = `calc(62% + ${(i - 1) * 70}px)`;
+            statusText.textContent = "num = 2 抵達檢驗工位（62%）：2 % 2 != 0 為 False（偶數），略過 if 區塊。";
+          } else if (step === 4) {
+            updateLines(4); // 2 正常推進加工艙
+            packages[1].style.left = "28%";
+            packages[1].classList.add("processing");
+            chamberHood.classList.add("active");
+            term.textContent += "輸出偶數：2\n";
+            statusText.textContent = "num = 2 推進至加工工位（28%），執行 print(輸出偶數：2)，完成輸出。";
+          } else if (step === 5) {
+            updateLines(2); // 2 移出，3 抵達工位 1
+            chamberHood.classList.remove("active");
+            packages[1].classList.remove("processing");
+            packages[1].style.left = "-80px";
+            packages[2].style.left = "62%";
+            for (let i = 3; i < 5; i++) packages[i].style.left = `calc(62% + ${(i - 2) * 70}px)`;
+            statusText.textContent = "num = 3 抵達檢驗工位（62%）：3 % 2 != 0 結果為 True（奇數）！進入 if 分支。";
+          } else if (step === 6) {
+            updateLines(3); // 3 走旁路
+            packages[2].classList.add("bypassing");
+            packages[2].style.top = "-8px";
+            packages[2].style.left = "28%";
+            statusText.textContent = "⏩ 執行 continue！元素 3 走高空旁路跨越加工艙，直接跳到下一輪！";
+          } else if (step === 7) {
+            updateLines(2); // 3 移出，4 抵達工位 1
+            packages[2].style.left = "-80px";
+            packages[3].style.left = "62%";
+            packages[4].style.left = `calc(62% + 70px)`;
+            statusText.textContent = "num = 4 抵達檢驗工位（62%）：4 為偶數，略過 if 區塊。";
+          } else if (step === 8) {
+            updateLines(4); // 4 正常輸出
+            packages[3].style.left = "28%";
+            packages[3].classList.add("processing");
+            chamberHood.classList.add("active");
+            term.textContent += "輸出偶數：4\n";
+            statusText.textContent = "num = 4 推進至加工工位（28%），執行 print(輸出偶數：4)，完成輸出。";
+          } else if (step === 9) {
+            updateLines(2); // 4 移出，5 抵達工位 1
+            chamberHood.classList.remove("active");
+            packages[3].classList.remove("processing");
+            packages[3].style.left = "-80px";
+            packages[4].style.left = "62%";
+            statusText.textContent = "num = 5 抵達檢驗工位（62%）：5 為奇數，進入 if 分支。";
+          } else if (step === 10) {
+            updateLines(3); // 5 走旁路
+            packages[4].classList.add("bypassing");
+            packages[4].style.top = "-8px";
+            packages[4].style.left = "28%";
+            statusText.textContent = "⏩ 執行 continue！元素 5 走高空旁路略過輸出，完成該輪迭代。";
+          } else if (step === 11) {
+            updateLines(5); // 結束
+            packages[4].style.left = "-80px";
+            statusText.textContent = "串列全數走訪完畢！請注意：continue 從未中斷輸送帶，僅略過了奇數的加工陳述式。";
+            btnNext.disabled = true;
+          }
+        }
+      }
+
+      btnModeBreak.addEventListener("click", () => setMode("break"));
+      btnModeContinue.addEventListener("click", () => setMode("continue"));
+      btnNext.addEventListener("click", stepNext);
+      btnReset.addEventListener("click", init);
+
+      setMode("break");
+    })();
+
+
+    /* ==========================================================
+       教具四：雙重巢狀迴圈（二維矩陣時序掃描儀）
+       ========================================================== */
+    (function() {
+      "use strict";
+
+      const btnNext = document.getElementById("btn-nest-next");
+      const btnAuto = document.getElementById("btn-nest-auto");
+      const btnReset = document.getElementById("btn-nest-reset");
+      const gaugeI = document.getElementById("gauge-i");
+      const gaugeJ = document.getElementById("gauge-j");
+      const gaugeCalc = document.getElementById("gauge-calc");
+      const term = document.getElementById("term-nest-output");
+      const statusText = document.getElementById("status-nest-text");
+      const stepCounter = document.getElementById("step-nest-counter");
+      const lines = [
+        document.getElementById("nline-1"),
+        document.getElementById("nline-2"),
+        document.getElementById("nline-3"),
+        document.getElementById("nline-4"),
+        document.getElementById("nline-5"),
+        document.getElementById("nline-6")
+      ];
+
+      let step = 0;
+      let autoTimer = null;
+      const totalSteps = 16;
+
+      const schedule = [
+        { type: "i", i: 1, j: null, line: 0, text: "外層迴圈啟動：外層指標前進 1 步至 i = 1。" },
+        { type: "cell", i: 1, j: 1, line: 3, text: "內層第 1 步：j = 1，計算 1x1=1，輸出到終端機。" },
+        { type: "cell", i: 1, j: 2, line: 3, text: "內層第 2 步：j = 2，計算 1x2=2，輸出到終端機。" },
+        { type: "cell", i: 1, j: 3, line: 3, text: "內層第 3 步：j = 3，計算 1x3=3，內層週期走訪完畢。" },
+        { type: "newline", i: 1, j: null, line: 4, text: "內層週期結束：執行 print() 輸出換行字元。" },
+
+        { type: "i", i: 2, j: null, line: 0, text: "外層指標推進至 i = 2，內層即將重新開始新週期。" },
+        { type: "cell", i: 2, j: 1, line: 3, text: "內層第 1 步：j = 1，計算 2x1=2，輸出到終端機。" },
+        { type: "cell", i: 2, j: 2, line: 3, text: "內層第 2 步：j = 2，計算 2x2=4，輸出到終端機。" },
+        { type: "cell", i: 2, j: 3, line: 3, text: "內層第 3 步：j = 3，計算 2x3=6，內層週期走訪完畢。" },
+        { type: "newline", i: 2, j: null, line: 4, text: "內層週期結束：執行 print() 輸出換行字元。" },
+
+        { type: "i", i: 3, j: null, line: 0, text: "外層指標推進至 i = 3。" },
+        { type: "cell", i: 3, j: 1, line: 3, text: "內層第 1 步：j = 1，計算 3x1=3，輸出到終端機。" },
+        { type: "cell", i: 3, j: 2, line: 3, text: "內層第 2 步：j = 2，計算 3x2=6，輸出到終端機。" },
+        { type: "cell", i: 3, j: 3, line: 3, text: "內層第 3 步：j = 3，計算 3x3=9，內層週期走訪完畢。" },
+        { type: "newline", i: 3, j: null, line: 4, text: "內層週期結束：執行 print() 輸出換行字元。" },
+
+        { type: "done", i: null, j: null, line: 5, text: "雙層巢狀迴圈全數執行完畢，完成二維矩陣運算輸出。" }
+      ];
+
+      function init() {
+        for (let r = 1; r <= 3; r++) {
+          for (let c = 1; c <= 3; c++) {
+            const cell = document.getElementById(`cell-${r}-${c}`);
+            cell.className = "matrix-cell";
+            cell.querySelector(".expr").textContent = "?";
+          }
+        }
+        gaugeI.textContent = "i = -";
+        gaugeJ.textContent = "j = -";
+        gaugeCalc.textContent = "-";
+        term.textContent = "";
+        step = 0;
+        updateLines(-1);
+        stepCounter.textContent = `Step: 0 / ${totalSteps}`;
+        statusText.textContent = "點擊「單步執行」，觀察當外層 i 固定時，內層 j 如何逐一走訪並輸出計算成果。";
+        btnNext.disabled = false;
+        clearInterval(autoTimer);
+        autoTimer = null;
+        btnAuto.textContent = "⚡ 自動掃描 (Auto)";
+      }
+
+      function updateLines(idx) {
+        lines.forEach((l, i) => {
+          if (i === idx) l.classList.add("active");
+          else l.classList.remove("active");
+        });
+      }
+
+      function stepNext() {
+        if (step >= schedule.length) return;
+        const cur = schedule[step];
+        step++;
+        stepCounter.textContent = `Step: ${step} / ${totalSteps}`;
+
+        updateLines(cur.line);
+        statusText.textContent = cur.text;
+
+        if (cur.type === "i") {
+          gaugeI.textContent = `i = ${cur.i}`;
+          gaugeJ.textContent = "j = 準備中";
+          gaugeCalc.textContent = `鎖定第 ${cur.i} 列`;
+        } else if (cur.type === "cell") {
+          gaugeI.textContent = `i = ${cur.i}`;
+          gaugeJ.textContent = `j = ${cur.j}`;
+          const prod = cur.i * cur.j;
+          gaugeCalc.textContent = `${cur.i} × ${cur.j} = ${prod}`;
+
+          const cell = document.getElementById(`cell-${cur.i}-${cur.j}`);
+          cell.classList.add("scanning");
+          cell.querySelector(".expr").textContent = `${cur.i}x${cur.j}=${prod}`;
+          setTimeout(() => {
+            cell.classList.remove("scanning");
+            cell.classList.add("done");
+          }, 350);
+
+          term.textContent += `${cur.i}x${cur.j}=${prod}  `;
+          term.scrollTop = term.scrollHeight;
+        } else if (cur.type === "newline") {
+          gaugeJ.textContent = "重置 (1..3)";
+          gaugeCalc.textContent = "換行 (\\n)";
+          term.textContent += "\n";
+          term.scrollTop = term.scrollHeight;
+        } else if (cur.type === "done") {
+          gaugeI.textContent = "已結束";
+          gaugeJ.textContent = "已結束";
+          gaugeCalc.textContent = "完成";
+          btnNext.disabled = true;
+          clearInterval(autoTimer);
+          autoTimer = null;
+          btnAuto.textContent = "⚡ 自動掃描 (Auto)";
+        }
+      }
+
+      btnNext.addEventListener("click", stepNext);
+      btnReset.addEventListener("click", init);
+      btnAuto.addEventListener("click", function() {
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          this.textContent = "⚡ 自動掃描 (Auto)";
+        } else {
+          this.textContent = "⏸ 暫停 (Pause)";
+          autoTimer = setInterval(() => {
+            if (step >= totalSteps) {
+              clearInterval(autoTimer);
+              autoTimer = null;
+              btnAuto.textContent = "⚡ 自動掃描 (Auto)";
+            } else {
+              stepNext();
+            }
+          }, 700);
+        }
+      });
+
+      init();
+    })();
+  </script>
+</body>
+</html>

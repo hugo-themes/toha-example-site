@@ -1,0 +1,108 @@
+/* 覆蓋主題 .card-head 的固定高度，改由圖片 aspect-ratio 自動決定高度 */
+.card-head {
+  height: auto !important;
+  overflow: hidden;
+}
+
+/* 防止圖片撐開卡片寬度 */
+.post-card {
+  display: flex !important;   /* 覆蓋主題的 inline-flex */
+  overflow: hidden;
+  min-width: 0;
+
+  .card {
+    min-width: 0;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  /* 固定 card-body 高度（約三行內文），超出截斷 */
+  .card-body {
+    height: 8.5rem !important;
+    overflow: hidden !important;
+  }
+
+  .post-summary {
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+    max-height: none !important;
+  }
+}
+
+/* 講義列表卡片（type-slides）：支援 summary_points 學習重點列表，高度自適應 */
+body.type-slides {
+  .post-card {
+    .card-body {
+      height: auto !important;
+      min-height: 13rem;
+      overflow: visible !important;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+/* 關閉卡片 hover/focus 時圖片放大的效果 */
+.card:hover .card-img-top,
+.card:focus .card-img-top,
+.post-card .card:hover .card-img-top,
+.post-card .card:focus .card-img-top {
+  transform: none !important;
+}
+
+/* 固定每列卡片數量，卡片等比縮小而非減少欄數
+   超寬螢幕 (>=1536px)：5 欄（2K 顯示器 / 大型桌機）
+   超大桌面 (1280px~1535px)：4 欄
+   桌面 (960px~1279px)：3 欄
+   平板 (640px~959px)：2 欄
+   手機 (<640px)：1 欄
+*/
+body.kind-section,
+body.kind-term,
+body.kind-page {
+  .post-card {
+    width: calc(100% / 3) !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  body.kind-section,
+  body.kind-term,
+  body.kind-page {
+    .post-card {
+      width: calc(100% / 4) !important;
+    }
+  }
+}
+
+@media (min-width: 1536px) {
+  body.kind-section,
+  body.kind-term,
+  body.kind-page {
+    .post-card {
+      width: calc(100% / 5) !important;
+    }
+  }
+}
+
+@media (max-width: 959px) {
+  body.kind-section,
+  body.kind-term,
+  body.kind-page {
+    .post-card {
+      width: calc(100% / 2) !important;
+    }
+  }
+}
+
+@media (max-width: 639px) {
+  body.kind-section,
+  body.kind-term,
+  body.kind-page {
+    .post-card {
+      width: 100% !important;
+    }
+  }
+}

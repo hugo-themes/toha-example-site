@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 10：物件導向程式設計基礎（教師互動講義版）</title>
+  <style>
+    /* ==========================================================================
+       1. 視覺美學系統（溫暖出版品風格 Warm Editorial Style）
+       ========================================================================== */
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-secondary: #f4efe6;
+      --text-main: #2d2926;
+      --text-muted: #57534e;
+      --text-light: #78716c;
+      --border-color: #e5dec9;
+      --border-strong: #d6d3d1;
+      --accent-terracotta: #c2410c;
+      --accent-amber: #b45309;
+      --accent-blue: #1e3a8a;
+      --accent-green: #15803d;
+      --accent-red: #b91c1c;
+      --terminal-bg: #1e293b;
+      --terminal-text: #f8fafc;
+      --code-bg: #1e293b;
+      --code-text: #f1f5f9;
+      --blueprint-bg: #0f2b48;
+      --blueprint-grid: rgba(255, 255, 255, 0.12);
+      --shadow-sm: 0 2px 4px rgba(45, 41, 38, 0.05);
+      --shadow-md: 0 4px 12px rgba(45, 41, 38, 0.08);
+      --shadow-lg: 0 8px 24px rgba(45, 41, 38, 0.12);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      --font-code: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      line-height: 1.8;
+      padding: 40px 20px 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .lecture-container {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* 頁首標題 */
+    header.lecture-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 28px;
+      margin-bottom: 40px;
+    }
+
+    .lecture-badge {
+      display: inline-block;
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .lecture-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent-blue);
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .lecture-subtitle {
+      font-size: 1.12rem;
+      color: var(--text-muted);
+    }
+
+    /* 章節區塊 */
+    .section-block {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 36px 40px;
+      margin-bottom: 44px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    h2.section-heading {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      border-left: 5px solid var(--accent-terracotta);
+      padding-left: 14px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+    }
+
+    h3.sub-heading {
+      font-size: 1.22rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 28px 0 14px 0;
+    }
+
+    p { margin-bottom: 16px; font-size: 1.02rem; color: var(--text-main); }
+
+    /* 資訊提示卡片 */
+    .callout-box {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-blue);
+      border-radius: var(--radius-sm);
+      padding: 18px 22px;
+      margin: 22px 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .callout-box.mnemonic {
+      border-left-color: var(--accent-green);
+      background-color: #f0fdf4;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.96rem;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .callout-box.mnemonic .callout-title { color: var(--accent-green); }
+
+    /* 程式碼區塊 (PEP 8、零行號) */
+    .code-wrapper {
+      background-color: var(--code-bg);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: 20px 0 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid #334155;
+    }
+
+    .code-header {
+      background-color: #0f172a;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-family: var(--font-code);
+      border-bottom: 1px solid #334155;
+    }
+
+    .window-dots { display: flex; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot.red { background-color: #ef4444; }
+    .dot.yellow { background-color: #f59e0b; }
+    .dot.green { background-color: #10b981; }
+
+    pre.code-block {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: var(--font-code);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      margin: 0;
+      white-space: pre !important;
+    }
+
+    code.inline-code {
+      background-color: var(--bg-secondary);
+      color: var(--accent-terracotta);
+      font-family: var(--font-code);
+      font-size: 0.9em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* 表格標準 */
+    .table-container {
+      overflow-x: auto;
+      margin: 22px 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      text-align: left;
+      background: #ffffff;
+    }
+
+    .spec-table th {
+      background-color: #f1f5f9;
+      color: var(--accent-blue);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .spec-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .spec-table tr:last-child td { border-bottom: none; }
+    .spec-table tr:nth-child(even) { background-color: #fafaf9; }
+
+    /* ==========================================================================
+       動態教具外框與按鈕標準
+       ========================================================================== */
+    .widget-container {
+      background-color: #ffffff;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      margin: 36px 0 44px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .widget-frame-label {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-bottom: 1px solid #334155;
+    }
+
+    .widget-tag {
+      background-color: var(--accent-terracotta);
+      color: #ffffff;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .widget-canvas { padding: 24px; background-color: #fafaf9; }
+
+    .btn-action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .theater-btn {
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-main);
+    }
+
+    .theater-btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .theater-btn.primary {
+      background-color: var(--accent-amber);
+      color: #ffffff;
+      border-color: var(--accent-amber);
+    }
+    .theater-btn.primary:hover { background-color: #92400e; }
+
+    .theater-btn.toggle-sol {
+      background-color: #e0e7ff;
+      color: var(--accent-blue);
+      border-color: #c7d2fe;
+      margin-top: 12px;
+    }
+    .theater-btn.toggle-sol:hover { background-color: var(--accent-blue); color: #ffffff; }
+
+    .live-terminal {
+      background-color: var(--terminal-bg);
+      color: var(--terminal-text);
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 85px;
+      border: 1px solid #334155;
+    }
+
+    .term-prompt { color: #38bdf8; margin-right: 6px; }
+    .term-log { color: #fbbf24; }
+    .term-result { font-weight: 700; color: #4ade80; }
+    .term-error { color: #f87171; font-weight: 700; }
+
+    /* ==========================================================================
+       教具一：汽車藍圖出廠模擬器樣式
+       ========================================================================== */
+    .factory-stage {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .blueprint-spec-box {
+      background-color: var(--blueprint-bg);
+      background-image: 
+        linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
+      background-size: 16px 16px;
+      border: 2px solid #38bdf8;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      color: #e0f2fe;
+    }
+
+    .garage-area {
+      background: #ffffff;
+      border: 2px dashed #94a3b8;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .parking-bays {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      height: 100%;
+    }
+
+    .parking-slot {
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      background: #f8fafc;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 220px;
+      transition: all 0.3s;
+    }
+    .parking-slot.occupied { border-color: var(--accent-blue); background: #ffffff; box-shadow: var(--shadow-sm); }
+
+    .slot-id-tag {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .variable-tag {
+      position: absolute;
+      top: -12px;
+      background: var(--accent-terracotta);
+      color: #ffffff;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-sm);
+      animation: popIn 0.3s ease;
+    }
+
+    .svg-car-unit {
+      width: 190px;
+      height: 95px;
+      margin: 12px 0 8px;
+      animation: driveIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes driveIn {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .car-info-card {
+      width: 100%;
+      background: #f1f5f9;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: #334155;
+      margin-top: 6px;
+    }
+
+    /* ==========================================================================
+       教具二：雙層屬性搜尋與同名遮蔽模擬器（完整 6 輪對稱視覺）
+       ========================================================================== */
+    .laser-equip-stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-bottom: 16px;
+      padding: 10px 0;
+    }
+
+    .hq-billboard {
+      background: #fffbeb;
+      border: 3px solid var(--accent-amber);
+      border-radius: var(--radius-md);
+      padding: 18px 24px;
+      text-align: center;
+      position: relative;
+      transition: all 0.4s;
+    }
+    .hq-billboard.glow-hit {
+      border-color: #10b981;
+      background: #ecfdf5;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+      transform: scale(1.02);
+    }
+    .hq-billboard.glow-broadcast {
+      border-color: var(--accent-terracotta);
+      background: #fff7ed;
+      box-shadow: 0 0 30px rgba(194, 65, 12, 0.45);
+      animation: hqPulse 0.5s infinite alternate;
+    }
+    @keyframes hqPulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.025); }
+    }
+
+    .cars-grid-interactive {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      position: relative;
+    }
+
+    .car-bay-pod {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s;
+    }
+    .car-bay-pod.active-pulse {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 20px rgba(30, 58, 138, 0.2);
+    }
+
+    .lookup-beam {
+      position: absolute;
+      width: 6px;
+      background: linear-gradient(180deg, #38bdf8, #1d4ed8);
+      box-shadow: 0 0 12px #38bdf8, 0 0 24px #1d4ed8;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 100%;
+      height: 0;
+      opacity: 0;
+      transition: height 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .lookup-beam.firing {
+      height: 38px;
+      opacity: 1;
+    }
+
+    .metal-shield-badge {
+      position: absolute;
+      top: -14px;
+      background: linear-gradient(135deg, #ea580c, #b91c1c);
+      color: #ffffff;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(185, 28, 28, 0.4);
+      display: none;
+      z-index: 25;
+      animation: shieldDrop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes shieldDrop {
+      0% { transform: translateY(-40px) scale(1.4); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .deflect-spark {
+      position: absolute;
+      top: -24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fef08a 10%, #ef4444 80%, transparent 100%);
+      display: none;
+      animation: sparkBurst 0.6s ease-out;
+      z-index: 30;
+    }
+    @keyframes sparkBurst {
+      0% { transform: scale(0.2); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    .wheel-element {
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .wheel-detached {
+      transform: translateY(22px) rotate(45deg);
+      opacity: 0.3;
+    }
+    .wheel-hidden {
+      display: none;
+    }
+
+    .wheel-status-text {
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+    .wheel-status-text.custom-red {
+      background: #fee2e2;
+      color: var(--accent-red);
+      border: 1px solid #fca5a5;
+    }
+    .wheel-status-text.upgraded-gold {
+      background: #fef3c7;
+      color: var(--accent-amber);
+      border: 1px solid #fcd34d;
+    }
+
+    /* ==========================================================================
+       教具三：保全機器人樣式
+       ========================================================================= */
+    .robot-guard-stage {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .vault-security-chamber {
+      background: #ffffff;
+      border: 2px solid #334155;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .guard-robot-wrap { display: flex; flex-direction: column; align-items: center; }
+    .svg-guard-robot { width: 110px; height: 140px; transition: all 0.3s ease; }
+
+    .robot-state-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-code);
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #334155;
+      margin-top: 6px;
+    }
+
+    .vault-inner-card {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .balance-huge {
+      font-family: var(--font-code);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-blue);
+    }
+
+    .gate-indicator-bar {
+      grid-column: span 2;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--font-code);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .gate-indicator-bar.pass { background: #dcfce7; color: var(--accent-green); border: 1px solid #86efac; }
+    .gate-indicator-bar.block { background: #fee2e2; color: var(--accent-red); border: 1px solid #fca5a5; }
+
+    /* 頁尾版權宣告 */
+    footer.disclaimer-section {
+      margin-top: 60px;
+      padding: 28px 24px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    footer.disclaimer-section h4 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--accent-blue);
+      margin-bottom: 12px;
+    }
+
+    footer.disclaimer-section p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+    footer.disclaimer-section p:last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+<div class="lecture-container">
+  <!-- 10-1 類別定義、物件實例化與記憶體配置機制 -->
+  <section class="section-block">
+    <h2 class="section-heading">10-1 類別定義、物件實例化與記憶體配置機制</h2>
+    <p>
+      在程序導向中，變數與函式彼此分立；而<strong>物件導向程式設計（OOP）</strong>則是透過<strong>類別（Class）</strong>，將實體的特徵資料與操作行為封裝為單一結構。
+    </p>
+
+    <h3 class="sub-heading">10-1.1 類別藍圖 vs 堆積記憶體（Heap）物件實例</h3>
+    <p>
+      請把「類別」想像成工程師繪製的<strong>規格工程藍圖</strong>：藍圖本身不佔用車庫空間。當工廠依據藍圖將汽車真正打造出廠時，這輛停在車庫中、擁有實體引擎與烤漆的車輛，就是<strong>物件實例（Instance）</strong>。
+    </p>
+    <p>
+      唯有執行呼叫（如 <code>Car()</code>）時，直譯器才會在<strong>堆積記憶體（Heap Memory）</strong>中分配一塊獨立的記憶體門牌位址（例如 <code>0x10A8</code>）來容納這個全新物件。
+    </p>
+
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="window-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></span>
+        <span>class_blueprint_intro.py</span>
+      </div>
+      <pre class="code-block"># 定義 Car 類別規格（遵循 PEP 8 之 PascalCase 命名規範）
+class Car:
+    pass
+
+# 物件實例化：工廠依照藍圖打造出兩台完全獨立的實體車輛
+car_a = Car()
+car_b = Car()
+
+# 印出物件與記憶體門牌位址驗證
+print(car_a)
+print(car_b)
+print(f"car_a 記憶體門牌 (ID): {hex(id(car_a))}")
+print(f"car_b 記憶體門牌 (ID): {hex(id(car_b))}")
+print(f"兩台車是否為完全獨立的個體: {car_a is not car_b}")</pre>
+    </div>
+  </section>
+
+  <!-- 10-2 建構函式與實例屬性初始化：__init__() 與 self 參照 -->
+  <section class="section-block">
+    <h2 class="section-heading">10-2 建構函式與實例屬性初始化：__init__() 與 self 參照</h2>
+    <p>
+      每台車出廠時，都需要完成噴漆、掛牌與各項基本設定。Python 透過特殊方法 <code>__init__()</code> 負責物件的組裝初始化。
+    </p>
+
+    <h3 class="sub-heading">10-2.1 self 隱性引數傳遞機制</h3>
+    <p>
+      初學者最常產生的困惑在於：<strong>「為什麼定義函式時宣告了 <code>def __init__(self, brand, color):</code> 三個參數，後面建立物件 <code>Car("Toyota", "白色")</code> 卻只傳入兩個引數？」</strong>
+    </p>
+    <p>
+      這是因為直譯器在實例化時，會自動完成底層調配：
+    </p>
+    <ol style="margin-left: 24px; margin-bottom: 16px; color: var(--text-muted);">
+      <li>直譯器先在 Heap 記憶體為新車開闢專屬停車位（例如位址 <code>0x10A8</code>）。</li>
+      <li><strong>隱性傳遞</strong>：直譯器會自動把「當前這台新車的記憶體位址」當作第一個引數塞給 <code>self</code>。換言之，<strong><code>self</code> 就是「這台正在被打造的車自己」</strong>。</li>
+      <li>因此，<code>self.brand = brand</code> 的意義就是：「請把傳進來的品牌，掛在這台新車的行照屬性上」。</li>
+    </ol>
+
+    <!-- 動態教具一：汽車藍圖與組裝出廠模擬器 -->
+    <div class="widget-container" id="widget-car-factory">
+      <div class="widget-frame-label">
+        <span>【直譯器機制標註】汽車規格藍圖、組裝工廠與實例記憶體配置模擬器</span>
+        <span class="widget-tag">Interactive Visualizer</span>
+      </div>
+      <div class="widget-canvas">
+        <div class="factory-stage">
+          <div class="blueprint-spec-box">
+            <span style="background:#0284c7; color:#fff; font-size:0.75rem; font-weight:700; padding:2px 6px; border-radius:4px;">CLASS SPECIFICATION</span>
+            <div style="font-weight:700; font-size:1.05rem; margin:8px 0;">規格藍圖：Class Car</div>
+            <pre class="code-block" style="background:rgba(0,0,0,0.3); padding:10px; font-size:0.8rem; border-radius:4px; border-color:#0284c7;"><code>class Car:
+    def __init__(self, brand, color):
+        self.brand = brand
+        self.color = color
+        self.speed = 0</code></pre>
+            <div class="btn-action-group" style="flex-direction:column; margin-top:14px;">
+              <button class="theater-btn primary" id="btn-build-toyota">打造 car1 ("Toyota", "白色")</button>
+              <button class="theater-btn" id="btn-build-tesla">打造 car2 ("Tesla", "紅色")</button>
+              <button class="theater-btn" id="btn-reset-factory">清空記憶體車庫</button>
+            </div>
+          </div>
+
+          <div class="garage-area">
+            <div style="font-size:0.85rem; font-weight:700; color:#64748b; text-transform:uppercase;">
+              作業系統 Heap 記憶體車庫 (實體車輛停車位)
+            </div>
+            <div class="parking-bays">
+              <div class="parking-slot" id="slot-bay-1">
+                <span class="slot-id-tag">格位: 0x10A8</span>
+                <div id="slot-1-empty" style="color:#94a3b8; font-size:0.85rem; font-style:italic;">車位閒置中 (Waiting)</div>
+              </div>
+              <div class="parking-slot" id="slot-bay-2">
+                <span class="slot-id-tag">格位: 0x10B2</span>
+                <div id="slot-2-empty" style="color:#94a3b8; font-size:0.85rem; font-style:italic;">車位閒置中 (Waiting)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="live-terminal">
+          <div><span class="term-prompt">&gt;&gt;&gt;</span><span id="w1-factory-code">等待出廠指令...</span></div>
+          <div><span class="term-log">[直譯器出廠日誌] </span><span id="w1-factory-log">組裝流水線就緒。</span></div>
+          <div><span class="term-prompt">&gt;&gt;&gt;</span>回傳指標位址: <span class="term-result" id="w1-factory-res">&lt;無&gt;</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10-3 類別屬性與實例屬性：原廠標配與車主改裝 -->
+  <section class="section-block">
+    <h2 class="section-heading">10-3 類別屬性與實例屬性：原廠標配與車主改裝</h2>
+    <p>
+      初學者在學到屬性時，最容易搞混「全體共享」與「個人專屬」的差異。我們用最貼近生活的概念來理解：
+    </p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 18px;">
+        <h4 style="color: var(--accent-amber); font-size: 1.05rem; margin-bottom: 8px;">1. 類別屬性（原廠標配）</h4>
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0;">
+          工廠藍圖統一規定的出廠規格（例如：<strong>所有出廠的車預設都是 4 個輪子</strong>）。這是所有車主共同參考的公用規格。
+        </p>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 18px;">
+        <h4 style="color: var(--accent-blue); font-size: 1.05rem; margin-bottom: 8px;">2. 實例屬性（車主個人行照）</h4>
+        <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0;">
+          買回家後專屬於該台車的資料（例如：車主是誰、目前里程數、烤漆顏色），每台車各自獨立保管。
+        </p>
+      </div>
+    </div>
+
+    <div class="callout-box mnemonic">
+      <div class="callout-title">💡 避坑二大口訣（記住這兩句，觀念永遠不打結！）</div>
+      <p><strong>口訣一：查問時「先看個人改裝，沒有才看原廠標配」</strong><br>
+      當你想查這台車有幾顆輪子（<code>car1.wheels</code>），直譯器先看車身有沒有貼改裝標籤；如果車主沒改過，就自然向上看原廠標配是 4 顆。</p>
+      <p style="margin-bottom: 0;"><strong>口訣二：修改時「改誰就是誰，動不到原廠」</strong><br>
+      如果車主小明爆胎，把自己的車改成了 3 顆輪子（<code>car1.wheels = 3</code>），這只是在車頂貼上一面金屬盾牌。原廠依然是 4 顆，隔壁小華買的車（<code>car2.wheels</code>）依然安安穩穩是 4 顆！</p>
+    </div>
+
+    <!-- 動態教具二：類別屬性查找鏈與實例屬性覆蓋（Attribute Shadowing）模擬器 -->
+    <div class="widget-container" id="widget-equipment-app">
+      <div class="widget-frame-label">
+        <span>【直譯器機制標註】類別屬性查找鏈與實例屬性覆蓋（Attribute Shadowing）模擬器</span>
+        <span class="widget-tag">Interactive Visualizer</span>
+      </div>
+      <div class="widget-canvas">
+        <div class="laser-equip-stage">
+
+          <!-- 上層：工廠總部看板 (類別空間) -->
+          <div class="hq-billboard" id="hq-billboard-node">
+            <span style="background: var(--accent-amber); color: #fff; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 4px;">工廠總部・全體公用公佈欄 (Class Car)</span>
+            <div style="font-family: var(--font-code); font-weight: 800; font-size: 1.3rem; color: #78350f; margin-top: 6px;">
+              Car.wheels = <span id="hq-wheels-num" style="color:var(--accent-red); font-size:1.6rem;">4</span> (原廠出廠統一標配)
+            </div>
+            <div id="hq-msg-badge" style="font-size:0.8rem; color:#b45309; margin-top:4px;">全車系未改裝車輛，均向上參照此公用規格</div>
+          </div>
+
+          <!-- 下層：兩台車實體 (實例空間) -->
+          <div class="cars-grid-interactive">
+
+            <!-- 車輛 1：小明白色房車 -->
+            <div class="car-bay-pod" id="pod-car1">
+              <div class="lookup-beam" id="beam-car1"></div>
+              <div class="metal-shield-badge" id="shield-car1">🛠️ 客製化屬性: wheels = 3</div>
+              <div class="deflect-spark" id="spark-car1"></div>
+
+              <span style="background: #e0f2fe; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">實例：car1 (小明車輛)</span>
+
+              <!-- SVG 車輛 1 (含前輪、動態中輪、後輪完整對稱結構) -->
+              <svg class="svg-car-unit" viewBox="0 0 200 100">
+                <path d="M 20 65 L 35 65 Q 40 45 60 45 Q 80 45 85 65 L 135 65 Q 140 45 160 45 Q 180 45 185 65 L 195 65 Q 200 65 200 58 L 190 40 Q 180 32 155 30 L 125 15 Q 115 10 90 10 L 60 10 Q 40 10 30 25 L 10 42 Q 5 48 5 58 L 5 65 Z" fill="#ffffff" stroke="#334155" stroke-width="2.5" />
+                <path d="M 60 16 L 88 16 L 88 32 L 38 32 Q 45 20 60 16 Z" fill="#38bdf8" fill-opacity="0.8" />
+                <path d="M 94 16 L 120 16 Q 135 22 145 32 L 94 32 Z" fill="#38bdf8" fill-opacity="0.8" />
+                <!-- 前輪 -->
+                <circle cx="50" cy="65" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+                <circle cx="50" cy="65" r="7" fill="#94a3b8" />
+                <!-- 中輪 (原廠升級 6 輪時動態顯現) -->
+                <g id="c1-mid-wheel-group" class="wheel-element wheel-hidden">
+                  <circle cx="105" cy="65" r="16" fill="#1e293b" stroke="#b45309" stroke-width="2.5" />
+                  <circle cx="105" cy="65" r="7" fill="#fbbf24" />
+                </g>
+                <!-- 後輪 (小明改裝時產生狀態變化) -->
+                <g id="c1-rear-wheel-group" class="wheel-element">
+                  <circle cx="160" cy="65" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+                  <circle cx="160" cy="65" r="7" fill="#94a3b8" />
+                </g>
+              </svg>
+
+              <div class="wheel-status-text" id="status-pill-c1">實質輪子數: 4 輪 (參照原廠)</div>
+            </div>
+
+            <!-- 車輛 2：小華紅色跑車 -->
+            <div class="car-bay-pod" id="pod-car2">
+              <div class="lookup-beam" id="beam-car2"></div>
+
+              <span style="background: #e0f2fe; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">實例：car2 (小華車輛)</span>
+
+              <!-- SVG 車輛 2 -->
+              <svg class="svg-car-unit" viewBox="0 0 200 100">
+                <path d="M 20 65 L 35 65 Q 40 45 60 45 Q 80 45 85 65 L 135 65 Q 140 45 160 45 Q 180 45 185 65 L 195 65 Q 200 65 200 58 L 190 40 Q 180 32 155 30 L 125 15 Q 115 10 90 10 L 60 10 Q 40 10 30 25 L 10 42 Q 5 48 5 58 L 5 65 Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="2.5" />
+                <path d="M 60 16 L 88 16 L 88 32 L 38 32 Q 45 20 60 16 Z" fill="#38bdf8" fill-opacity="0.8" />
+                <path d="M 94 16 L 120 16 Q 135 22 145 32 L 94 32 Z" fill="#38bdf8" fill-opacity="0.8" />
+                <!-- 前輪 -->
+                <circle cx="50" cy="65" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+                <circle cx="50" cy="65" r="7" fill="#94a3b8" />
+                <!-- 中輪 (原廠升級 6 輪時動態顯現) -->
+                <g id="c2-mid-wheel-group" class="wheel-element wheel-hidden">
+                  <circle cx="105" cy="65" r="16" fill="#1e293b" stroke="#b45309" stroke-width="2.5" />
+                  <circle cx="105" cy="65" r="7" fill="#fbbf24" />
+                </g>
+                <!-- 後輪 -->
+                <circle cx="160" cy="65" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+                <circle cx="160" cy="65" r="7" fill="#94a3b8" />
+              </svg>
+
+              <div class="wheel-status-text" id="status-pill-c2">實質輪子數: 4 輪 (參照原廠)</div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="btn-action-group">
+          <button class="theater-btn" id="btn-read-c1">1. 讀取 car1.wheels（查詢屬性）</button>
+          <button class="theater-btn primary" id="btn-mod-c1">2. 執行 car1.wheels = 3（實例賦值客製化）</button>
+          <button class="theater-btn" id="btn-read-c2">3. 讀取 car2.wheels（驗證未受影響）</button>
+          <button class="theater-btn" id="btn-change-hq" style="border-color:var(--accent-amber); color:var(--accent-amber);">4. 執行 Car.wheels = 6（修改類別屬性）</button>
+          <button class="theater-btn" id="btn-reset-equip">重設展示狀態</button>
+        </div>
+
+        <div class="live-terminal">
+          <div><span class="term-prompt">&gt;&gt;&gt;</span><span id="w2-equip-code">等待指令執行...</span></div>
+          <div><span class="term-log">[直譯器查找路徑] </span><span id="w2-equip-log">就緒。</span></div>
+          <div><span class="term-prompt">&gt;&gt;&gt;</span>印出結果: <span class="term-result" id="w2-equip-res">&lt;無&gt;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="window-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></span>
+        <span>wheels_demo.py</span>
+      </div>
+      <pre class="code-block">class Car:
+    wheels = 4  # 【原廠標配】全體共享
+
+car1 = Car()
+car2 = Car()
+
+# 1. 沒改裝前，兩台車都看原廠標配
+print(car1.wheels)  # 4
+print(car2.wheels)  # 4
+
+# 2. 小明自己改裝，只在 car1 貼上個人標籤
+car1.wheels = 3
+
+print(car1.wheels)  # 3 (看到自己的改裝標籤)
+print(car2.wheels)  # 4 (小華沒改過，依然抬頭看原廠標配)
+print(Car.wheels)   # 4 (工廠原廠標配完全沒被動到！)</pre>
+    </div>
+  </section>
+
+  <!-- 10-4 方法封裝協定：實例方法、類別方法與靜態方法 -->
+  <section class="section-block">
+    <h2 class="section-heading">10-4 方法封裝協定：實例方法、類別方法與靜態方法</h2>
+    <p>
+      在類別內部宣告函式時，依據其第一參數約定與操作範圍，可分為三種標準型式：
+    </p>
+
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>方法種類</th>
+            <th>裝飾器宣告</th>
+            <th>第一參數</th>
+            <th>可存取之範圍</th>
+            <th>典型應用情境</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>實例方法 (Instance Method)</strong></td>
+            <td>無（預設）</td>
+            <td><code>self</code></td>
+            <td>可存取自身實例屬性與類別屬性</td>
+            <td>最常見的物件行為（如車輛加速、帳戶存提款）</td>
+          </tr>
+          <tr>
+            <td><strong>類別方法 (Class Method)</strong></td>
+            <td><code>@classmethod</code></td>
+            <td><code>cls</code></td>
+            <td>僅能存取類別屬性，無法存取特定個別實例</td>
+            <td>替代工廠建構函式（如從字串或設定檔解析建物件）</td>
+          </tr>
+          <tr>
+            <td><strong>靜態方法 (Static Method)</strong></td>
+            <td><code>@staticmethod</code></td>
+            <td>無強制約束</td>
+            <td>無法直接存取 <code>self</code> 或 <code>cls</code></td>
+            <td>與該類別邏輯相關之獨立工具函式（如輸入格式驗證）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 10-5 封裝性與存取控制：私有慣例、@property 與屬性防護 -->
+  <section class="section-block">
+    <h2 class="section-heading">10-5 封裝性與存取控制：私有慣例、@property 與屬性防護</h2>
+    <p>
+      <strong>封裝（Encapsulation）</strong>的核心精神在於：「不讓外部任意竄改內部重要資料，以保證資料絕對正確與健全」。
+    </p>
+
+    <!-- 動態教具三：保全審查機器人 (Security GuardBot) 與 @property 金庫防護器 -->
+    <div class="widget-container" id="widget-property-guard">
+      <div class="widget-frame-label">
+        <span>【直譯器機制標註】@property 讀取與 Setter 屬性防禦閘門模擬器</span>
+        <span class="widget-tag">Interactive Visualizer</span>
+      </div>
+      <div class="widget-canvas">
+        <div class="robot-guard-stage">
+          <div class="blueprint-card" style="background:#fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+            <div style="font-weight: 700; color: var(--accent-blue); margin-bottom: 8px;">外部操作控制台</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">透過公開屬性介面存取內部資產：</p>
+            <div class="btn-action-group" style="flex-direction: column;">
+              <button class="theater-btn" id="btn-prop-read">1. 讀取餘額 (acc.balance)</button>
+              <button class="theater-btn primary" id="btn-prop-save">2. 正常存款 +500 (acc.balance = 1500)</button>
+              <button class="theater-btn" id="btn-prop-err" style="color: var(--accent-red); border-color: #fca5a5;">3. 惡意/錯誤寫入 -200 (acc.balance = -200)</button>
+              <button class="theater-btn" id="btn-prop-clr">重設帳戶狀態</button>
+            </div>
+          </div>
+
+          <div class="vault-security-chamber">
+            <div class="guard-robot-wrap">
+              <svg class="svg-guard-robot" viewBox="0 0 100 130" id="guard-bot-svg">
+                <line x1="50" y1="18" x2="50" y2="6" stroke="#475569" stroke-width="3" />
+                <circle cx="50" cy="5" r="4" fill="#38bdf8" id="bot-beacon" />
+                <rect x="30" y="18" width="40" height="30" rx="6" fill="#1e293b" stroke="#475569" stroke-width="2" />
+                <rect x="38" y="28" width="24" height="8" rx="3" fill="#38bdf8" id="bot-visor" />
+                <rect x="25" y="52" width="50" height="48" rx="8" fill="#334155" stroke="#475569" stroke-width="2" />
+                <circle cx="50" cy="74" r="9" fill="#10b981" id="bot-chest-core" />
+                <rect x="12" y="56" width="10" height="24" rx="4" fill="#1e293b" />
+                <path d="M 12 76 L 4 84" stroke="#38bdf8" stroke-width="3" id="bot-scanner-beam" stroke-dasharray="2,2" style="display:none;" />
+                <path d="M 78 54 L 94 60 L 94 88 L 78 98 Z" fill="#64748b" stroke="#334155" stroke-width="2" id="bot-shield" />
+              </svg>
+              <span class="robot-state-label" id="bot-status-text">GUARD: STANDBY</span>
+            </div>
+
+            <div>
+              <span style="background: #e0f2fe; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">實例內部封裝空間</span>
+              <div class="vault-inner-card">
+                <div style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-code);">內部私有保護變數: self._balance</div>
+                <div class="balance-huge" id="vault-balance-num">$1000</div>
+              </div>
+            </div>
+
+            <div class="gate-indicator-bar pass" id="guard-gate-banner">
+              <span id="guard-title">Setter 閘門狀態：</span>
+              <span id="guard-desc">待命中（防護閘門正常放行）</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="live-terminal">
+          <div><span class="term-prompt">&gt;&gt;&gt;</span><span id="w3-guard-code">等待操作指令...</span></div>
+          <div><span class="term-log">[Setter 安全閥日誌] </span><span id="w3-guard-log">保全系統就緒。</span></div>
+          <div><span class="term-prompt">&gt;&gt;&gt;</span>執行結果: <span class="term-result" id="w3-guard-res">&lt;無&gt;</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10-6 常見陷阱與新手避坑指南 -->
+  <section class="section-block">
+    <h2 class="section-heading">10-6 常見陷阱與新手避坑指南</h2>
+    <div class="table-container">
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>典型例外或錯誤行為</th>
+            <th>引發錯誤之典型寫法</th>
+            <th>直譯器底層原因分析</th>
+            <th>標準修復指引</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="inline-code">TypeError: takes 0 args but 1 given</code></td>
+            <td><pre class="code-block" style="padding:6px; font-size:0.8rem;">class Dog:
+    def bark():
+        print("汪汪")
+d = Dog()
+d.bark()</pre></td>
+            <td>實例呼叫方法時，直譯器自動傳入 <code>d</code> 的位址給第一參數，但定義時漏寫了 <code>self</code>。</td>
+            <td>所有實例方法的第一個參數必須顯式寫上 <code>self</code>。</td>
+          </tr>
+          <tr>
+            <td><strong>串列作為類別屬性導致全體污染</strong></td>
+            <td><pre class="code-block" style="padding:6px; font-size:0.8rem;">class User:
+    cart = []  # 類別屬性！
+u1 = User()
+u1.cart.append("書本")</pre></td>
+            <td>所有實例共用同一串列物件，在一個實例新增會導致全體實例一起被影響。</td>
+            <td>可變物件務必放在 <code>__init__</code> 內部使用 <code>self.cart = []</code> 初始化。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 10-7 課堂實作驗證題 (含摺疊/展開按鈕) -->
+  <section class="section-block">
+    <h2 class="section-heading">10-7 課堂實作驗證題 (Hands-on Practice)</h2>
+    <div class="callout-box" style="border-left-color: var(--accent-terracotta);">
+      <h3 style="font-size: 1.15rem; color: var(--accent-terracotta); margin-bottom: 8px;">實作題 01：銀行帳戶安全封裝實作（存提款校驗與 @property 防護）</h3>
+      <p>
+        <strong>規格需求：</strong><br>
+        1. 建立 <code>BankAccount</code> 類別，接收 <code>account_id</code> 與初始餘額 <code>initial_balance</code>。<br>
+        2. 餘額存於 <code>_balance</code>，提供 <code>@property</code> 供安全讀取。<br>
+        3. 實作 <code>deposit(amount)</code> 與 <code>withdraw(amount)</code>，金額小於等於 0 拋出 <code>ValueError</code>，餘額不足提款印出警告拒絕。
+      </p>
+      <button class="theater-btn toggle-sol" data-target="sol-box-1">👁️ 展開參考解答程式碼</button>
+      <div id="sol-box-1" style="display: none; margin-top: 14px;">
+        <div class="code-wrapper">
+          <div class="code-header"><span>solution_bank_account.py</span></div>
+          <pre class="code-block">class BankAccount:
+    def __init__(self, account_id, initial_balance=0):
+        self.account_id = account_id
+        if initial_balance < 0:
+            raise ValueError("初始餘額不能為負數")
+        self._balance = initial_balance
+
+    @property
+    def balance(self):
+        return self._balance
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("存款金額必須大於 0")
+        self._balance += amount
+        print(f"成功存入 ${amount}，最新餘額為: ${self._balance}")
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            raise ValueError("提款金額必須大於 0")
+        if amount > self._balance:
+            print(f"提款失敗：餘額不足（目前餘額 ${self._balance}）")
+            return False
+        self._balance -= amount
+        print(f"成功提款 ${amount}，剩餘餘額為: ${self._balance}")
+        return True
+
+acc = BankAccount("TW888-001", 1000)
+acc.deposit(500)
+acc.withdraw(1200)</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 官方免責聲明與權益宣示 (規範強制一字不漏) -->
+  <footer class="disclaimer-section">
+    <h4>免責聲明與權益宣示</h4>
+    <p>本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。</p>
+    <p>如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。</p>
+  </footer>
+
+</div>
+
+<!-- ==========================================================================
+     原生 JavaScript 邏輯 (完全隔離)
+     ========================================================================== -->
+<script>
+/**
+ * 教具一：汽車藍圖出廠模擬器
+ */
+(function() {
+  const btnToyota = document.getElementById('btn-build-toyota');
+  const btnTesla = document.getElementById('btn-build-tesla');
+  const btnReset = document.getElementById('btn-reset-factory');
+  const bay1 = document.getElementById('slot-bay-1');
+  const bay2 = document.getElementById('slot-bay-2');
+  const empty1 = document.getElementById('slot-1-empty');
+  const empty2 = document.getElementById('slot-2-empty');
+  const termCode = document.getElementById('w1-factory-code');
+  const termLog = document.getElementById('w1-factory-log');
+  const termRes = document.getElementById('w1-factory-res');
+
+  let car1Built = false;
+  let car2Built = false;
+
+  function createCarSvg(bodyColor, strokeColor) {
+    return `
+      <svg class="svg-car-unit" viewBox="0 0 200 100">
+        <path d="M 20 65 L 35 65 Q 40 45 60 45 Q 80 45 85 65 L 135 65 Q 140 45 160 45 Q 180 45 185 65 L 195 65 Q 200 65 200 58 L 190 40 Q 180 32 155 30 L 125 15 Q 115 10 90 10 L 60 10 Q 40 10 30 25 L 10 42 Q 5 48 5 58 L 5 65 Z" fill="${bodyColor}" stroke="${strokeColor}" stroke-width="2.5" />
+        <path d="M 60 16 L 88 16 L 88 32 L 38 32 Q 45 20 60 16 Z" fill="#38bdf8" fill-opacity="0.8" />
+        <path d="M 94 16 L 120 16 Q 135 22 145 32 L 94 32 Z" fill="#38bdf8" fill-opacity="0.8" />
+        <circle cx="60" cy="65" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+        <circle cx="60" cy="65" r="7" fill="#94a3b8" />
+        <circle cx="160" cy="65" r="16" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+        <circle cx="160" cy="65" r="7" fill="#94a3b8" />
+      </svg>
+    `;
+  }
+
+  btnToyota.addEventListener('click', () => {
+    if (car1Built) return;
+    car1Built = true;
+    empty1.style.display = 'none';
+    bay1.classList.add('occupied');
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = 'column';
+    wrap.style.alignItems = 'center';
+    wrap.style.width = '100%';
+    wrap.innerHTML = `
+      <div class="variable-tag">變數標籤: car1</div>
+      ${createCarSvg('#ffffff', '#334155')}
+      <div class="car-info-card">
+        <div><strong>記憶體車牌:</strong> [ 0x10A8 ]</div>
+        <div>• brand: "Toyota", color: "白色"</div>
+      </div>
+    `;
+    bay1.appendChild(wrap);
+    termCode.innerText = 'car1 = Car("Toyota", "白色")';
+    termLog.innerText = 'Heap 配置 0x10A8 ➔ self 隱性注入 ➔ 繫結至 car1。';
+    termRes.innerText = '<__main__.Car object at 0x10A8>';
+  });
+
+  btnTesla.addEventListener('click', () => {
+    if (car2Built) return;
+    car2Built = true;
+    empty2.style.display = 'none';
+    bay2.classList.add('occupied');
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = 'column';
+    wrap.style.alignItems = 'center';
+    wrap.style.width = '100%';
+    wrap.innerHTML = `
+      <div class="variable-tag">變數標籤: car2</div>
+      ${createCarSvg('#ef4444', '#7f1d1d')}
+      <div class="car-info-card">
+        <div><strong>記憶體車牌:</strong> [ 0x10B2 ]</div>
+        <div>• brand: "Tesla", color: "紅色"</div>
+      </div>
+    `;
+    bay2.appendChild(wrap);
+    termCode.innerText = 'car2 = Car("Tesla", "紅色")';
+    termLog.innerText = '同藍圖於 0x10B2 打造第 2 台車，證明多實例完全獨立！';
+    termRes.innerText = '<__main__.Car object at 0x10B2>';
+  });
+
+  btnReset.addEventListener('click', () => {
+    bay1.querySelectorAll('div').forEach(d => { if (d.id !== 'slot-1-empty') d.remove(); });
+    bay2.querySelectorAll('div').forEach(d => { if (d.id !== 'slot-2-empty') d.remove(); });
+    bay1.classList.remove('occupied');
+    bay2.classList.remove('occupied');
+    empty1.style.display = 'block';
+    empty2.style.display = 'block';
+    car1Built = false;
+    car2Built = false;
+    termCode.innerText = '等待出廠指令...';
+    termLog.innerText = '車庫已清空。';
+    termRes.innerText = '<無>';
+  });
+})();
+
+/**
+ * 教具二：雙層屬性搜尋與同名遮蔽模擬器（小明與小華 6 輪對稱連動修復版）
+ */
+(function() {
+  const btnReadC1 = document.getElementById('btn-read-c1');
+  const btnModC1 = document.getElementById('btn-mod-c1');
+  const btnReadC2 = document.getElementById('btn-read-c2');
+  const btnChangeHq = document.getElementById('btn-change-hq');
+  const btnReset = document.getElementById('btn-reset-equip');
+
+  const hqBillboard = document.getElementById('hq-billboard-node');
+  const hqWheelsNum = document.getElementById('hq-wheels-num');
+  const hqMsg = document.getElementById('hq-msg-badge');
+
+  const podCar1 = document.getElementById('pod-car1');
+  const podCar2 = document.getElementById('pod-car2');
+  const beamCar1 = document.getElementById('beam-car1');
+  const beamCar2 = document.getElementById('beam-car2');
+  const shieldCar1 = document.getElementById('shield-car1');
+  const sparkCar1 = document.getElementById('spark-car1');
+
+  const c1MidWheel = document.getElementById('c1-mid-wheel-group');
+  const c1RearWheel = document.getElementById('c1-rear-wheel-group');
+  const c2MidWheel = document.getElementById('c2-mid-wheel-group');
+  const statusPillC1 = document.getElementById('status-pill-c1');
+  const statusPillC2 = document.getElementById('status-pill-c2');
+
+  const termCode = document.getElementById('w2-equip-code');
+  const termLog = document.getElementById('w2-equip-log');
+  const termRes = document.getElementById('w2-equip-res');
+
+  let hqWheels = 4;
+  let car1Customized = false;
+
+  function clearVisuals() {
+    podCar1.classList.remove('active-pulse');
+    podCar2.classList.remove('active-pulse');
+    hqBillboard.classList.remove('glow-hit', 'glow-broadcast');
+    beamCar1.classList.remove('firing');
+    beamCar2.classList.remove('firing');
+    sparkCar1.style.display = 'none';
+  }
+
+  // 集中更新 car1 狀態與外觀
+  function updateCar1Display() {
+    if (car1Customized) {
+      shieldCar1.style.display = 'block';
+      c1MidWheel.classList.add('wheel-hidden');
+      c1RearWheel.classList.add('wheel-detached');
+      statusPillC1.innerText = '實質輪子數: 3 輪 (實例屬性覆蓋)';
+      statusPillC1.className = 'wheel-status-text custom-red';
+    } else {
+      shieldCar1.style.display = 'none';
+      c1RearWheel.classList.remove('wheel-detached');
+      if (hqWheels === 6) {
+        c1MidWheel.classList.remove('wheel-hidden');
+        statusPillC1.innerText = '實質輪子數: 6 輪 (跟隨原廠自動升級！)';
+        statusPillC1.className = 'wheel-status-text upgraded-gold';
+      } else {
+        c1MidWheel.classList.add('wheel-hidden');
+        statusPillC1.innerText = '實質輪子數: 4 輪 (參照原廠)';
+        statusPillC1.className = 'wheel-status-text';
+      }
+    }
+  }
+
+  // 集中更新 car2 狀態與外觀
+  function updateCar2Display() {
+    if (hqWheels === 6) {
+      c2MidWheel.classList.remove('wheel-hidden');
+      statusPillC2.innerText = '實質輪子數: 6 輪 (跟隨原廠自動升級！)';
+      statusPillC2.className = 'wheel-status-text upgraded-gold';
+    } else {
+      c2MidWheel.classList.add('wheel-hidden');
+      statusPillC2.innerText = '實質輪子數: 4 輪 (參照原廠)';
+      statusPillC2.className = 'wheel-status-text';
+    }
+  }
+
+  // 1. 讀取 car1.wheels
+  btnReadC1.addEventListener('click', () => {
+    clearVisuals();
+    podCar1.classList.add('active-pulse');
+    termCode.innerText = 'print(car1.wheels)';
+
+    if (car1Customized) {
+      termLog.innerText = '直譯器查詢 car1 實例命名空間 ➔ 命中實例專屬屬性 wheels = 3 ➔ 直接回傳，停止向上查找。';
+      termRes.innerText = '3 (顆輪子・讀取自 car1 自身實例屬性)';
+    } else {
+      beamCar1.classList.add('firing');
+      setTimeout(() => { hqBillboard.classList.add('glow-hit'); }, 200);
+
+      termLog.innerText = `直譯器查詢 car1 實例命名空間（未定義 wheels）➔ 向上查找類別命名空間 Class Car ➔ 取得類別屬性 ${hqWheels} 輪！`;
+      termRes.innerText = `${hqWheels} (顆輪子・來自工廠類別屬性)`;
+    }
+  });
+
+  // 2. 執行 car1.wheels = 3（實例賦值客製化）
+  btnModC1.addEventListener('click', () => {
+    clearVisuals();
+    podCar1.classList.add('active-pulse');
+    car1Customized = true;
+
+    updateCar1Display();
+
+    termCode.innerText = 'car1.wheels = 3  # 實例屬性賦值';
+    termLog.innerText = '【實例覆蓋】：僅在 car1 實例掛載專屬屬性，原廠類別屬性與 car2 絲毫不受影響！';
+    termRes.innerText = 'car1 實例屬性建立成功 (wheels = 3)';
+  });
+
+  // 3. 讀取 car2.wheels
+  btnReadC2.addEventListener('click', () => {
+    clearVisuals();
+    podCar2.classList.add('active-pulse');
+    beamCar2.classList.add('firing');
+    setTimeout(() => { hqBillboard.classList.add('glow-hit'); }, 200);
+
+    termCode.innerText = 'print(car2.wheels)';
+    termLog.innerText = `直譯器查詢 car2 實例命名空間（無改裝）➔ 向上查找類別屬性 Class Car ➔ 取得當前原廠規格 ${hqWheels} 輪！`;
+    termRes.innerText = `${hqWheels} (顆輪子・來自工廠類別屬性)`;
+  });
+
+  // 4. 執行 Car.wheels = 6（修改類別屬性）
+  btnChangeHq.addEventListener('click', () => {
+    clearVisuals();
+    hqWheels = 6;
+    hqWheelsNum.innerText = '6';
+    hqBillboard.classList.add('glow-broadcast');
+    hqMsg.innerText = '🚨 工廠總部規格更新：全車系原廠標配升級為 6 輪！';
+
+    // 兩台車外觀同步連動更新
+    updateCar1Display();
+    updateCar2Display();
+
+    if (car1Customized) {
+      sparkCar1.style.display = 'block';
+      setTimeout(() => { sparkCar1.style.display = 'none'; }, 600);
+      termLog.innerText = '修改類別屬性 Car.wheels = 6 ➔ car2 同步反映為 6 輪；car1 因具備實例屬性遮蔽，維持自身數值 3 輪！';
+    } else {
+      termLog.innerText = '修改類別屬性 Car.wheels = 6 ➔ car1 與 car2 皆未自訂屬性，兩者同步反映為 6 輪！';
+    }
+
+    termCode.innerText = 'Car.wheels = 6  # 修改類別屬性';
+    termRes.innerText = '工廠類別屬性已更新為 6 輪';
+  });
+
+  // 5. 重設展示狀態
+  btnReset.addEventListener('click', () => {
+    clearVisuals();
+    hqWheels = 4;
+    car1Customized = false;
+    hqWheelsNum.innerText = '4';
+    hqMsg.innerText = '全車系未改裝車輛，均向上參照此公用規格';
+
+    updateCar1Display();
+    updateCar2Display();
+
+    termCode.innerText = '等待指令執行...';
+    termLog.innerText = '雙層屬性空間已重設為出廠狀態。';
+    termRes.innerText = '<無>';
+  });
+})();
+
+/**
+ * 教具三：保全機器人控制
+ */
+(function() {
+  const btnRead = document.getElementById('btn-prop-read');
+  const btnSave = document.getElementById('btn-prop-save');
+  const btnErr = document.getElementById('btn-prop-err');
+  const btnClr = document.getElementById('btn-prop-clr');
+  const dispBalance = document.getElementById('vault-balance-num');
+  const gateBanner = document.getElementById('guard-gate-banner');
+  const gateTitle = document.getElementById('guard-title');
+  const gateDesc = document.getElementById('guard-desc');
+  const botBeacon = document.getElementById('bot-beacon');
+  const botVisor = document.getElementById('bot-visor');
+  const botCore = document.getElementById('bot-chest-core');
+  const botBeam = document.getElementById('bot-scanner-beam');
+  const botStatus = document.getElementById('bot-status-text');
+  const termCode = document.getElementById('w3-guard-code');
+  const termLog = document.getElementById('w3-guard-log');
+  const termRes = document.getElementById('w3-guard-res');
+
+  let currentBalance = 1000;
+
+  function setBotNormal() {
+    botBeacon.setAttribute('fill', '#38bdf8');
+    botVisor.setAttribute('fill', '#38bdf8');
+    botCore.setAttribute('fill', '#10b981');
+    botBeam.style.display = 'none';
+    botStatus.innerText = 'GUARD: STANDBY';
+    botStatus.style.background = '#e2e8f0';
+    botStatus.style.color = '#334155';
+  }
+
+  btnRead.addEventListener('click', () => {
+    setBotNormal();
+    botBeam.style.display = 'block';
+    botStatus.innerText = 'GETTER: READING';
+    gateBanner.className = 'gate-indicator-bar pass';
+    gateTitle.innerText = '保全檢驗：';
+    gateDesc.innerText = '透過 @property balance 取出 _balance 複本';
+    termCode.innerText = 'print(acc.balance)';
+    termLog.innerText = '安全讀取內部保護變數 self._balance。';
+    termRes.innerText = `$${currentBalance}`;
+  });
+
+  btnSave.addEventListener('click', () => {
+    setBotNormal();
+    currentBalance = 1500;
+    dispBalance.innerText = `$${currentBalance}`;
+    botVisor.setAttribute('fill', '#4ade80');
+    botStatus.innerText = 'SETTER: PASSED';
+    gateBanner.className = 'gate-indicator-bar pass';
+    gateTitle.innerText = 'Setter 檢驗通過：';
+    gateDesc.innerText = '數值 1500 >= 0 合法放行，更新內部';
+    termCode.innerText = 'acc.balance = 1500';
+    termLog.innerText = '觸發 @balance.setter ➔ 條件檢驗通過 ➔ 放行更新。';
+    termRes.innerText = '存款成功 (Balance = $1500)';
+  });
+
+  btnErr.addEventListener('click', () => {
+    botVisor.setAttribute('fill', '#ef4444');
+    botBeacon.setAttribute('fill', '#ef4444');
+    botCore.setAttribute('fill', '#ef4444');
+    botStatus.innerText = '🚨 ALERT: BLOCKED';
+    gateBanner.className = 'gate-indicator-bar block';
+    gateTitle.innerText = '🚨 Setter 攔截阻斷：';
+    gateDesc.innerText = '偵測到非法負數 -200！緊急阻斷';
+    termCode.innerText = 'acc.balance = -200';
+    termLog.innerText = '觸發 @balance.setter ➔ 判定 < 0 ➔ 拋出 ValueError！';
+    termRes.innerText = 'ValueError: 帳戶餘額不得為負數！已阻斷非法寫入。';
+    termRes.className = 'term-error';
+  });
+
+  btnClr.addEventListener('click', () => {
+    currentBalance = 1000;
+    dispBalance.innerText = `$${currentBalance}`;
+    setBotNormal();
+    gateBanner.className = 'gate-indicator-bar pass';
+    gateTitle.innerText = 'Setter 閘門狀態：';
+    gateDesc.innerText = '待命中（防護閘門正常放行）';
+    termCode.innerText = '等待操作指令...';
+    termLog.innerText = '帳戶已重設為初始狀態 ($1000)。';
+    termRes.innerText = '<無>';
+  });
+})();
+
+/**
+ * 實作題解答代碼摺疊/展開控制器
+ */
+(function() {
+  const toggleBtns = document.querySelectorAll('.toggle-sol');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const targetBox = document.getElementById(targetId);
+      if (targetBox.style.display === 'none' || targetBox.style.display === '') {
+        targetBox.style.display = 'block';
+        btn.innerText = '🙈 收合參考解答程式碼';
+      } else {
+        targetBox.style.display = 'none';
+        btn.innerText = '👁️ 展開參考解答程式碼';
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python List 互動動態教材：學生排排坐的記憶體奧秘</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js 音訊合成引擎（無需任何外部音檔） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --spring-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --decel-smooth: cubic-bezier(0.25, 1, 0.4, 1);
+      --desk-step: 164px; /* 單一課桌椅精準步長 (寬度 148px + 間距 16px) */
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    .code-font {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* 教室木質地板與工程微點陣背景混合 */
+    .classroom-floor {
+      background-color: #fdfaf6;
+      background-image: 
+        repeating-linear-gradient(90deg, rgba(217, 119, 6, 0.04) 0px, rgba(217, 119, 6, 0.04) 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(0deg, rgba(146, 64, 14, 0.05) 0px, rgba(146, 64, 14, 0.05) 80px, rgba(120, 53, 15, 0.12) 81px, transparent 81px, transparent 160px),
+        radial-gradient(rgba(100, 116, 139, 0.2) 1.2px, transparent 1.2px);
+      background-size: 40px 100%, 100% 160px, 24px 24px;
+    }
+
+    /* 虛擬畫布外框固定比例容器 */
+    #virtualStageViewport {
+      position: relative;
+      width: 100%;
+      height: 770px;
+      overflow: hidden;
+      border-radius: 28px;
+    }
+
+    #virtualStageCanvas {
+      width: 1200px;
+      height: 770px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: top left;
+      transition: transform 0.35s ease-out;
+    }
+
+    /* 墨綠色復古黑板質感 */
+    .blackboard-texture {
+      background: #153326;
+      box-shadow: inset 0 0 45px rgba(0, 0, 0, 0.8), 0 8px 18px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+    .blackboard-texture::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* 木質畫框外邊 */
+    .wood-frame {
+      border: 8px solid #854d0e;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 6px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 金屬滑軌與導航條 */
+    .floor-rail {
+      background: linear-gradient(180deg, #94a3b8 0%, #e2e8f0 30%, #64748b 70%, #334155 100%);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* 課桌平移動態過渡 */
+    .slot-motion {
+      transition: transform 0.58s var(--spring-overshoot), opacity 0.35s ease;
+      will-change: transform, opacity;
+    }
+
+    /* 翻牌器 3D 翻轉效果 */
+    .flip-badge {
+      perspective: 600px;
+      transition: transform 0.5s var(--spring-overshoot);
+    }
+    .flipped {
+      animation: badgeFlip 0.55s ease-in-out;
+    }
+    @keyframes badgeFlip {
+      0% { transform: rotateX(0deg); }
+      50% { transform: rotateX(90deg) scale(0.9); }
+      100% { transform: rotateX(0deg); }
+    }
+
+    /* 學生落座壓扁回彈 (Squash & Stretch) */
+    @keyframes dropSquashLanding {
+      0% {
+        transform: translateY(-90px) scale(0.8, 1.3);
+        opacity: 0;
+      }
+      50% {
+        transform: translateY(0px) scale(1.22, 0.78);
+        opacity: 1;
+      }
+      75% {
+        transform: translateY(-8px) scale(0.95, 1.05);
+      }
+      100% {
+        transform: translateY(0px) scale(1, 1);
+      }
+    }
+    .motion-squash-landing {
+      animation: dropSquashLanding 0.62s var(--spring-overshoot) forwards;
+    }
+
+    /* 學生起立舉手答題 */
+    @keyframes studentRaiseHand {
+      0% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-22px) scale(1.08); }
+      75% { transform: translateY(-16px) scale(1.04); }
+      100% { transform: translateY(-18px) scale(1.06); }
+    }
+    .motion-raise-hand {
+      animation: studentRaiseHand 0.5s var(--spring-overshoot) forwards;
+    }
+
+    /* 起吊離場動態 */
+    @keyframes liftOutAir {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      40% {
+        transform: translateY(-45px) scale(1.1, 0.95);
+      }
+      100% {
+        transform: translateY(-140px) scale(0.65);
+        opacity: 0;
+      }
+    }
+    .motion-lift-out {
+      animation: liftOutAir 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* 考卷副本傳送動態 */
+    @keyframes flyToPodium {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(-140px, -130px) scale(1.18);
+        opacity: 1;
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.9);
+      }
+      100% {
+        transform: translate(-340px, -240px) scale(0.8);
+        opacity: 0;
+      }
+    }
+    .motion-fly-podium {
+      animation: flyToPodium 0.85s var(--decel-smooth) forwards;
+    }
+
+    /* 視覺聚光燈模式 (Focus & Dimming) */
+    .dimmed {
+      opacity: 0.25 !important;
+      filter: grayscale(80%) blur(0.5px) !important;
+      pointer-events: none;
+    }
+    .spotlight-active {
+      transform: scale(1.06) translateY(-8px) !important;
+      box-shadow: 0 22px 35px -8px rgba(245, 158, 11, 0.55) !important;
+      border-color: #f59e0b !important;
+    }
+
+    /* 虛線擴充預備槽呼吸燈 */
+    @keyframes dashedPulse {
+      0%, 100% { border-color: #94a3b8; background-color: rgba(241, 245, 249, 0.45); }
+      50% { border-color: #3b82f6; background-color: rgba(239, 246, 255, 0.85); }
+    }
+    .dashed-slot-pulse {
+      animation: dashedPulse 2.2s ease-in-out infinite;
+    }
+
+    /* 放大鏡左右搜尋比對動畫 */
+    .scan-magnifier {
+      transition: transform 0.42s var(--spring-overshoot);
+    }
+  </style>
+</head>
+<body class="classroom-floor min-h-screen text-slate-800 flex flex-col items-center justify-between p-3 sm:p-5">
+
+  <!-- ========================================== -->
+  <!-- 頂部總覽標頭：雙軌命名 + 模式切換器 -->
+  <!-- ========================================== -->
+  <header class="w-full max-w-[1200px] bg-white/95 backdrop-blur-md border-[2.8px] border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xl mb-3 flex flex-wrap items-center justify-between gap-3">
+    
+    <!-- 左側雙軌標籤與主題 -->
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-amber-400 border-[2.6px] border-slate-900 flex items-center justify-center text-2xl shadow-inner">
+        🏫
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-slate-900 text-amber-300">互動式動態教材</span>
+          <h1 class="text-base sm:text-lg font-black text-slate-900">Python 串列教室：學生排排坐的記憶體奧秘</h1>
+        </div>
+        <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+          <span>生活隱喻：具備物理伸縮間距的排號課桌椅</span>
+          <span>•</span>
+          <span class="code-font text-indigo-700 font-bold">Contiguous Memory & Dynamic Array</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側功能切換區：索引模式切換、導覽/沙盒切換、音效開關 -->
+    <div class="flex items-center flex-wrap gap-2">
+      <!-- 正負索引切換開關 -->
+      <button onclick="toggleIndexMode()" id="indexModeBtn" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 border-[2px] border-amber-600 rounded-xl text-xs font-black text-amber-900 shadow-sm flex items-center gap-1 transition-all" title="在正向 [0, 1, 2] 與逆向 [-3, -2, -1] 索引切換">
+        <span>🔄 索引：</span>
+        <span id="indexModeLabel" class="code-font font-bold">正向 [0, 1, 2]</span>
+      </button>
+
+      <!-- 導覽模式開關 -->
+      <div class="bg-slate-100 border-[2px] border-slate-800 rounded-xl p-1 flex items-center gap-1 shadow-inner">
+        <button id="modeTourBtn" onclick="switchMainMode('tour')" class="px-3 py-1.5 rounded-lg text-xs font-black bg-indigo-600 text-white shadow-sm flex items-center gap-1 transition-all">
+          <span>🎬 影視導覽模式</span>
+        </button>
+        <button id="modeSandboxBtn" onclick="switchMainMode('sandbox')" class="px-3 py-1.5 rounded-lg text-xs font-black text-slate-700 hover:bg-slate-200 transition-all flex items-center gap-1">
+          <span>🛠️ 實機自由沙盒</span>
+        </button>
+      </div>
+
+      <!-- 音效開關 -->
+      <button onclick="toggleAudio()" id="audioToggleBtn" class="px-2.5 py-1.5 bg-slate-100 border-[2px] border-slate-800 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-200 shadow-sm flex items-center gap-1">
+        <span id="audioIcon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- 核心展示容器 (1200 x 770 虛擬畫布等比縮放) -->
+  <!-- ========================================== -->
+  <div id="virtualStageViewport" class="border-[3px] border-slate-800 bg-white shadow-2xl relative">
+    
+    <div id="virtualStageCanvas" class="p-5 flex flex-col justify-between">
+
+      <!-- ========================================== -->
+      <!-- 角色 A：講台、智慧黑板與粉筆即時解說台 -->
+      <!-- ========================================== -->
+      <section id="roleTeacherSection" class="w-full bg-slate-100 border-[2.6px] border-slate-800 rounded-2xl p-3 shadow-lg flex flex-col gap-2 relative">
+        <div class="flex items-center justify-between border-b-[2px] border-slate-300 pb-1.5">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span class="text-xs font-black text-slate-900 tracking-wider">角色 A：教室講台與智慧黑板 (`Python Interpreter & Podium`)</span>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] code-font text-slate-600 font-bold">
+            <span class="px-2 py-0.5 rounded bg-white border border-slate-300">基底記憶體位址 (Base): 0x7FFF00</span>
+            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">步長偏移: Index × 8 Bytes</span>
+          </div>
+        </div>
+
+        <!-- 黑板主體與老師講桌 -->
+        <div class="grid grid-cols-12 gap-3 items-stretch">
+          
+          <!-- 左側 8 欄：墨綠色粉筆黑板 -->
+          <div class="col-span-8 blackboard-texture wood-frame rounded-xl p-3 flex flex-col justify-between relative text-amber-200 code-font shadow-inner">
+            <!-- 黑板粉筆邊條 -->
+            <div class="flex items-center justify-between text-[10px] text-emerald-300 border-b border-emerald-800/80 pb-1">
+              <span class="flex items-center gap-1.5">
+                <span>📝 PYTHON 3.12 CHALKBOARD</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-emerald-950 text-emerald-400 rounded border border-emerald-700">互動直譯器</span>
+              </span>
+              <span id="chalkComplexityBadge" class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[10px]">
+                複雜度：O(1)
+              </span>
+            </div>
+
+            <!-- 粉筆大字語法動態顯示 -->
+            <div class="my-1.5">
+              <div class="text-[11px] text-slate-300 mb-0.5 font-sans font-bold flex items-center gap-1">
+                <span>👉 目前執行動作：</span>
+                <span id="chalkActionTitle" class="text-white font-black">準備開始上課</span>
+              </div>
+              <div class="text-base sm:text-lg font-black text-amber-300 tracking-wide truncate flex items-center gap-1.5">
+                <span class="text-emerald-400">&gt;&gt;&gt;</span>
+                <span id="chalkActionCode">students = ['小明', '小華', '小強']</span>
+                <span class="w-2 h-4 bg-amber-400 inline-block animate-pulse"></span>
+              </div>
+            </div>
+
+            <!-- 底層串列實況陣列值 -->
+            <div class="bg-black/40 border border-emerald-900/60 rounded px-2.5 py-1 text-[11px] text-emerald-300 flex items-center justify-between">
+              <span class="truncate">
+                串列名單：<span id="chalkListSnapshot" class="text-white font-bold">['小明', '小華', '小強']</span>
+              </span>
+              <span id="chalkCountBadge" class="text-amber-300 shrink-0 font-bold ml-2">len: 3</span>
+            </div>
+          </div>
+
+          <!-- 右側 4 欄：老師講桌與點名簽到簿 -->
+          <div class="col-span-4 bg-amber-50 border-[2.4px] border-amber-900/80 rounded-xl p-2.5 flex flex-col justify-between shadow-sm">
+            <div class="flex items-center justify-between border-b border-amber-200 pb-1">
+              <div class="flex items-center gap-1.5">
+                <span class="text-lg">👨‍🏫</span>
+                <span class="text-xs font-black text-amber-950">老師點名桌</span>
+              </div>
+              <span class="text-[9px] code-font bg-amber-200 px-1.5 py-0.5 rounded text-amber-900 font-bold">PODIUM</span>
+            </div>
+
+            <!-- 點名回傳值專用收納盤 -->
+            <div class="bg-white border-[2px] border-amber-800 rounded-lg p-2 flex flex-col justify-center my-1 shadow-inner relative">
+              <div class="text-[9px] font-bold text-slate-500 uppercase flex items-center justify-between">
+                <span>點名回傳值 (Return Register)</span>
+                <span id="returnTypeBadge" class="code-font text-[9px] px-1 py-0.2 rounded bg-slate-100 text-slate-600">None</span>
+              </div>
+              <div id="returnDisplayVal" class="text-sm font-black text-slate-900 mt-0.5 truncate">
+                無回傳值 (None)
+              </div>
+            </div>
+
+            <!-- 老師即時提示指引 -->
+            <div class="text-[10px] text-amber-900 font-medium bg-amber-100/80 rounded p-1.5 border border-amber-300 flex items-start gap-1">
+              <span>💡</span>
+              <span id="podiumQuickTip" class="leading-tight">串列中的每個位置都是依序連續相鄰的課桌。</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 角色 B & C：教室編號課桌椅與學生元素群 -->
+      <!-- ========================================== -->
+      <section id="roleClassroomStage" class="w-full flex-1 flex flex-col justify-between py-2 relative">
+        
+        <!-- 教室排席與記憶體連續位址標示 -->
+        <div class="flex items-center justify-between border-b-[2px] border-slate-800 pb-1.5 text-xs font-bold text-slate-600">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+            <span>角色 B：連續編號課桌椅 (`Array Slots`) 與 角色 C：學生本體 (`List Elements`)</span>
+          </div>
+          <div class="code-font text-[11px] text-slate-600 flex items-center gap-3">
+            <span>座席容量：<span id="lenCapacityBadge" class="text-indigo-600 font-bold">3 位學生入座</span></span>
+            <span>•</span>
+            <span class="text-emerald-700 font-bold">滑軌步長：164px</span>
+          </div>
+        </div>
+
+        <!-- 課堂座位滑軌舞台 -->
+        <div class="relative w-full h-[330px] flex items-center overflow-x-auto overflow-y-hidden" id="stageTrackArea">
+          
+          <!-- 地板金屬固定滑軌 -->
+          <div class="absolute bottom-5 left-0 right-0 h-7 floor-rail rounded-xl border-[2.6px] border-slate-800 flex items-center justify-between px-6 z-0 pointer-events-none">
+            <div class="w-full flex justify-between px-3 opacity-40">
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+            </div>
+            <div class="absolute -top-3.5 right-6 px-2.5 py-0.5 rounded bg-slate-800 text-[9px] text-amber-300 code-font font-bold tracking-wider">
+              CONTIGUOUS DESK TRACK (164px PITCH)
+            </div>
+          </div>
+
+          <!-- 尋找指針與放大鏡 (.remove 線性掃描專用) -->
+          <div id="linearScanPointer" class="absolute -top-1 left-0 z-40 transition-all duration-300 pointer-events-none hidden flex-col items-center">
+            <div class="bg-rose-600 text-white text-[10px] font-black code-font px-2 py-0.5 rounded-lg shadow-lg border border-rose-900 animate-bounce flex items-center gap-1">
+              <span>🔍 比對中：</span>
+              <span id="scanTargetNameLabel">小明</span>
+            </div>
+            <div class="w-1 h-14 bg-rose-600 shadow-md"></div>
+          </div>
+
+          <!-- 動態課桌椅掛載容器 -->
+          <div id="slotsStageContainer" class="relative z-10 flex items-end justify-start gap-4 px-4 pb-2">
+            <!-- 由 JavaScript 動態生成渲染 -->
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 影視級懸浮半透明字幕條 (Subtitle Bar) -->
+      <!-- ========================================== -->
+      <footer id="cinematicSubtitleBar" class="w-full bg-slate-900/95 backdrop-blur-md text-white rounded-2xl p-3 border-[2.4px] border-slate-800 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center gap-3">
+          <span id="narrationIcon" class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-400/40 flex items-center justify-center text-xl font-bold">🎬</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="narrationStepBadge" class="code-font text-[10px] font-black px-1.5 py-0.2 rounded bg-amber-400 text-slate-950">STEP 1/6</span>
+              <h2 class="text-xs sm:text-sm font-black text-amber-300" id="narrationTitle">記憶體連續定址與 0-based 索引</h2>
+            </div>
+            <div class="text-xs text-slate-300 mt-0.5" id="narrationBody">
+              Python List 在底層配置了一整段連續的記憶體空間，每位學生依序入座並獲得編號牌。
+            </div>
+          </div>
+        </div>
+        <div class="code-font text-xs px-3 py-1 bg-slate-800 rounded-lg border border-slate-700 text-amber-300 hidden md:block" id="narrationMetaCode">
+          students = ['小明', '小華', '小強']
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 雙模態底層互動操作面板 -->
+  <!-- ========================================== -->
+  <section class="w-full max-w-[1200px] mt-3 bg-white border-[2.8px] border-slate-800 rounded-2xl p-3.5 shadow-xl">
+    
+    <!-- 模態 1：影視導覽播放控制面板 -->
+    <div id="tourControlPanel" class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">📽️</span>
+        <span class="text-xs font-black text-slate-900">劇院模式播放軸：</span>
+        <span class="text-xs text-slate-500">依序示範 append ➔ 讀取 ➔ insert 讓位 ➔ pop 拔起 ➔ remove 尋找</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="prevTourStep()" id="tourPrevBtn" class="px-3.5 py-1.5 rounded-xl border-[2px] border-slate-800 bg-slate-100 text-slate-800 text-xs font-black hover:bg-slate-200 transition-all flex items-center gap-1">
+          <span>⏮️ 上一步</span>
+        </button>
+        <button onclick="toggleTourPlay()" id="tourPlayBtn" class="px-4 py-1.5 rounded-xl border-[2px] border-slate-900 bg-amber-400 text-slate-950 text-xs font-black hover:bg-amber-500 transition-all shadow flex items-center gap-1.5">
+          <span id="playBtnIcon">▶️</span>
+          <span id="playBtnText">自動播放導覽</span>
+        </button>
+        <button onclick="nextTourStep()" id="tourNextBtn" class="px-3.5 py-1.5 rounded-xl border-[2px] border-slate-800 bg-slate-100 text-slate-800 text-xs font-black hover:bg-slate-200 transition-all flex items-center gap-1">
+          <span>下一步 ⏭️</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 模態 2：自由實機沙盒操作面板 (預設隱藏) -->
+    <div id="sandboxControlPanel" class="hidden flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between border-b border-slate-200 pb-2 gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🎛️</span>
+          <span class="text-xs font-black text-slate-900">實機代碼發射面板：</span>
+          <span class="text-xs text-slate-500">可自由調整參數，親身體驗物理碰撞、挪位步長與時間複雜度</span>
+        </div>
+        <button onclick="resetFullList()" class="px-3 py-1 rounded-lg border border-slate-400 bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200">
+          🔄 重置為預設名單 [3 位學生]
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+        <!-- 1. append -->
+        <div class="p-2 rounded-xl bg-emerald-50 border-[2px] border-emerald-600 flex flex-col justify-between gap-1.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-emerald-950">➕ .append()</span>
+            <span class="text-[9px] code-font font-bold text-emerald-700">O(1)</span>
+          </div>
+          <input type="text" id="appendInputName" value="小美" class="code-font text-xs px-2 py-1 bg-white border border-emerald-400 rounded focus:outline-none font-bold text-slate-800" placeholder="學生名字">
+          <button onclick="sandboxRunAppend()" class="w-full py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-black hover:bg-emerald-700 transition shadow">
+            執行追加入座
+          </button>
+        </div>
+
+        <!-- 2. insert -->
+        <div class="p-2 rounded-xl bg-indigo-50 border-[2px] border-indigo-600 flex flex-col justify-between gap-1.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-indigo-950">🪑 .insert()</span>
+            <span class="text-[9px] code-font font-bold text-indigo-700">O(n)</span>
+          </div>
+          <div class="flex gap-1">
+            <input type="number" id="insertInputIdx" value="1" min="0" max="5" class="code-font text-xs w-12 px-1 py-1 bg-white border border-indigo-400 rounded text-center font-bold" title="插入索引">
+            <input type="text" id="insertInputName" value="小龍" class="code-font text-xs flex-1 px-1.5 py-1 bg-white border border-indigo-400 rounded font-bold" placeholder="學生名">
+          </div>
+          <button onclick="sandboxRunInsert()" class="w-full py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-black hover:bg-indigo-700 transition shadow">
+            執行插隊 (讓位 164px)
+          </button>
+        </div>
+
+        <!-- 3. read -->
+        <div class="p-2 rounded-xl bg-sky-50 border-[2px] border-sky-600 flex flex-col justify-between gap-1.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-sky-950">🔍 students[i]</span>
+            <span class="text-[9px] code-font font-bold text-sky-700">O(1)</span>
+          </div>
+          <input type="number" id="readInputIdx" value="1" min="0" max="5" class="code-font text-xs px-2 py-1 bg-white border border-sky-400 rounded focus:outline-none font-bold text-slate-800 text-center" placeholder="座號索引">
+          <button onclick="sandboxRunRead()" class="w-full py-1.5 rounded-lg bg-sky-600 text-white text-xs font-black hover:bg-sky-700 transition shadow">
+            定址取值 (舉手答題)
+          </button>
+        </div>
+
+        <!-- 4. pop -->
+        <div class="p-2 rounded-xl bg-amber-50 border-[2px] border-amber-600 flex flex-col justify-between gap-1.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-amber-950">📤 .pop()</span>
+            <span class="text-[9px] code-font font-bold text-amber-700">O(n)</span>
+          </div>
+          <input type="number" id="popInputIdx" value="1" min="0" max="5" class="code-font text-xs px-2 py-1 bg-white border border-amber-400 rounded focus:outline-none font-bold text-slate-800 text-center" placeholder="座號索引 (預設最後)">
+          <button onclick="sandboxRunPop()" class="w-full py-1.5 rounded-lg bg-amber-600 text-white text-xs font-black hover:bg-amber-700 transition shadow">
+            離席拔起 (左移補齊)
+          </button>
+        </div>
+
+        <!-- 5. remove -->
+        <div class="p-2 rounded-xl bg-rose-50 border-[2px] border-rose-600 flex flex-col justify-between gap-1.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-rose-950">❌ .remove()</span>
+            <span class="text-[9px] code-font font-bold text-rose-700">O(n)</span>
+          </div>
+          <input type="text" id="removeInputName" value="小明" class="code-font text-xs px-2 py-1 bg-white border border-rose-400 rounded focus:outline-none font-bold text-slate-800" placeholder="依名字尋找">
+          <button onclick="sandboxRunRemove()" class="w-full py-1.5 rounded-lg bg-rose-600 text-white text-xs font-black hover:bg-rose-700 transition shadow">
+            循序點名除名
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 核心狀態機、音訊合成、物理動態與縮放演算法 -->
+  <!-- ========================================== -->
+  <script>
+    // 預設教室學生名單
+    const DEFAULT_STUDENTS = [
+      { id: 's1', name: '小明', val: "'Alice'", avatar: '👦', color: 'from-amber-400 to-orange-500', badgeColor: 'bg-amber-400', memId: '0x7F9B20' },
+      { id: 's2', name: '小華', val: "'Bob'", avatar: '👧', color: 'from-sky-400 to-blue-500', badgeColor: 'bg-sky-400', memId: '0x7F9B38' },
+      { id: 's3', name: '小強', val: "'Charlie'", avatar: '🧑', color: 'from-emerald-400 to-teal-500', badgeColor: 'bg-emerald-400', memId: '0x7F9B50' }
+    ];
+
+    let students = JSON.parse(JSON.stringify(DEFAULT_STUDENTS));
+    let isBusy = false;
+    let audioEnabled = true;
+    let synth;
+    let isNegativeIndexMode = false; // 正負向索引模式切換
+
+    // 候補轉學生庫
+    const CANDIDATE_STUDENTS = [
+      { name: '小美', val: "'David'", avatar: '👩', color: 'from-pink-400 to-rose-500', badgeColor: 'bg-pink-400' },
+      { name: '小龍', val: "'Evan'", avatar: '🧒', color: 'from-purple-400 to-indigo-500', badgeColor: 'bg-purple-400' },
+      { name: '小安', val: "'Fiona'", avatar: '👱', color: 'from-cyan-400 to-blue-500', badgeColor: 'bg-cyan-400' },
+      { name: '大寶', val: "'George'", avatar: '🧑‍🦰', color: 'from-yellow-400 to-amber-600', badgeColor: 'bg-yellow-400' }
+    ];
+    let candidateIndex = 0;
+
+    // 影視導覽 6 步劇本定義
+    const TOUR_STEPS = [
+      {
+        step: 1,
+        title: '記憶體連續定址與 0-based 索引',
+        body: 'Python List 在記憶體中佔據一段連續的空間。每位學生坐在依序編號 [0], [1], [2] 的座位上。',
+        actionTitle: '班級名冊初始化',
+        code: 'students = [\'小明\', \'小華\', \'小強\']',
+        action: 'intro',
+        complexity: 'O(1)'
+      },
+      {
+        step: 2,
+        title: '末端追加：students.append("小美")',
+        body: '【O(1) 平攤常數時間】尾端早已備妥預備課桌，新同學小美直接入座，完全不需搬動其他同學的桌椅！',
+        actionTitle: '末端追加新同學',
+        code: 'students.append("小美")',
+        action: 'append',
+        complexity: 'O(1)'
+      },
+      {
+        step: 3,
+        title: '隨機存取：val = students[1]',
+        body: '【O(1) 定址直接抵達】藉由公式 Base + (1 × 8) 直接鎖定 [1] 號小華，小華起立舉手回答問題！',
+        actionTitle: '依座號點名答題',
+        code: 'val = students[1]  # 回傳 \'小華\'',
+        action: 'read',
+        complexity: 'O(1)'
+      },
+      {
+        step: 4,
+        title: '指定插隊：students.insert(1, "小龍")',
+        body: '【O(n) 連續搬動讓位】為了在 1 號桌騰出空位，小華及其右側所有同學集體向右挪移 164px 讓出位置！',
+        actionTitle: '中間插入轉學生',
+        code: 'students.insert(1, "小龍")',
+        action: 'insert',
+        complexity: 'O(n)'
+      },
+      {
+        step: 5,
+        title: '指定彈出：removed = students.pop(1)',
+        body: '【O(n) 遞補空缺】[1] 號小龍被點名離席出發；右側同學整齊向左踏步補齊空位，座號集體減 1。',
+        actionTitle: '依座號離席並回傳',
+        code: 'removed = students.pop(1)  # 回傳 \'小龍\'',
+        action: 'pop',
+        complexity: 'O(n)'
+      },
+      {
+        step: 6,
+        title: '依值除名：students.remove("小明")',
+        body: '【O(n) 循序搜尋】老師拿著放大鏡從 [0] 號桌逐一向右比對姓名，命中後小明收拾書包離席，後方同學向左緊縮補位。',
+        actionTitle: '比對姓名並移除',
+        code: 'students.remove("小明")',
+        action: 'remove',
+        complexity: 'O(n)'
+      }
+    ];
+
+    let currentTourStep = 0;
+    let tourAutoPlayTimer = null;
+    let currentMainMode = 'tour'; // 'tour' | 'sandbox'
+
+    // ==========================================
+    // 音效合成模組 (Tone.js 物理音響)
+    // ==========================================
+    function initSynth() {
+      if (!synth && window.Tone) {
+        try {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle8' },
+            envelope: { attack: 0.005, decay: 0.12, sustain: 0.02, release: 0.2 }
+          }).toDestination();
+          synth.volume.value = -6;
+        } catch (e) {}
+      }
+    }
+
+    function playSfx(type) {
+      if (!audioEnabled) return;
+      initSynth();
+      if (!window.Tone || Tone.context.state !== 'running') {
+        Tone.start();
+      }
+      try {
+        const t = Tone.now();
+        if (type === 'thud') synth.triggerAttackRelease(['C3', 'G3'], '16n', t);
+        if (type === 'shift') synth.triggerAttackRelease(['E4', 'A4'], '32n', t);
+        if (type === 'ping') synth.triggerAttackRelease(['C5', 'E5', 'G5'], '16n', t);
+        if (type === 'pop') synth.triggerAttackRelease(['G4', 'D5', 'G5'], '32n', t);
+        if (type === 'scan') synth.triggerAttackRelease(['B4'], '64n', t);
+        if (type === 'chalk') synth.triggerAttackRelease(['F#5'], '64n', t);
+        if (type === 'delete') synth.triggerAttackRelease(['D3', 'F#3'], '16n', t);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('audioIcon').textContent = audioEnabled ? '🔊' : '🔇';
+    }
+
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+    // ==========================================
+    // 虛擬畫布等比縮放演算法 (Virtual Stage Scale)
+    // ==========================================
+    function adjustStageScale() {
+      const viewport = document.getElementById('virtualStageViewport');
+      const canvas = document.getElementById('virtualStageCanvas');
+      if (!viewport || !canvas) return;
+
+      const vpWidth = viewport.clientWidth;
+      const baseWidth = 1200;
+      const baseHeight = 770;
+
+      const scale = vpWidth / baseWidth;
+      canvas.style.transform = `scale(${scale})`;
+      viewport.style.height = `${baseHeight * scale}px`;
+    }
+
+    window.addEventListener('resize', adjustStageScale);
+
+    // ==========================================
+    // 正負索引雙軌切換
+    // ==========================================
+    function toggleIndexMode() {
+      isNegativeIndexMode = !isNegativeIndexMode;
+      const label = document.getElementById('indexModeLabel');
+      label.textContent = isNegativeIndexMode ? '逆向 [-3, -2, -1]' : '正向 [0, 1, 2]';
+      playSfx('chalk');
+      renderSlotsView();
+    }
+
+    // ==========================================
+    // 渲染課桌椅（正式座席 + 末端預備虛線槽）
+    // ==========================================
+    function renderSlotsView() {
+      const container = document.getElementById('slotsStageContainer');
+      container.innerHTML = '';
+
+      students.forEach((student, index) => {
+        const hexAddr = (0x7FFF00 + index * 8).toString(16).toUpperCase();
+        
+        // 計算顯示的索引標籤 (支援正負索引)
+        const displayIndex = isNegativeIndexMode 
+          ? `-${students.length - index}` 
+          : `${index}`;
+
+        const slotEl = document.createElement('div');
+        slotEl.id = `slot-${student.id}`;
+        slotEl.className = 'slot-motion shrink-0 flex flex-col items-center w-[148px]';
+        slotEl.dataset.index = index;
+
+        slotEl.innerHTML = `
+          <!-- 桌前金屬翻牌器 (座號標籤) -->
+          <div class="flex flex-col items-center mb-1 flip-badge">
+            <div class="w-0.5 h-3.5 bg-slate-800"></div>
+            <div class="px-2.5 py-0.5 rounded-lg ${student.badgeColor} border-[2.2px] border-slate-900 flex items-center gap-1 shadow-sm">
+              <span class="text-[9px] font-black tracking-wider text-slate-900">${isNegativeIndexMode ? 'NEG' : 'INDEX'}</span>
+              <span class="code-font text-xs font-black text-slate-950">[${displayIndex}]</span>
+            </div>
+          </div>
+
+          <!-- 木質課桌椅實體道具 -->
+          <div class="desk-card w-full bg-slate-50 border-[2.6px] border-slate-800 rounded-2xl p-2 shadow-md relative flex flex-col items-center bg-gradient-to-b from-white to-amber-50/50">
+            <!-- 學生實體卡片 -->
+            <div class="student-card w-full rounded-xl p-2 bg-gradient-to-br ${student.color} border-[2.2px] border-slate-900 shadow text-white flex flex-col items-center relative transition-transform">
+              
+              <!-- 學生頭像圓框 -->
+              <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm border-2 border-white/80 flex items-center justify-center text-xl mb-1 shadow-inner">
+                ${student.avatar}
+              </div>
+              <div class="text-xs font-black tracking-wide text-slate-950">${student.name}</div>
+              <div class="text-[9px] code-font font-bold text-slate-900 bg-white/90 px-1.5 py-0.2 rounded mt-0.5 border border-black/20">
+                str: ${student.val}
+              </div>
+
+              <!-- 學生胸前書包 (底層記憶體指標) -->
+              <div class="w-full mt-1.5 pt-1 border-t border-black/15 flex flex-col gap-0.5 text-[8px] code-font text-slate-900 font-bold bg-white/40 p-1 rounded">
+                <div class="flex justify-between">
+                  <span class="text-slate-700">PTR:</span>
+                  <span>${student.memId}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-700">REF:</span>
+                  <span class="text-indigo-950 font-black">1</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 課桌底層記憶體實體刻度 -->
+            <div class="w-full mt-1 pt-1 border-t-[1.5px] border-slate-300 flex items-center justify-between text-[8px] text-slate-500 code-font px-0.5">
+              <span>0x${hexAddr}</span>
+              <span class="text-emerald-700 font-bold">OCCUPIED</span>
+            </div>
+            <!-- 卡榫金屬滑輪 -->
+            <div class="w-8 h-1.5 bg-slate-800 rounded-full -mb-2 mt-0.5 border border-slate-600"></div>
+          </div>
+        `;
+        container.appendChild(slotEl);
+      });
+
+      // 尾端擴充預備虛線課桌 (Over-allocation Metaphor)
+      const nextIndex = students.length;
+      const nextDisplay = isNegativeIndexMode ? 'OVERFLOW' : `${nextIndex}`;
+      const nextAddr = (0x7FFF00 + nextIndex * 8).toString(16).toUpperCase();
+
+      const dashedSlot = document.createElement('div');
+      dashedSlot.id = 'dashed-append-slot';
+      dashedSlot.className = 'slot-motion shrink-0 flex flex-col items-center w-[148px]';
+
+      dashedSlot.innerHTML = `
+        <div class="flex flex-col items-center mb-1 opacity-75">
+          <div class="w-0.5 h-3.5 border-l-2 border-dashed border-slate-400"></div>
+          <div class="px-2 py-0.5 rounded-lg bg-slate-200 border-[1.8px] border-dashed border-slate-500 flex items-center gap-1 shadow-sm">
+            <span class="text-[8px] font-bold text-slate-600">RESERVE</span>
+            <span class="code-font text-xs font-bold text-slate-700">[${nextDisplay}]</span>
+          </div>
+        </div>
+
+        <div class="w-full dashed-slot-pulse border-[2.4px] border-dashed border-slate-400 rounded-2xl p-2.5 flex flex-col items-center justify-between min-h-[175px]">
+          <div class="w-full h-24 border border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 bg-white/60">
+            <span class="text-2xl opacity-60">🪑</span>
+            <span class="text-[9px] font-bold mt-1 code-font text-slate-500">.append() 預備空桌</span>
+          </div>
+          <div class="w-full mt-1 pt-1 border-t border-dashed border-slate-300 flex items-center justify-between text-[8px] text-slate-400 code-font px-0.5">
+            <span>0x${nextAddr}</span>
+            <span class="text-sky-600 font-bold">FREE SLOT</span>
+          </div>
+          <div class="w-7 h-1 bg-slate-300 rounded-full -mb-2 mt-0.5 border border-dashed border-slate-400"></div>
+        </div>
+      `;
+      container.appendChild(dashedSlot);
+
+      // 更新黑板即時狀態資訊
+      document.getElementById('lenCapacityBadge').textContent = `${students.length} 位學生在座`;
+      document.getElementById('chalkCountBadge').textContent = `len: ${students.length}`;
+      const nameList = students.map(s => `'${s.name}'`).join(', ');
+      document.getElementById('chalkListSnapshot').textContent = `[${nameList}]`;
+    }
+
+    // ==========================================
+    // 黑板粉筆字更新輔助函式
+    // ==========================================
+    function updateChalkboard(actionTitle, code, complexity = 'O(1)') {
+      document.getElementById('chalkActionTitle').textContent = actionTitle;
+      document.getElementById('chalkActionCode').textContent = code;
+      document.getElementById('chalkComplexityBadge').textContent = `複雜度：${complexity}`;
+      playSfx('chalk');
+    }
+
+    // ==========================================
+    // 5 大核心操作實作 (附帶 600ms 認知停頓與非線性物理動態)
+    // ==========================================
+
+    // 1. .append()
+    async function executeAppend(name = '小美', val = "'David'", avatar = '👩', color = 'from-pink-400 to-rose-500', badgeColor = 'bg-pink-400') {
+      if (students.length >= 6) {
+        document.getElementById('podiumQuickTip').textContent = '⚠️ 教室座位已滿 (最多示範 6 位學生)！';
+        return;
+      }
+      isBusy = true;
+
+      updateChalkboard('末端追加入座', `students.append("${name}")`, 'O(1)');
+
+      const appendStudent = {
+        id: 's_' + Date.now(),
+        name,
+        val,
+        avatar,
+        color,
+        badgeColor,
+        memId: '0x7F9B' + Math.floor(Math.random()*89+10)
+      };
+
+      const dashedSlot = document.getElementById('dashed-append-slot');
+      if (dashedSlot) {
+        // 在末端空位渲染學生落座
+        dashedSlot.innerHTML = `
+          <div class="flex flex-col items-center mb-1">
+            <div class="w-0.5 h-3.5 bg-slate-800"></div>
+            <div class="px-2.5 py-0.5 rounded-lg ${appendStudent.badgeColor} border-[2.2px] border-slate-900 flex items-center gap-1 shadow-sm">
+              <span class="text-[9px] font-black tracking-wider text-slate-900">INDEX</span>
+              <span class="code-font text-xs font-black text-slate-950">[${students.length}]</span>
+            </div>
+          </div>
+          <div class="desk-card w-full bg-slate-50 border-[2.6px] border-slate-800 rounded-2xl p-2 shadow-md relative flex flex-col items-center bg-gradient-to-b from-white to-amber-50/50">
+            <div class="student-card motion-squash-landing w-full rounded-xl p-2 bg-gradient-to-br ${appendStudent.color} border-[2.2px] border-slate-900 shadow text-white flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm border-2 border-white/80 flex items-center justify-center text-xl mb-1 shadow-inner">
+                ${appendStudent.avatar}
+              </div>
+              <div class="text-xs font-black tracking-wide text-slate-950">${appendStudent.name}</div>
+              <div class="text-[9px] code-font font-bold text-slate-900 bg-white/90 px-1.5 py-0.2 rounded mt-0.5 border border-black/20">
+                str: ${appendStudent.val}
+              </div>
+            </div>
+            <div class="w-full mt-1 pt-1 border-t-[1.5px] border-slate-300 flex items-center justify-between text-[8px] text-slate-500 code-font px-0.5">
+              <span>0x${(0x7FFF00 + students.length * 8).toString(16).toUpperCase()}</span>
+              <span class="text-emerald-700 font-bold">OCCUPIED</span>
+            </div>
+            <div class="w-8 h-1.5 bg-slate-800 rounded-full -mb-2 mt-0.5 border border-slate-600"></div>
+          </div>
+        `;
+        playSfx('thud');
+      }
+
+      document.getElementById('podiumQuickTip').textContent = `新同學【${name}】直接坐在末端預留席，無需移動前方任何同學。`;
+      students.push(appendStudent);
+      await sleep(650); // 認知停頓
+      renderSlotsView();
+      isBusy = false;
+    }
+
+    // 2. .insert()
+    async function executeInsert(targetIndex = 1, name = '小龍', val = "'Evan'", avatar = '🧒', color = 'from-purple-400 to-indigo-500', badgeColor = 'bg-purple-400') {
+      if (students.length >= 6) {
+        document.getElementById('podiumQuickTip').textContent = '⚠️ 教室座位已滿 (最多示範 6 位學生)！';
+        return;
+      }
+      isBusy = true;
+
+      updateChalkboard('指定插隊挪位', `students.insert(${targetIndex}, "${name}")`, 'O(n)');
+
+      const insertStudent = {
+        id: 's_' + Date.now(),
+        name,
+        val,
+        avatar,
+        color,
+        badgeColor,
+        memId: '0x7F9B' + Math.floor(Math.random()*89+10)
+      };
+
+      // 物理推擠：目標索引與其右側所有課桌椅向右推移 164px
+      playSfx('shift');
+      document.getElementById('podiumQuickTip').textContent = `為在 [${targetIndex}] 號騰出座位，右側所有課桌椅必須向右跨步 164px 讓位！`;
+
+      for (let i = targetIndex; i < students.length; i++) {
+        const slotEl = document.getElementById(`slot-${students[i].id}`);
+        if (slotEl) slotEl.style.transform = 'translateX(164px)';
+      }
+      const dashedSlot = document.getElementById('dashed-append-slot');
+      if (dashedSlot) dashedSlot.style.transform = 'translateX(164px)';
+
+      await sleep(600); // 等待讓位滑動完畢
+
+      // 更新資料模型並重繪
+      students.splice(targetIndex, 0, insertStudent);
+      renderSlotsView();
+
+      // 為新入座同學加入回彈動態
+      const newSlot = document.getElementById(`slot-${insertStudent.id}`);
+      if (newSlot) {
+        const card = newSlot.querySelector('.student-card');
+        if (card) {
+          card.classList.add('motion-squash-landing');
+          playSfx('thud');
+        }
+      }
+
+      await sleep(650);
+      isBusy = false;
+    }
+
+    // 3. students[i] 定址取值 (舉手答題 + 副本傳送)
+    async function executeRead(index = 1) {
+      if (index >= students.length || index < 0) {
+        document.getElementById('podiumQuickTip').textContent = '⚠️ IndexError: list index out of range';
+        return;
+      }
+      isBusy = true;
+
+      const target = students[index];
+      updateChalkboard('定址隨機存取', `val = students[${index}]`, 'O(1)');
+
+      // 聚光燈聚焦模式：非目標座席降低透明度
+      students.forEach((s, idx) => {
+        const el = document.getElementById(`slot-${s.id}`);
+        if (el) {
+          if (idx === index) el.classList.add('spotlight-active');
+          else el.classList.add('dimmed');
+        }
+      });
+      const dashed = document.getElementById('dashed-append-slot');
+      if (dashed) dashed.classList.add('dimmed');
+
+      playSfx('ping');
+
+      // 目標學生起立舉手答題
+      const targetSlot = document.getElementById(`slot-${target.id}`);
+      const studentCard = targetSlot.querySelector('.student-card');
+      if (studentCard) studentCard.classList.add('motion-raise-hand');
+
+      // 產生考卷副本飛向講台
+      const copyToken = document.createElement('div');
+      copyToken.className = 'motion-fly-podium absolute -top-8 px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black code-font text-xs shadow-xl border-2 border-white pointer-events-none z-50';
+      copyToken.textContent = `答卷: ${target.val}`;
+      targetSlot.appendChild(copyToken);
+
+      await sleep(850);
+
+      // 講桌點名回傳窗口更新
+      document.getElementById('returnDisplayVal').textContent = `${target.val} (由 ${target.name} 回答)`;
+      document.getElementById('returnTypeBadge').textContent = `str (${target.memId})`;
+      document.getElementById('returnTypeBadge').className = 'code-font text-[9px] px-1 py-0.2 rounded bg-amber-200 text-amber-900 font-bold';
+      document.getElementById('podiumQuickTip').textContent = `直接透過記憶體位址 0x${(0x7FFF00 + index * 8).toString(16).toUpperCase()} 取得資料，完全無需搜尋！`;
+
+      // 恢復常態
+      students.forEach(s => {
+        const el = document.getElementById(`slot-${s.id}`);
+        if (el) {
+          el.classList.remove('spotlight-active', 'dimmed');
+          const sc = el.querySelector('.student-card');
+          if (sc) sc.classList.remove('motion-raise-hand');
+        }
+      });
+      if (dashed) dashed.classList.remove('dimmed');
+      if (copyToken.parentNode) copyToken.remove();
+
+      await sleep(600);
+      isBusy = false;
+    }
+
+    // 4. .pop()
+    async function executePop(popIndex = 1) {
+      if (students.length === 0) return;
+      if (popIndex >= students.length || popIndex < 0) {
+        popIndex = students.length - 1; // 預設彈出末端
+      }
+      isBusy = true;
+
+      const target = students[popIndex];
+      updateChalkboard('依座號離席拔起', `removed = students.pop(${popIndex})`, popIndex === students.length - 1 ? 'O(1)' : 'O(n)');
+
+      const targetSlot = document.getElementById(`slot-${target.id}`);
+      if (targetSlot) {
+        const card = targetSlot.querySelector('.student-card');
+        if (card) card.classList.add('motion-lift-out');
+      }
+      playSfx('pop');
+
+      document.getElementById('podiumQuickTip').textContent = `同學【${target.name}】被點名離席出發，回傳至老師講桌。`;
+      await sleep(550);
+
+      // 右側同學整齊向左踏步補齊空位
+      playSfx('shift');
+      for (let i = popIndex + 1; i < students.length; i++) {
+        const slotEl = document.getElementById(`slot-${students[i].id}`);
+        if (slotEl) slotEl.style.transform = 'translateX(-164px)';
+      }
+      const dashedSlot = document.getElementById('dashed-append-slot');
+      if (dashedSlot) dashedSlot.style.transform = 'translateX(-164px)';
+
+      await sleep(600);
+
+      // 回傳窗口更新
+      document.getElementById('returnDisplayVal').textContent = `${target.val} (離席)`;
+      document.getElementById('returnTypeBadge').textContent = `str (Popped)`;
+      document.getElementById('returnTypeBadge').className = 'code-font text-[9px] px-1 py-0.2 rounded bg-rose-100 text-rose-800 font-bold';
+
+      students.splice(popIndex, 1);
+      renderSlotsView();
+
+      await sleep(600);
+      isBusy = false;
+    }
+
+    // 5. .remove()
+    async function executeRemove(targetName = '小明') {
+      if (students.length === 0) return;
+      isBusy = true;
+
+      updateChalkboard('依姓名循序除名', `students.remove("${targetName}")`, 'O(n)');
+
+      const scanner = document.getElementById('linearScanPointer');
+      document.getElementById('scanTargetNameLabel').textContent = targetName;
+      scanner.classList.remove('hidden');
+      scanner.style.display = 'flex';
+
+      let foundIndex = -1;
+
+      // 線性由左至右逐一比對
+      for (let i = 0; i < students.length; i++) {
+        const slot = document.getElementById(`slot-${students[i].id}`);
+        if (slot) {
+          const rect = slot.getBoundingClientRect();
+          const parentRect = document.getElementById('stageTrackArea').getBoundingClientRect();
+          const leftOffset = (rect.left - parentRect.left) + (rect.width / 2) - 24;
+
+          scanner.style.transform = `translateX(${leftOffset}px)`;
+          playSfx('scan');
+          document.getElementById('podiumQuickTip').textContent = `檢查座號 [${i}]：${students[i].name} ...`;
+          await sleep(520);
+
+          if (students[i].name === targetName) {
+            foundIndex = i;
+            break;
+          }
+        }
+      }
+
+      scanner.classList.add('hidden');
+
+      if (foundIndex === -1) {
+        document.getElementById('podiumQuickTip').textContent = `⚠️ ValueError: list.remove(x): x not in list (找不到 ${targetName})`;
+        setNarration('找不到目標學生', `未在座位名冊中尋獲 "${targetName}"，直譯器拋出 ValueError。`, '⚠️');
+        isBusy = false;
+        return;
+      }
+
+      // 命中目標，同學收拾書包離席
+      const target = students[foundIndex];
+      const targetSlot = document.getElementById(`slot-${target.id}`);
+      if (targetSlot) {
+        targetSlot.style.transform = 'scale(0.85)';
+        targetSlot.style.opacity = '0';
+      }
+      playSfx('delete');
+      document.getElementById('podiumQuickTip').textContent = `找到【${targetName}】！請同學收拾書包離開，後方課桌向左平移補位。`;
+      await sleep(400);
+
+      // 後方同學向左補位
+      playSfx('shift');
+      for (let i = foundIndex + 1; i < students.length; i++) {
+        const slotEl = document.getElementById(`slot-${students[i].id}`);
+        if (slotEl) slotEl.style.transform = 'translateX(-164px)';
+      }
+      const dashedSlot = document.getElementById('dashed-append-slot');
+      if (dashedSlot) dashedSlot.style.transform = 'translateX(-164px)';
+
+      await sleep(600);
+
+      students.splice(foundIndex, 1);
+      renderSlotsView();
+
+      await sleep(600);
+      isBusy = false;
+    }
+
+    // ==========================================
+    // 影視導覽軸控制 (Cinematic Tour Controller)
+    // ==========================================
+    function setNarration(title, body, icon = '🎬', step = currentTourStep + 1, code = '') {
+      document.getElementById('narrationTitle').textContent = title;
+      document.getElementById('narrationBody').textContent = body;
+      document.getElementById('narrationIcon').textContent = icon;
+      document.getElementById('narrationStepBadge').textContent = `STEP ${step}/6`;
+      if (code) {
+        document.getElementById('narrationMetaCode').textContent = code;
+      }
+    }
+
+    async function playTourStep(stepIdx) {
+      if (isBusy) return;
+      currentTourStep = stepIdx;
+      const script = TOUR_STEPS[stepIdx];
+      setNarration(script.title, script.body, '🎬', script.step, script.code);
+      updateChalkboard(script.actionTitle, script.code, script.complexity);
+
+      if (script.action === 'intro') {
+        resetFullList();
+      } else if (script.action === 'append') {
+        await executeAppend('小美', "'David'", '👩', 'from-pink-400 to-rose-500', 'bg-pink-400');
+      } else if (script.action === 'read') {
+        await executeRead(1);
+      } else if (script.action === 'insert') {
+        await executeInsert(1, '小龍', "'Evan'", '🧒', 'from-purple-400 to-indigo-500', 'bg-purple-400');
+      } else if (script.action === 'pop') {
+        await executePop(1);
+      } else if (script.action === 'remove') {
+        await executeRemove('小明');
+      }
+    }
+
+    async function nextTourStep() {
+      if (currentTourStep < TOUR_STEPS.length - 1) {
+        await playTourStep(currentTourStep + 1);
+      } else {
+        await playTourStep(0);
+      }
+    }
+
+    async function prevTourStep() {
+      if (currentTourStep > 0) {
+        await playTourStep(currentTourStep - 1);
+      }
+    }
+
+    function toggleTourPlay() {
+      const btnText = document.getElementById('playBtnText');
+      const btnIcon = document.getElementById('playBtnIcon');
+
+      if (tourAutoPlayTimer) {
+        clearInterval(tourAutoPlayTimer);
+        tourAutoPlayTimer = null;
+        btnText.textContent = '自動播放導覽';
+        btnIcon.textContent = '▶️';
+      } else {
+        btnText.textContent = '暫停自動播放';
+        btnIcon.textContent = '⏸️';
+        tourAutoPlayTimer = setInterval(async () => {
+          if (!isBusy) {
+            await nextTourStep();
+          }
+        }, 3800);
+      }
+    }
+
+    // ==========================================
+    // 實機自由沙盒模式發射調用
+    // ==========================================
+    function sandboxRunAppend() {
+      if (isBusy) return;
+      const name = document.getElementById('appendInputName').value.trim() || '新同學';
+      const candidate = CANDIDATE_STUDENTS[candidateIndex % CANDIDATE_STUDENTS.length];
+      candidateIndex++;
+      executeAppend(name, candidate.val, candidate.avatar, candidate.color, candidate.badgeColor);
+    }
+
+    function sandboxRunInsert() {
+      if (isBusy) return;
+      const idx = parseInt(document.getElementById('insertInputIdx').value) || 0;
+      const name = document.getElementById('insertInputName').value.trim() || '新插班';
+      const candidate = CANDIDATE_STUDENTS[candidateIndex % CANDIDATE_STUDENTS.length];
+      candidateIndex++;
+      executeInsert(idx, name, candidate.val, candidate.avatar, candidate.color, candidate.badgeColor);
+    }
+
+    function sandboxRunRead() {
+      if (isBusy) return;
+      const idx = parseInt(document.getElementById('readInputIdx').value) || 0;
+      executeRead(idx);
+    }
+
+    function sandboxRunPop() {
+      if (isBusy) return;
+      const idx = parseInt(document.getElementById('popInputIdx').value);
+      executePop(isNaN(idx) ? students.length - 1 : idx);
+    }
+
+    function sandboxRunRemove() {
+      if (isBusy) return;
+      const name = document.getElementById('removeInputName').value.trim() || '小明';
+      executeRemove(name);
+    }
+
+    function resetFullList() {
+      students = JSON.parse(JSON.stringify(DEFAULT_STUDENTS));
+      renderSlotsView();
+      document.getElementById('returnDisplayVal').textContent = '無回傳值 (None)';
+      document.getElementById('returnTypeBadge').textContent = 'None';
+      document.getElementById('returnTypeBadge').className = 'code-font text-[9px] px-1 py-0.2 rounded bg-slate-100 text-slate-600 font-bold';
+      document.getElementById('podiumQuickTip').textContent = '名冊已重置為 3 位學生依序入座狀態。';
+    }
+
+    // ==========================================
+    // 模態切換 (影視導覽 vs 自由沙盒)
+    // ==========================================
+    function switchMainMode(mode) {
+      currentMainMode = mode;
+      const tourPanel = document.getElementById('tourControlPanel');
+      const sandboxPanel = document.getElementById('sandboxControlPanel');
+      const tourBtn = document.getElementById('modeTourBtn');
+      const sandboxBtn = document.getElementById('modeSandboxBtn');
+
+      if (mode === 'tour') {
+        tourPanel.classList.remove('hidden');
+        sandboxPanel.classList.add('hidden');
+        sandboxPanel.classList.remove('flex');
+        tourBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-black bg-indigo-600 text-white shadow-sm flex items-center gap-1 transition-all';
+        sandboxBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-black text-slate-700 hover:bg-slate-200 transition-all flex items-center gap-1';
+        setNarration('切換至：影視導覽模式', '跟隨預設的分鏡腳本，欣賞具備因果關係的動態科普導航。', '🎬');
+      } else {
+        if (tourAutoPlayTimer) toggleTourPlay();
+        tourPanel.classList.add('hidden');
+        sandboxPanel.classList.remove('hidden');
+        sandboxPanel.classList.add('flex');
+        sandboxBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-black bg-indigo-600 text-white shadow-sm flex items-center gap-1 transition-all';
+        tourBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-black text-slate-700 hover:bg-slate-200 transition-all flex items-center gap-1';
+        setNarration('切換至：實機自由沙盒模式', '您可於下方自訂姓名與索引，親手發射各種指令並檢驗位移反饋。', '🛠️');
+      }
+    }
+
+    // 頁面初始化入口
+    window.onload = function() {
+      renderSlotsView();
+      adjustStageScale();
+      setNarration(TOUR_STEPS[0].title, TOUR_STEPS[0].body, '🎬', 1, TOUR_STEPS[0].code);
+    };
+
+    // 首次點擊啟用音效合成
+    document.body.addEventListener('click', () => {
+      initSynth();
+    }, { once: true });
+  </script>
+</body>
+</html>

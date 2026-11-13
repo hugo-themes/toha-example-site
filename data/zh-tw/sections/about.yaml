@@ -1,0 +1,87 @@
+# section information
+section:
+  name: 關於
+  id: about
+  enable: true
+  weight: 1
+  showOnNavbar: true
+  template: sections/about.html
+
+# your designation
+designation: AI Engineer
+# your company information
+company:
+  name: Medigen Biotechnology Corp.
+  url: "https://www.medigen.com.tw/"
+
+# a summary about you
+summary: '大家好，我是王健安，具備三年以上AI 工程與資料科學經驗，擅長結合後端開發技術實現AI 模型的生產化部署，深度參與醫療、公衛、法律、金融、行銷等跨領域專案，專精於可解釋人工智慧與MLOps 架構設計，致力於開發兼具效能與透明度的可信任AI 解決方案。'
+
+# your social links
+# give as many as you want. use font-awesome for the icons.
+socialLinks:
+- name: Email
+  icon: "fas fa-envelope"
+  url: "andywangkenichi@gmail.com"
+
+- name: Github
+  icon: "fab fa-github"
+  url: "https://github.com/Wang-Jian-An"
+
+- name: LinkedIn
+  icon: "fab fa-linkedin"
+  url: "https://www.linkedin.com/in/%E5%81%A5%E5%AE%89-%E7%8E%8B-273b46171/"
+
+- name: Line
+  icon: "fa-brands fa-line"
+  url: "https://line.me/ti/p/5ydLxXtUGg"
+
+# - name: Facebook
+#   icon: "fab fa-facebook"
+#   url: "#"
+
+# You can put custom buttons to link your relevant resources.
+# For example, you can put link for your resume.
+# resourceLinks:
+# - title: "আমার জীবনবৃত্তান্ত"
+#   url: "files/resume.pdf"
+
+# Show your badges
+# You can show your verifiable certificates from https://www.credly.com.
+# You can also show a circular bar indicating the level of expertise on a certain skill
+badges:
+- type: certification
+  name: AWS Certified Machine Learning Engineer - Associate
+  url: "https://www.credly.com/badges/de007a9a-cd93-40fe-9574-4babc55b6f9f/public_url"
+  badge: "https://images.credly.com/images/1a634b4e-3d6b-4a74-b118-c0dcb429e8d2/image.png"
+
+- type: certification
+  name: AWS Certified AI Practitioner
+  url: "https://www.credly.com/badges/0c6dc9b1-8fdc-41dd-94c6-43693306839d/linked_in_profile"
+  badge: "https://images.credly.com/size/340x340/images/4d4693bb-530e-4bca-9327-de07f3aa2348/image.png"
+
+- type: certification
+  name: ISO/IEC 42001:2023 Lead Auditor (人工智慧管理系統主導稽核員)
+  url: "https://www.credly.com/org/grupo-bancolombia/badge/artificial-intelligence-and-machine-learning"
+  badge: "https://images.credly.com/size/680x680/images/e027514f-9d07-4b29-862f-fe21a8aaebf1/ae.png"
+
+- type: soft-skill-indicator
+  name: Leadership
+  percentage: 85
+  color: blue
+
+- type: soft-skill-indicator
+  name: Team Work
+  percentage: 90
+  color: yellow
+
+- type: soft-skill-indicator
+  name: Hard Working
+  percentage: 85
+  color: orange
+
+# you can also provide color code instead of the color name
+# - type: soft-skill-indicator
+#   name: Example 1
+#   percentage: 75
+#   color: "#00adb5"

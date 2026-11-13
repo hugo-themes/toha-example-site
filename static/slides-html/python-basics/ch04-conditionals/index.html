@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 4：流程控制與邏輯判斷（教師互動講義版）</title>
+  <style>
+    /* ==========================================================================
+       溫暖出版品風格系統 (Warm Editorial Theme)
+       ========================================================================== */
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-secondary: #f4efe6;
+      --text-main: #2d2926;
+      --text-muted: #6b635b;
+      --border-color: #e5dec9;
+      --accent-terracotta: #c2410c;
+      --accent-amber: #b45309;
+      --accent-blue: #1e3a8a;
+      --accent-green: #15803d;
+      --terminal-bg: #1e293b;
+      --terminal-text: #e2e8f0;
+      --code-bg: #f5f0e6;
+      --shadow-sm: 0 2px 4px rgba(45, 41, 38, 0.05);
+      --shadow-md: 0 4px 12px rgba(45, 41, 38, 0.08);
+      --shadow-lg: 0 8px 24px rgba(45, 41, 38, 0.12);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-code: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      line-height: 1.8;
+      padding: 40px 20px;
+    }
+
+    .lecture-container {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    /* 頁首標題 */
+    .lecture-header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+
+    .lecture-badge {
+      display: inline-block;
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .lecture-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .lecture-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+    }
+
+    /* 章節結構 */
+    .section-block {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 32px 36px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    h2.section-heading {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-left: 5px solid var(--accent-terracotta);
+      padding-left: 14px;
+      margin-bottom: 20px;
+    }
+
+    h3.sub-heading {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin: 24px 0 12px 0;
+    }
+
+    p {
+      margin-bottom: 16px;
+      font-size: 1.02rem;
+    }
+
+    /* 程式碼區塊 */
+    .code-wrapper {
+      position: relative;
+      margin: 18px 0 24px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .code-header {
+      background-color: #27272a;
+      color: #a1a1aa;
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      font-family: var(--font-code);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    pre.code-block {
+      background-color: var(--terminal-bg);
+      color: var(--terminal-text);
+      font-family: var(--font-code);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    code.inline-code {
+      background-color: var(--code-bg);
+      color: var(--accent-terracotta);
+      font-family: var(--font-code);
+      font-size: 0.9em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #ebdcc7;
+    }
+
+    .highlight-card {
+      background-color: var(--bg-secondary);
+      border-left: 4px solid var(--accent-amber);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+
+    .highlight-card strong {
+      color: var(--accent-amber);
+    }
+
+    .truth-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95rem;
+    }
+
+    .truth-table th, .truth-table td {
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    .truth-table th {
+      background-color: var(--bg-secondary);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .truth-table td.val-true {
+      color: var(--accent-green);
+      font-weight: 700;
+      font-family: var(--font-code);
+    }
+
+    .truth-table td.val-false {
+      color: var(--accent-terracotta);
+      font-weight: 700;
+      font-family: var(--font-code);
+    }
+
+    /* ==========================================================================
+       動態教具共用外框樣式（第二層：教具功能標籤）
+       ========================================================================== */
+    .theater-container {
+      background-color: #faf7f0;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 28px 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    .theater-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+
+    .theater-tag {
+      background-color: var(--accent-blue);
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .preset-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .preset-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-main);
+    }
+
+    .preset-btn:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .preset-btn.active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .theater-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn-action-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .theater-btn {
+      padding: 9px 18px;
+      border-radius: 6px;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-play {
+      background-color: var(--accent-amber);
+      color: #fff;
+    }
+    .btn-play:hover { background-color: #92400e; }
+
+    .btn-step {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-step:hover { background-color: var(--bg-secondary); }
+
+    .btn-reset {
+      background-color: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+    }
+    .btn-reset:hover { color: var(--text-main); }
+
+    .live-terminal {
+      background-color: var(--terminal-bg);
+      color: var(--terminal-text);
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .term-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .term-prompt {
+      color: #38bdf8;
+      user-select: none;
+    }
+
+    .term-status {
+      color: #fbbf24;
+    }
+
+    .term-result {
+      font-weight: 700;
+    }
+    .term-result.r-true { color: #4ade80; }
+    .term-result.r-false { color: #f87171; }
+
+    /* ==========================================================================
+       教具一：邏輯審查機器人 (Logic Bot)
+       ========================================================================== */
+    .bot-stage {
+      position: relative;
+      min-height: 260px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 24px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .bot-podium {
+      width: 200px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .bot-podium-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .condition-chip {
+      display: inline-block;
+      padding: 12px 28px;
+      font-family: var(--font-code);
+      font-size: 1.4rem;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      background-color: #f1f5f9;
+      color: #64748b;
+    }
+
+    .condition-chip.is-true {
+      background-color: #ecfdf5;
+      color: var(--accent-green);
+      border-color: #a7f3d0;
+      box-shadow: 0 0 14px rgba(21, 128, 61, 0.15);
+    }
+
+    .condition-chip.is-false {
+      background-color: #fef2f2;
+      color: var(--accent-terracotta);
+      border-color: #fecaca;
+      box-shadow: 0 0 14px rgba(194, 65, 12, 0.15);
+    }
+
+    .bot-curtain {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(2px);
+      border-radius: 8px;
+      border: 2px dashed #94a3b8;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #475569;
+      z-index: 5;
+    }
+
+    .bot-curtain.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .bot-hall {
+      flex: 1;
+      height: 220px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 3;
+    }
+
+    .bot-hud-bubble {
+      position: absolute;
+      top: 0;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      box-shadow: var(--shadow-sm);
+      max-width: 360px;
+      text-align: center;
+      transition: all 0.3s ease;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bot-hud-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 7px 7px 0;
+      border-style: solid;
+      border-color: #1e293b transparent;
+      display: block;
+      width: 0;
+    }
+
+    .bot-actor {
+      position: relative;
+      width: 90px;
+      height: 110px;
+      transition: transform 0.5s ease-in-out;
+      margin-bottom: 10px;
+    }
+
+    .bot-at-left { transform: translateX(-120px); }
+    .bot-at-center { transform: translateX(0); }
+    .bot-at-right { transform: translateX(120px); }
+
+    /* ==========================================================================
+       教具二：指令指標分支執行模擬器 (Train on if...elif...else)
+       ========================================================================== */
+    .train-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .train-slider-row input[type="range"] {
+      flex: 1;
+      height: 6px;
+      cursor: pointer;
+    }
+
+    .rail-layout-container {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .svg-rail-stage {
+      width: 100%;
+      height: 380px;
+      background-color: #fafaf9;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .train-code-panel {
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .rail-code-row {
+      padding: 9px 12px;
+      border-radius: 6px;
+      background: #f8fafc;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.25s;
+    }
+
+    .rail-code-row.current-ip {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+      font-weight: 600;
+    }
+
+    .rail-code-row.branch-passed {
+      background: #ecfdf5;
+      border-color: #10b981;
+      font-weight: 700;
+    }
+
+    .rail-code-row.branch-bypassed {
+      opacity: 0.35;
+      background: #f1f5f9;
+      text-decoration: line-through;
+    }
+
+    .rail-tag {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .rt-check { background: #fef3c7; color: #b45309; }
+    .rt-hit { background: #dcfce7; color: #15803d; }
+    .rt-skip { background: #e2e8f0; color: #64748b; }
+
+    /* ==========================================================================
+       教具三：複合條件拓撲分流模擬器（串聯 vs. 並聯）
+       ========================================================================== */
+    .dual-rail-controls {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .ctrl-col-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    .weather-btn-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .weather-btn-pill.active {
+      background-color: var(--accent-terracotta);
+      color: #fff;
+      border-color: var(--accent-terracotta);
+    }
+
+    .op-toggle-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: var(--font-code);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .op-toggle-btn.active {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dual-rail-stage {
+      position: relative;
+      height: 330px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .checkpoint-block {
+      position: absolute;
+      width: 140px;
+      height: 105px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fafaf9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 6px;
+      transition: all 0.4s ease;
+      z-index: 5;
+    }
+
+    .checkpoint-block.cp-pass {
+      border-color: #22c55e;
+      background: #f0fdf4;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+    }
+
+    .checkpoint-block.cp-fail {
+      border-color: #ef4444;
+      background: #fef2f2;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .checkpoint-block.cp-bypassed {
+      opacity: 0.35;
+      background: #f1f5f9;
+      border-style: dashed;
+    }
+
+    .cp-indicator-light {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #94a3b8;
+    }
+    .cp-pass .cp-indicator-light { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+    .cp-fail .cp-indicator-light { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+    /* 版權宣告 */
+    .disclaimer-box {
+      border-top: 2px solid var(--border-color);
+      margin-top: 50px;
+      padding-top: 24px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .disclaimer-box h4 {
+      color: var(--text-main);
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="lecture-container">
+  <!-- 第一章 -->
+  <section class="section-block">
+    <h2 class="section-heading">第一章：比較運算子與布林值判定</h2>
+    <p>在進入程式的分支決策之前，電腦必須具備衡量與辨明真偽的能力。在 Python 中，所有比較運算本質上就像是一座<strong>精密的天秤</strong>：天秤兩端放置資料，檢測完畢後，只會產生兩種不可撼動的布林值（Boolean）結果：<code class="inline-code">True</code>（真）或是 <code class="inline-code">False</code>（假）。這種布林狀態，正是所有控制流程決策的基礎。</p>
+
+    <h3 class="sub-heading">1-1 數值衡量：認識 6 大比較運算子</h3>
+    <p>Python 提供了 6 種最基礎的比較運算子，用於數值與資料內容的比對：</p>
+    
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>comparison_demo.py</span></div>
+      <pre class="code-block">score = 85
+
+print(score > 60)
+print(score < 50)
+print(score >= 85)
+print(score <= 80)
+print(score == 85)
+print(score != 100)</pre>
+    </div>
+
+    <h3 class="sub-heading">1-2 觀念避坑：指定值「=」與 數值比較「==」的本質差異</h3>
+    <div class="highlight-card">
+      <strong>⚠️ 零基礎避坑提醒：</strong><br>
+      初學者極常將數學上的「等於」習慣寫成單一個等號 <code class="inline-code">=</code>。<br>
+      請在課堂上為學生建立嚴謹的心智模型：
+      <ul style="margin-left: 20px; margin-top: 6px;">
+        <li><strong>單等號 <code class="inline-code">=</code>（賦值 Binding）</strong>：是「<strong>繫上名牌吊牌</strong>」，將變數名稱綁定到右側物件。</li>
+        <li><strong>雙等號 <code class="inline-code">==</code>（比較 Comparison）</strong>：是「<strong>拿出天秤比對</strong>」，詢問直譯器左右兩側的值是否相等。</li>
+      </ul>
+      如果在條件式中誤寫為 <code class="inline-code">if x = 5:</code>，直譯器會立即拋出 <code class="inline-code">SyntaxError: invalid syntax</code> 語法錯誤！
+    </div>
+  </section>
+
+  <!-- 第二章 -->
+  <section class="section-block">
+    <h2 class="section-heading">第二章：邏輯運算子與短路求值</h2>
+    <p>日常生活中，事件的發生往往取決於多項條件的組合。在 Python 中，我們使用三大邏輯運算子：<code class="inline-code">and</code>（且）、<code class="inline-code">or</code>（或）、<code class="inline-code">not</code>（非）。</p>
+
+    <h3 class="sub-heading">2-1 多重條件檢查：真值表與邏輯法則</h3>
+    <table class="truth-table">
+      <thead>
+        <tr>
+          <th>條件 A</th>
+          <th>運算子</th>
+          <th>條件 B</th>
+          <th>計算結果</th>
+          <th>邏輯法則</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="val-true">True</td>
+          <td><strong>and</strong></td>
+          <td class="val-true">True</td>
+          <td class="val-true">True</td>
+          <td>雙方皆為 True，結果才為 True</td>
+        </tr>
+        <tr>
+          <td class="val-true">True</td>
+          <td><strong>and</strong></td>
+          <td class="val-false">False</td>
+          <td class="val-false">False</td>
+          <td>任一方為 False，結果即為 False</td>
+        </tr>
+        <tr>
+          <td class="val-true">True</td>
+          <td><strong>or</strong></td>
+          <td class="val-false">False</td>
+          <td class="val-true">True</td>
+          <td>任一方為 True，結果即為 True</td>
+        </tr>
+        <tr>
+          <td class="val-false">False</td>
+          <td><strong>or</strong></td>
+          <td class="val-false">False</td>
+          <td class="val-false">False</td>
+          <td>雙方皆為 False，結果才為 False</td>
+        </tr>
+        <tr>
+          <td class="val-true">True</td>
+          <td><strong>not</strong></td>
+          <td>—</td>
+          <td class="val-false">False</td>
+          <td>邏輯反轉，反轉真假狀態</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-heading">2-2 直譯器求值機制：短路求值（Short-circuit Evaluation）</h3>
+    <p>直譯器在運算複合邏輯時非常講究執行效率。若<strong>左側運算式的結果已經足以決定最終的布林值，直譯器就會直接中斷，跳過右側運算式的求值程序</strong>！這種機制稱為「短路求值」。</p>
+
+    <!-- 動態教具一：邏輯審查機器人 -->
+    <div class="theater-container" id="botTheater">
+      <div class="theater-title-bar">
+        <div>
+          <strong style="font-size: 1.1rem;">動態教具一：邏輯審查機器人——短路求值模擬器</strong>
+          <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;">(短路求值路徑可視化)</span>
+        </div>
+        <span class="theater-tag">邏輯運算核心</span>
+      </div>
+
+      <div class="preset-group">
+        <button class="preset-btn active" data-op="and" data-a="false" data-b="true">情境一：False and True (左側為假，and 觸發短路)</button>
+        <button class="preset-btn" data-op="and" data-a="true" data-b="false">情境二：True and False (左側為真，and 續測右側)</button>
+        <button class="preset-btn" data-op="or" data-a="true" data-b="false">情境三：True or False (左側為真，or 觸發短路)</button>
+        <button class="preset-btn" data-op="or" data-a="false" data-b="true">情境四：False or True (左側為假，or 續測右側)</button>
+      </div>
+
+      <div class="bot-stage">
+        <div class="bot-podium" id="botPodiumA">
+          <div class="bot-podium-title">【左側運算元 A】</div>
+          <div class="condition-chip" id="botChipA">False</div>
+        </div>
+
+        <div class="bot-hall">
+          <div class="bot-hud-bubble" id="botHud">
+            [SYS_READY] 邏輯審查單元待命中。
+          </div>
+
+          <div class="bot-actor bot-at-center" id="botBody">
+            <svg viewBox="0 0 90 110" width="90" height="110">
+              <line x1="45" y1="12" x2="45" y2="24" stroke="#475569" stroke-width="3"/>
+              <circle cx="45" cy="10" r="5" fill="#38bdf8" id="botAntennaLight"/>
+              <rect x="25" y="24" width="40" height="28" rx="6" fill="#334155"/>
+              <rect x="30" y="32" width="30" height="10" rx="3" fill="#0ea5e9" id="botVisor"/>
+              <rect x="20" y="56" width="50" height="38" rx="8" fill="#1e293b"/>
+              <rect x="35" y="66" width="20" height="18" rx="4" fill="#0f172a"/>
+              <circle cx="45" cy="75" r="4" fill="#22c55e" id="botCoreLight"/>
+              <rect x="10" y="60" width="8" height="26" rx="4" fill="#475569"/>
+              <rect x="72" y="60" width="8" height="26" rx="4" fill="#475569"/>
+              <rect x="18" y="96" width="54" height="12" rx="4" fill="#0f172a"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="bot-podium" id="botPodiumB">
+          <div class="bot-podium-title">【右側運算元 B】</div>
+          <div class="condition-chip" id="botChipB">True</div>
+          <div class="bot-curtain" id="botCurtainB">
+            <span style="font-size: 1.4rem;">⚡</span>
+            <span>短路中斷 (Skipped)</span>
+            <span style="font-size: 0.75rem; color: #64748b;">直譯器終止後續求值</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="theater-controls">
+        <div class="btn-action-group">
+          <button class="theater-btn btn-play" id="botBtnPlay">🎬 啟動審查程序 (Play)</button>
+          <button class="theater-btn btn-step" id="botBtnStep">⏭ 單步推進 (Step)</button>
+          <button class="theater-btn btn-reset" id="botBtnReset">🔄 重設程序</button>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+          當前運算子：<strong id="botOpLabel" style="color: var(--accent-blue);">and 運算子</strong>
+        </div>
+      </div>
+
+      <div class="live-terminal">
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span id="botTermCode">result = False and True</span>
+        </div>
+        <div class="term-row">
+          <span class="term-status">[直譯器日誌]</span>
+          <span id="botTermLog">指令指標就緒，等待輸入信號。</span>
+        </div>
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span>print(result) ➔ </span>
+          <span class="term-result" id="botTermResult">尚未計算</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第三章 -->
+  <section class="section-block">
+    <h2 class="section-heading">第三章：條件分支控制結構（if / elif / else）</h2>
+    <p>掌握了真偽判斷後，我們就能指引 Python 走向不同的程式區塊。Python 的條件分支結構就像是鐵道上的<strong>轉轍器</strong>，負責引導載運資料的指令指標（IP）駛入指定的程式碼區塊。</p>
+
+    <h3 class="sub-heading">3-1 單向通行閘門：if 條件式</h3>
+    <p>只有滿足條件時，才會執行特定動作；若不滿足，則會直接繞過該區塊：</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>single_if.py</span></div>
+      <pre class="code-block">age = 18
+
+if age >= 18:
+    print("你已經成年")</pre>
+    </div>
+
+    <h3 class="sub-heading">3-2 雙向分流：if...else 結構</h3>
+    <p>非此即彼，兩個區塊必定擇一執行，絕不可能同時跳過或同時執行：</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>if_else.py</span></div>
+      <pre class="code-block">age = 16
+
+if age >= 18:
+    print("你已經成年")
+else:
+    print("你還未成年")</pre>
+    </div>
+
+    <h3 class="sub-heading">3-3 多向條件分支：if...elif...else 互斥階梯與順序依賴</h3>
+    <p>當面臨 3 種以上的分流需求時，使用 <code class="inline-code">elif</code>（即 else if 之縮寫）。請務必向學生強調：<strong>這是一座由上而下的互斥階梯，一旦上方條件成立，整個判斷流程就會直接結束，下方所有的 elif 與 else 都會被指令指標略過（Bypass）！</strong></p>
+
+    <!-- 動態教具二：指令指標分支執行模擬器 -->
+    <div class="theater-container" id="trainSwitchTheater">
+      <div class="theater-title-bar">
+        <div>
+          <strong style="font-size: 1.1rem;">動態教具二：指令指標（IP）分支執行模擬器</strong>
+          <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;">(變數載運過磅、轉轍分流與下游 Bypass 斷電展示)</span>
+        </div>
+        <span class="theater-tag">流程控制核心</span>
+      </div>
+
+      <div class="train-slider-row">
+        <label for="trainScoreInput" style="font-weight: 600; font-size: 0.95rem;">列車裝載變數 score = <span id="trainScoreVal" style="color: var(--accent-terracotta); font-weight: 700; font-size: 1.2rem;">85</span></label>
+        <input type="range" id="trainScoreInput" min="0" max="100" value="85">
+      </div>
+
+      <div class="preset-group">
+        <button class="preset-btn tr-preset" data-val="95">等級 A 測試 (95分)</button>
+        <button class="preset-btn active tr-preset" data-val="85">等級 B 測試 (85分)</button>
+        <button class="preset-btn tr-preset" data-val="75">等級 C 測試 (75分)</button>
+        <button class="preset-btn tr-preset" data-val="65">等級 D 測試 (65分)</button>
+        <button class="preset-btn tr-preset" data-val="45">等級 F 測試 (45分)</button>
+      </div>
+
+      <div class="rail-layout-container">
+        <!-- SVG 動態鐵道調車場 -->
+        <svg class="svg-rail-stage" id="svgRailStage" viewBox="0 0 540 380">
+          <line x1="80" y1="20" x2="80" y2="350" stroke="#cbd5e1" stroke-width="12" stroke-linecap="round"/>
+          <line x1="80" y1="20" x2="80" y2="350" stroke="#94a3b8" stroke-width="4" stroke-dasharray="6,6"/>
+
+          <path d="M 80 80 Q 140 80 200 80 L 460 80" stroke="#e2e8f0" stroke-width="8" fill="none" id="railPath1"/>
+          <circle cx="80" cy="80" r="10" fill="#94a3b8" id="railSwitch1"/>
+          <text x="210" y="74" fill="#64748b" font-size="12" font-family="monospace">Gate 1: >= 90 (等級 A)</text>
+
+          <path d="M 80 150 Q 140 150 200 150 L 460 150" stroke="#e2e8f0" stroke-width="8" fill="none" id="railPath2"/>
+          <circle cx="80" cy="150" r="10" fill="#94a3b8" id="railSwitch2"/>
+          <text x="210" y="144" fill="#64748b" font-size="12" font-family="monospace">Gate 2: >= 80 (等級 B)</text>
+
+          <path d="M 80 220 Q 140 220 200 220 L 460 220" stroke="#e2e8f0" stroke-width="8" fill="none" id="railPath3"/>
+          <circle cx="80" cy="220" r="10" fill="#94a3b8" id="railSwitch3"/>
+          <text x="210" y="214" fill="#64748b" font-size="12" font-family="monospace">Gate 3: >= 70 (等級 C)</text>
+
+          <path d="M 80 290 Q 140 290 200 290 L 460 290" stroke="#e2e8f0" stroke-width="8" fill="none" id="railPath4"/>
+          <circle cx="80" cy="290" r="10" fill="#94a3b8" id="railSwitch4"/>
+          <text x="210" y="284" fill="#64748b" font-size="12" font-family="monospace">Gate 4: else 保底 (等級 F)</text>
+
+          <line x1="460" y1="80" x2="460" y2="350" stroke="#cbd5e1" stroke-width="8" stroke-dasharray="4,4"/>
+          <text x="400" y="365" fill="#64748b" font-size="11">匯流出口 ➔</text>
+
+          <g id="trainGroup" transform="translate(56, 10)" style="transition: transform 0.6s ease-in-out;">
+            <rect x="0" y="0" width="48" height="24" rx="4" fill="#1e3a8a"/>
+            <rect x="6" y="-8" width="16" height="12" rx="2" fill="#3b82f6"/>
+            <rect x="36" y="-6" width="6" height="8" fill="#475569"/>
+            <circle cx="42" cy="-10" r="3" fill="#cbd5e1" opacity="0.8"/>
+            <circle cx="12" cy="24" r="4" fill="#0f172a"/>
+            <circle cx="36" cy="24" r="4" fill="#0f172a"/>
+            <rect x="0" y="28" width="48" height="22" rx="4" fill="#c2410c"/>
+            <text x="24" y="42" text-anchor="middle" fill="#ffffff" font-size="9" font-family="monospace" font-weight="bold">score</text>
+            <text x="24" y="49" text-anchor="middle" fill="#fde047" font-size="8" font-family="monospace" id="trainCargoVal">85</text>
+          </g>
+        </svg>
+
+        <div class="train-code-panel">
+          <div class="rail-code-row" id="rcRow1">
+            <span><code>if score >= 90:</code></span>
+            <span class="rail-tag" id="rcTag1">待檢驗</span>
+          </div>
+          <div class="rail-code-row" id="rcRow1Sub" style="margin-left: 20px; font-size: 0.85rem; color: #475569;">
+            <span><code>print("你的成績是A")</code></span>
+          </div>
+
+          <div class="rail-code-row" id="rcRow2">
+            <span><code>elif score >= 80:</code></span>
+            <span class="rail-tag" id="rcTag2">待檢驗</span>
+          </div>
+          <div class="rail-code-row" id="rcRow2Sub" style="margin-left: 20px; font-size: 0.85rem; color: #475569;">
+            <span><code>print("你的成績是B")</code></span>
+          </div>
+
+          <div class="rail-code-row" id="rcRow3">
+            <span><code>elif score >= 70:</code></span>
+            <span class="rail-tag" id="rcTag3">待檢驗</span>
+          </div>
+          <div class="rail-code-row" id="rcRow3Sub" style="margin-left: 20px; font-size: 0.85rem; color: #475569;">
+            <span><code>print("你的成績是C")</code></span>
+          </div>
+
+          <div class="rail-code-row" id="rcRow4">
+            <span><code>else:</code></span>
+            <span class="rail-tag" id="rcTag4">待檢驗</span>
+          </div>
+          <div class="rail-code-row" id="rcRow4Sub" style="margin-left: 20px; font-size: 0.85rem; color: #475569;">
+            <span><code>print("你的成績是C")</code></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="theater-controls">
+        <div class="btn-action-group">
+          <button class="theater-btn btn-play" id="trBtnPlay">🎬 模擬執行 (Play)</button>
+          <button class="theater-btn btn-step" id="trBtnStep">⏭ 單步推進 (Step)</button>
+          <button class="theater-btn btn-reset" id="trBtnReset">🔄 指標復位</button>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+          指令指標狀態：<strong id="trStatusLabel" style="color: var(--accent-blue);">待發線整備中</strong>
+        </div>
+      </div>
+
+      <div class="live-terminal">
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span id="trTraceLog">指令指標（IP）於結構起點整備中...</span>
+        </div>
+        <div class="term-row">
+          <span class="term-status">[標準輸出 stdout]</span>
+          <span class="term-result" id="trStdout">&lt;無輸出&gt;</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第四章 -->
+  <section class="section-block">
+    <h2 class="section-heading">第四章：條件判斷進階技巧與複合邏輯</h2>
+
+    <h3 class="sub-heading">4-1 單行條件運算式（三元運算子）</h3>
+    <p>當只有單純的二選一賦值需求時，Python 支援將 if-else 撰寫為精巧的一行表達式：</p>
+    <p style="text-align: center; font-family: var(--font-code); background: var(--bg-secondary); padding: 10px; border-radius: 6px;">
+      <strong>變數 = 真實結果 if 判斷條件 else 虛假結果</strong>
+    </p>
+
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>ternary_demo.py</span></div>
+      <pre class="code-block">is_adult = True
+status = "成人" if is_adult else "未成年"
+print(status)</pre>
+    </div>
+
+    <h3 class="sub-heading">4-2 複合條件判斷：邏輯運算子與分支整合</h3>
+    <p>我們可以使用括號與邏輯運算子組合多個條件，設立多重檢驗門檻：</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>combined_conditions.py</span></div>
+      <pre class="code-block">temperature = 30
+weather = "晴天"
+
+if temperature > 25 and weather == "晴天":
+    print("天氣很好，適合外出")
+else:
+    print("天氣不太好")</pre>
+    </div>
+
+    <!-- 動態教具三：複合條件拓撲分流模擬器 -->
+    <div class="theater-container" id="dualRailTheater">
+      <div class="theater-title-bar">
+        <div>
+          <strong style="font-size: 1.1rem;">動態教具三：複合條件拓撲分流模擬器</strong>
+          <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;">(串聯 and 雙哨 vs. 並聯 or 雙軌幾何動態展示)</span>
+        </div>
+        <span class="theater-tag">複合條件專用</span>
+      </div>
+
+      <div class="dual-rail-controls">
+        <div class="ctrl-col-item">
+          <label style="font-weight: 600;">第一節車廂 (溫度)：<span id="drTempVal" style="color: var(--accent-terracotta);">30</span>°C</label>
+          <input type="range" id="drTempSlider" min="15" max="35" value="30">
+        </div>
+
+        <div class="ctrl-col-item">
+          <label style="font-weight: 600;">第二節車廂 (天候)：</label>
+          <div style="display: flex; gap: 6px;">
+            <button class="weather-btn-pill active" data-w="晴天">☀️ 晴天</button>
+            <button class="weather-btn-pill" data-w="雨天">🌧️ 雨天</button>
+            <button class="weather-btn-pill" data-w="陰天">☁️ 陰天</button>
+          </div>
+        </div>
+
+        <div class="ctrl-col-item">
+          <label style="font-weight: 600;">拓撲運算子：</label>
+          <div style="display: flex; gap: 6px;">
+            <button class="op-toggle-btn active" data-op="and">and (串聯雙哨)</button>
+            <button class="op-toggle-btn" data-op="or">or (並聯雙軌)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 幾何拓撲自適應舞台 -->
+      <div class="dual-rail-stage" id="drStage">
+        <svg viewBox="0 0 820 330" width="100%" height="100%" id="drSvgStage">
+          <!-- ================= 模式 1：串聯拓撲 (AND) ================= -->
+          <g id="seriesTrackGroup">
+            <!-- 主線貫穿 (Y=80) -->
+            <line x1="30" y1="80" x2="780" y2="80" stroke="#cbd5e1" stroke-width="10" stroke-linecap="round"/>
+            <line x1="30" y1="80" x2="780" y2="80" stroke="#94a3b8" stroke-width="3" stroke-dasharray="6,6"/>
+
+            <!-- 側線 (Y=240) -->
+            <line x1="220" y1="240" x2="780" y2="240" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+
+            <!-- 轉轍道岔 1：第一哨前分流 (X=140, Y=80 -> X=260, Y=240) -->
+            <path d="M 140 80 Q 200 80 240 180 T 290 240" stroke="#cbd5e1" stroke-width="6" fill="none" id="sDivert1"/>
+            <circle cx="140" cy="80" r="7" fill="#94a3b8" id="sPin1"/>
+
+            <!-- 轉轍道岔 2：第二哨前分流 (X=400, Y=80 -> X=500, Y=240) -->
+            <path d="M 400 80 Q 450 80 480 180 T 530 240" stroke="#cbd5e1" stroke-width="6" fill="none" id="sDivert2"/>
+            <circle cx="400" cy="80" r="7" fill="#94a3b8" id="sPin2"/>
+
+            <!-- 標籤文字 -->
+            <text x="660" y="65" fill="#15803d" font-size="12" font-family="monospace" font-weight="bold">➔ if 主線 (適合外出)</text>
+            <text x="660" y="265" fill="#c2410c" font-size="12" font-family="monospace" font-weight="bold">➔ else 側線 (天氣不太好)</text>
+          </g>
+
+          <!-- ================= 模式 2：並聯拓撲 (OR) ================= -->
+          <g id="parallelTrackGroup" style="display: none;">
+            <!-- 起始進站線 (Y=140) -->
+            <line x1="30" y1="140" x2="130" y2="140" stroke="#cbd5e1" stroke-width="10" stroke-linecap="round"/>
+
+            <!-- 分流道岔：上下並聯分裂 -->
+            <!-- 上軌支線 (Y=60)：前往哨所 1 -->
+            <path d="M 130 140 Q 180 140 220 60 L 590 60" stroke="#cbd5e1" stroke-width="8" fill="none" id="pPathTop"/>
+            <!-- 下軌支線 (Y=180)：前往哨所 2 -->
+            <path d="M 130 140 Q 180 140 220 180 L 590 180" stroke="#cbd5e1" stroke-width="8" fill="none" id="pPathBottom"/>
+            
+            <!-- 匯流道岔：上下雙軌重新匯入 if 主線 (Y=140) -->
+            <path d="M 590 60 Q 640 60 670 140 L 780 140" stroke="#cbd5e1" stroke-width="8" fill="none" id="pMergeTop"/>
+            <path d="M 590 180 Q 640 180 670 140" stroke="#cbd5e1" stroke-width="8" fill="none" id="pMergeBottom"/>
+            <line x1="670" y1="140" x2="780" y2="140" stroke="#94a3b8" stroke-width="3" stroke-dasharray="6,6"/>
+
+            <!-- 避車掉頭側線 (Y=280)：雙哨皆假時執行 -->
+            <path d="M 130 140 Q 170 200 220 280 L 780 280" stroke="#cbd5e1" stroke-width="7" fill="none" id="pPathElse"/>
+            <circle cx="130" cy="140" r="7" fill="#94a3b8" id="pPinMain"/>
+
+            <!-- 標籤文字 -->
+            <text x="660" y="125" fill="#15803d" font-size="12" font-family="monospace" font-weight="bold">➔ if 匯流 (適合外出)</text>
+            <text x="660" y="300" fill="#c2410c" font-size="12" font-family="monospace" font-weight="bold">➔ else 側線 (天氣不太好)</text>
+          </g>
+        </svg>
+
+        <!-- 第一管制哨（溫度） -->
+        <div class="checkpoint-block" id="cpBlockA">
+          <div class="cp-indicator-light"></div>
+          <div style="font-weight: 700; font-size: 0.85rem;">第一哨 (溫度)</div>
+          <div style="font-family: var(--font-code); font-size: 0.75rem; color: #475569;">temp > 25</div>
+          <div class="condition-chip" id="cpChipA" style="font-size: 0.85rem; padding: 2px 10px;">True</div>
+        </div>
+
+        <!-- 第二管制哨（天候） -->
+        <div class="checkpoint-block" id="cpBlockB">
+          <div class="cp-indicator-light"></div>
+          <div style="font-weight: 700; font-size: 0.85rem;">第二哨 (天候)</div>
+          <div style="font-family: var(--font-code); font-size: 0.75rem; color: #475569;">weather == "晴天"</div>
+          <div class="condition-chip" id="cpChipB" style="font-size: 0.85rem; padding: 2px 10px;">True</div>
+        </div>
+
+        <!-- 雙車廂列車 (象徵指令指標 IP) -->
+        <div id="drTrain" style="position: absolute; width: 110px; height: 50px; transition: all 0.65s cubic-bezier(0.25, 1, 0.5, 1); z-index: 10;">
+          <svg viewBox="0 0 110 50" width="110" height="50">
+            <rect x="60" y="10" width="45" height="26" rx="4" fill="#1e3a8a"/>
+            <circle cx="72" cy="38" r="4" fill="#0f172a"/>
+            <circle cx="95" cy="38" r="4" fill="#0f172a"/>
+            <rect x="5" y="14" width="50" height="22" rx="3" fill="#c2410c"/>
+            <circle cx="16" cy="38" r="4" fill="#0f172a"/>
+            <circle cx="44" cy="38" r="4" fill="#0f172a"/>
+            <text x="30" y="29" text-anchor="middle" fill="#ffffff" font-size="8" font-family="monospace" id="drCargoLabel">30°C/晴</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="theater-controls">
+        <div class="btn-action-group">
+          <button class="theater-btn btn-play" id="drBtnPlay">🎬 發車檢驗 (Check)</button>
+          <button class="theater-btn btn-reset" id="drBtnReset">🔄 列車回庫</button>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+          通關路徑判定：<strong id="drRouteStatus" style="color: var(--accent-green);">適合外出 (主線暢行)</strong>
+        </div>
+      </div>
+
+      <div class="live-terminal">
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span id="drCodePreview">if 30 > 25 and "晴天" == "晴天":</span>
+        </div>
+        <div class="term-row">
+          <span class="term-status">[標準輸出 stdout]</span>
+          <span class="term-result r-true" id="drStdout">天氣很好，適合外出</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第五章 -->
+  <section class="section-block">
+    <h2 class="section-heading">第五章：新手常見語法陷阱與除錯指南</h2>
+
+    <h3 class="sub-heading">5-1 縮排（Indentation）結構：空白字元的區塊界定</h3>
+    <p>在 Python 中，<strong>直譯器完全依賴「空白縮排」來辨識程式碼的區塊層級</strong>！</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>indentation_error.py</span></div>
+      <pre class="code-block"># 錯誤示範：忘記縮排
+if 5 > 3:
+print("這行會直接拋出 IndentationError！")
+
+# 正確規範：縮排統一使用 4 個半形空白，切勿混用 Tab 鍵</pre>
+    </div>
+
+    <h3 class="sub-heading">5-2 語法標點：忘記冒號「:」的常見錯誤訊息</h3>
+    <p><code class="inline-code">if</code>、<code class="inline-code">elif</code>、<code class="inline-code">else</code> 行尾的冒號代表「提示直譯器：接下來將進入子區塊」。漏掉冒號會立即引發 <code class="inline-code">SyntaxError: expected ':'</code> 語法錯誤。</p>
+  </section>
+
+  <!-- 第六章 -->
+  <section class="section-block">
+    <h2 class="section-heading">第六章：課堂實戰任務挑戰</h2>
+
+    <h3 class="sub-heading">任務一：判斷正負數與零</h3>
+    <p><strong>規則說明：</strong>撰寫程式，根據使用者輸入的整數判斷其為正數、負數還是零。</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>number_sign_solution.py</span></div>
+      <pre class="code-block">num = int(input("請輸入一個數字："))
+
+if num > 0:
+    print("這是一個正數")
+elif num < 0:
+    print("這是一個負數")
+else:
+    print("這是零")</pre>
+    </div>
+
+    <h3 class="sub-heading">任務二：公曆閏年判定系統</h3>
+    <p><strong>規則說明：</strong>公曆閏年規則如下：能被 4 整除且「不能被 100 整除」，或能被 400 整除者為閏年，其餘為平年。</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>leap_year_solution.py</span></div>
+      <pre class="code-block">year = int(input("請輸入年份："))
+
+if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
+    print(f"{year} 是閏年")
+else:
+    print(f"{year} 不是閏年")</pre>
+    </div>
+
+    <h3 class="sub-heading">任務三：成績分級系統</h3>
+    <p><strong>規則說明：</strong>根據使用者輸入的成績（0~100），輸出對應的等級（A, B, C, D, F）。</p>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>score_evaluator_solution.py</span></div>
+      <pre class="code-block">score = int(input("請輸入成績："))
+
+if score >= 90:
+    print("等級 A")
+elif score >= 80:
+    print("等級 B")
+elif score >= 70:
+    print("等級 C")
+elif score >= 60:
+    print("等級 D")
+else:
+    print("等級 F")</pre>
+    </div>
+  </section>
+
+  <!-- 免責聲明與權益宣示 -->
+  <footer class="disclaimer-box">
+    <h4>免責聲明與權益宣示</h4>
+    <p>本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+    如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。</p>
+  </footer>
+
+</div>
+
+<!-- ==========================================================================
+     原生腳本區（3 大教具全面採用 IIFE 作用域隔離）
+     ========================================================================== -->
+<script>
+/* ==========================================================================
+   教具一：邏輯審查機器人（Logic Bot）
+   ========================================================================== */
+(function() {
+  const chipA = document.getElementById('botChipA');
+  const chipB = document.getElementById('botChipB');
+  const hud = document.getElementById('botHud');
+  const body = document.getElementById('botBody');
+  const curtainB = document.getElementById('botCurtainB');
+  const termCode = document.getElementById('botTermCode');
+  const termLog = document.getElementById('botTermLog');
+  const termResult = document.getElementById('botTermResult');
+  const opLabel = document.getElementById('botOpLabel');
+  const visor = document.getElementById('botVisor');
+  const coreLight = document.getElementById('botCoreLight');
+
+  const btnPlay = document.getElementById('botBtnPlay');
+  const btnStep = document.getElementById('botBtnStep');
+  const btnReset = document.getElementById('botBtnReset');
+  const presetBtns = document.querySelectorAll('#botTheater .preset-btn');
+
+  let currentOp = 'and';
+  let valA = false;
+  let valB = true;
+  let currentStep = 0;
+  let playTimer = null;
+
+  function refreshBotBoard() {
+    chipA.innerText = valA ? 'True' : 'False';
+    chipA.className = 'condition-chip ' + (valA ? 'is-true' : 'is-false');
+    chipB.innerText = valB ? 'True' : 'False';
+    chipB.className = 'condition-chip ' + (valB ? 'is-true' : 'is-false');
+    opLabel.innerText = `${currentOp} 運算子`;
+    termCode.innerText = `result = ${valA ? 'True' : 'False'} ${currentOp} ${valB ? 'True' : 'False'}`;
+    resetBotState();
+  }
+
+  function resetBotState() {
+    clearTimeout(playTimer);
+    currentStep = 0;
+    body.className = 'bot-actor bot-at-center';
+    curtainB.className = 'bot-curtain';
+    visor.setAttribute('fill', '#0ea5e9');
+    coreLight.setAttribute('fill', '#22c55e');
+    termResult.innerText = '尚未計算';
+    termResult.className = 'term-result';
+    hud.innerText = '[SYS_READY] 邏輯審查單元待命中。';
+    termLog.innerText = '指令指標就緒，等待輸入信號。';
+  }
+
+  function executeBotStep() {
+    currentStep++;
+    if (currentOp === 'and') {
+      if (currentStep === 1) {
+        body.className = 'bot-actor bot-at-left';
+        termLog.innerText = `[步驟 1] 指令指標移動至左側運算元 A，進行布林求值...`;
+        if (!valA) {
+          hud.innerText = '[SCAN] 檢測運算元 A 為 False。AND 規則：單一 False 即判定整體為假。';
+          visor.setAttribute('fill', '#ef4444');
+          coreLight.setAttribute('fill', '#ef4444');
+        } else {
+          hud.innerText = '[SCAN] 檢測運算元 A 為 True。AND 規則：需繼續驗證運算元 B。';
+          visor.setAttribute('fill', '#22c55e');
+        }
+      } else if (currentStep === 2) {
+        if (!valA) {
+          curtainB.className = 'bot-curtain active';
+          hud.innerText = '[SHORT-CIRCUIT] 觸發短路協議：右側條件不影響結果，終止求值！';
+          termLog.innerText = `[短路觸發] 左側為 False，直譯器跳過右側運算式，直接回傳 False。`;
+          termResult.innerText = 'False (短路終止)';
+          termResult.className = 'term-result r-false';
+          currentStep = 99;
+        } else {
+          body.className = 'bot-actor bot-at-right';
+          termLog.innerText = `[步驟 2] 左側未定案，指令指標推進至運算元 B 求值...`;
+          hud.innerText = valB 
+            ? '[SCAN] 運算元 B 為 True。雙條件皆成立，判定 True。' 
+            : '[SCAN] 運算元 B 為 False。AND 檢驗未通過，判定 False。';
+          visor.setAttribute('fill', valB ? '#22c55e' : '#ef4444');
+          coreLight.setAttribute('fill', valB ? '#22c55e' : '#ef4444');
+        }
+      } else if (currentStep === 3) {
+        const finalVal = valA && valB;
+        body.className = 'bot-actor bot-at-center';
+        termLog.innerText = `[步驟 3] 全式求值完成，輸出結果。`;
+        termResult.innerText = finalVal ? 'True' : 'False';
+        termResult.className = 'term-result ' + (finalVal ? 'r-true' : 'r-false');
+        hud.innerText = `[COMPLETE] 運算式執行完畢，回傳結果：${finalVal}。`;
+        currentStep = 99;
+      }
+    } else {
+      if (currentStep === 1) {
+        body.className = 'bot-actor bot-at-left';
+        termLog.innerText = `[步驟 1] 指令指標移動至左側運算元 A，進行布林求值...`;
+        if (valA) {
+          hud.innerText = '[SCAN] 檢測運算元 A 為 True。OR 規則：單一 True 即判定整體為真。';
+          visor.setAttribute('fill', '#22c55e');
+          coreLight.setAttribute('fill', '#22c55e');
+        } else {
+          hud.innerText = '[SCAN] 檢測運算元 A 為 False。OR 規則：需繼續驗證運算元 B。';
+          visor.setAttribute('fill', '#f59e0b');
+        }
+      } else if (currentStep === 2) {
+        if (valA) {
+          curtainB.className = 'bot-curtain active';
+          hud.innerText = '[SHORT-CIRCUIT] 觸發短路協議：已確定為真，終止後續求值！';
+          termLog.innerText = `[短路觸發] 左側為 True，直譯器跳過右側運算式，直接回傳 True。`;
+          termResult.innerText = 'True (短路終止)';
+          termResult.className = 'term-result r-true';
+          currentStep = 99;
+        } else {
+          body.className = 'bot-actor bot-at-right';
+          termLog.innerText = `[步驟 2] 左側未定案，指令指標推進至運算元 B 求值...`;
+          hud.innerText = valB 
+            ? '[SCAN] 運算元 B 為 True。OR 檢驗通過，判定 True。' 
+            : '[SCAN] 運算元 B 為 False。雙條件皆為假，判定 False。';
+          visor.setAttribute('fill', valB ? '#22c55e' : '#ef4444');
+          coreLight.setAttribute('fill', valB ? '#22c55e' : '#ef4444');
+        }
+      } else if (currentStep === 3) {
+        const finalVal = valA || valB;
+        body.className = 'bot-actor bot-at-center';
+        termLog.innerText = `[步驟 3] 全式求值完成，輸出結果。`;
+        termResult.innerText = finalVal ? 'True' : 'False';
+        termResult.className = 'term-result ' + (finalVal ? 'r-true' : 'r-false');
+        hud.innerText = `[COMPLETE] 運算式執行完畢，回傳結果：${finalVal}。`;
+        currentStep = 99;
+      }
+    }
+  }
+
+  function playBot() {
+    resetBotState();
+    function run() {
+      if (currentStep < 99) {
+        executeBotStep();
+        if (currentStep < 99) {
+          playTimer = setTimeout(run, 1400);
+        }
+      }
+    }
+    run();
+  }
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentOp = this.getAttribute('data-op');
+      valA = this.getAttribute('data-a') === 'true';
+      valB = this.getAttribute('data-b') === 'true';
+      refreshBotBoard();
+    });
+  });
+
+  btnPlay.addEventListener('click', playBot);
+  btnStep.addEventListener('click', () => {
+    clearTimeout(playTimer);
+    if (currentStep >= 99) resetBotState();
+    executeBotStep();
+  });
+  btnReset.addEventListener('click', resetBotState);
+
+  refreshBotBoard();
+})();
+
+/* ==========================================================================
+   教具二：指令指標分支執行模擬器（載貨列車）
+   ========================================================================== */
+(function() {
+  const slider = document.getElementById('trainScoreInput');
+  const valDisplay = document.getElementById('trainScoreVal');
+  const cargoVal = document.getElementById('trainCargoVal');
+  const presetBtns = document.querySelectorAll('.tr-preset');
+  const btnPlay = document.getElementById('trBtnPlay');
+  const btnStep = document.getElementById('trBtnStep');
+  const btnReset = document.getElementById('trBtnReset');
+  const statusLabel = document.getElementById('trStatusLabel');
+  const traceLog = document.getElementById('trTraceLog');
+  const stdout = document.getElementById('trStdout');
+
+  const trainGroup = document.getElementById('trainGroup');
+  const switches = [
+    document.getElementById('railSwitch1'),
+    document.getElementById('railSwitch2'),
+    document.getElementById('railSwitch3'),
+    document.getElementById('railSwitch4')
+  ];
+  const paths = [
+    document.getElementById('railPath1'),
+    document.getElementById('railPath2'),
+    document.getElementById('railPath3'),
+    document.getElementById('railPath4')
+  ];
+
+  const codeRows = [
+    { row: document.getElementById('rcRow1'), sub: document.getElementById('rcRow1Sub'), tag: document.getElementById('rcTag1'), grade: 'A', text: 'score >= 90' },
+    { row: document.getElementById('rcRow2'), sub: document.getElementById('rcRow2Sub'), tag: document.getElementById('rcTag2'), grade: 'B', text: 'score >= 80' },
+    { row: document.getElementById('rcRow3'), sub: document.getElementById('rcRow3Sub'), tag: document.getElementById('rcTag3'), grade: 'C', text: 'score >= 70' },
+    { row: document.getElementById('rcRow4'), sub: document.getElementById('rcRow4Sub'), tag: document.getElementById('rcTag4'), grade: 'F', text: 'else 保底' }
+  ];
+
+  let currentScore = 85;
+  let trainStep = 0;
+  let playTimer = null;
+  let matchedGate = -1;
+
+  function setTrainScore(s) {
+    currentScore = parseInt(s, 10);
+    valDisplay.innerText = currentScore;
+    cargoVal.innerText = currentScore;
+    slider.value = currentScore;
+    resetTrainState();
+  }
+
+  function resetTrainState() {
+    clearTimeout(playTimer);
+    trainStep = 0;
+    matchedGate = -1;
+    trainGroup.style.transform = 'translate(56px, 10px)';
+    statusLabel.innerText = `待發線整備中 (score = ${currentScore})`;
+    traceLog.innerText = '指令指標（IP）於結構起點整備中...';
+    stdout.innerText = '<無輸出>';
+    stdout.className = 'term-result';
+
+    switches.forEach(s => s.setAttribute('fill', '#94a3b8'));
+    paths.forEach(p => {
+      p.setAttribute('stroke', '#e2e8f0');
+      p.style.opacity = '1';
+    });
+
+    codeRows.forEach(r => {
+      r.row.className = 'rail-code-row';
+      r.sub.className = 'rail-code-row';
+      r.sub.style.marginLeft = '20px';
+      r.sub.style.fontSize = '0.85rem';
+      r.tag.className = 'rail-tag';
+      r.tag.innerText = '待檢驗';
+    });
+  }
+
+  function advanceTrain() {
+    trainStep++;
+
+    if (trainStep <= 3) {
+      const idx = trainStep - 1;
+      const r = codeRows[idx];
+      const gateY = 60 + idx * 70;
+
+      trainGroup.style.transform = `translate(56px, ${gateY}px)`;
+      r.row.className = 'rail-code-row current-ip';
+      r.tag.className = 'rail-tag rt-check';
+      r.tag.innerText = '評估中...';
+
+      let isHit = false;
+      if (idx === 0) isHit = currentScore >= 90;
+      if (idx === 1) isHit = currentScore >= 80;
+      if (idx === 2) isHit = currentScore >= 70;
+
+      if (isHit) {
+        matchedGate = idx;
+        switches[idx].setAttribute('fill', '#22c55e');
+        paths[idx].setAttribute('stroke', '#86efac');
+        r.row.className = 'rail-code-row branch-passed';
+        r.sub.className = 'rail-code-row branch-passed';
+        r.tag.className = 'rail-tag rt-hit';
+        r.tag.innerText = '條件命中 (True)';
+
+        statusLabel.innerText = `閘門 ${idx + 1} 命中！切換轉轍軌道執行縮排區塊！`;
+        traceLog.innerText = `[命中分流] 變數值 ${currentScore} 符合 ${r.text}！切換轉轍器駛入該分支。`;
+        stdout.innerText = `你的成績是${r.grade}`;
+        stdout.className = 'term-result r-true';
+
+        setTimeout(() => {
+          trainGroup.style.transform = `translate(280px, ${gateY}px)`;
+        }, 350);
+
+        for (let j = idx + 1; j < 4; j++) {
+          codeRows[j].row.className = 'rail-code-row branch-bypassed';
+          codeRows[j].sub.className = 'rail-code-row branch-bypassed';
+          codeRows[j].tag.className = 'rail-tag rt-skip';
+          codeRows[j].tag.innerText = '🚫 略過 (Bypassed)';
+          switches[j].setAttribute('fill', '#ef4444');
+          paths[j].style.opacity = '0.25';
+        }
+
+        trainStep = 5;
+      } else {
+        switches[idx].setAttribute('fill', '#ef4444');
+        r.row.className = 'rail-code-row';
+        r.tag.className = 'rail-tag';
+        r.tag.innerText = '未命中 (False)';
+        traceLog.innerText = `[條件未達] 變數值 ${currentScore} 未達 ${r.text}。指標下移至下一分支...`;
+      }
+    } 
+    else if (trainStep === 4) {
+      if (matchedGate === -1) {
+        trainGroup.style.transform = `translate(56px, 270px)`;
+        const elseRow = codeRows[3];
+        switches[3].setAttribute('fill', '#22c55e');
+        paths[3].setAttribute('stroke', '#86efac');
+        elseRow.row.className = 'rail-code-row branch-passed';
+        elseRow.sub.className = 'rail-code-row branch-passed';
+        elseRow.tag.className = 'rail-tag rt-hit';
+        elseRow.tag.innerText = '保底觸發';
+
+        statusLabel.innerText = `上方條件全為假，駛入 else 保底分支！`;
+        traceLog.innerText = `[保底執行] 上方所有條件皆為 False，執行 else 區塊。`;
+        stdout.innerText = `你的成績是C`;
+        stdout.className = 'term-result r-false';
+
+        setTimeout(() => {
+          trainGroup.style.transform = `translate(280px, 270px)`;
+        }, 350);
+      }
+    }
+    else if (trainStep >= 5) {
+      trainGroup.style.transform = `translate(440px, 320px)`;
+      statusLabel.innerText = `執行完畢，指標匯流跳出結構！`;
+      traceLog.innerText = `[結構結束] 指令指標由匯流線跳出，下游條件未受任何走訪。`;
+      trainStep = 99;
+    }
+  }
+
+  function playTrainAll() {
+    resetTrainState();
+    function stepNext() {
+      if (trainStep < 99) {
+        advanceTrain();
+        if (trainStep < 99) {
+          playTimer = setTimeout(stepNext, 1400);
+        }
+      }
+    }
+    stepNext();
+  }
+
+  slider.addEventListener('input', function() {
+    setTrainScore(this.value);
+    presetBtns.forEach(b => b.classList.remove('active'));
+  });
+
+  presetBtns.forEach(b => {
+    b.addEventListener('click', function() {
+      presetBtns.forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+      setTrainScore(this.getAttribute('data-val'));
+    });
+  });
+
+  btnPlay.addEventListener('click', playTrainAll);
+  btnStep.addEventListener('click', () => {
+    clearTimeout(playTimer);
+    if (trainStep >= 99) resetTrainState();
+    advanceTrain();
+  });
+  btnReset.addEventListener('click', resetTrainState);
+
+  setTrainScore(85);
+})();
+
+/* ==========================================================================
+   教具三：複合條件拓撲分流模擬器（串聯 vs. 並聯）
+   ========================================================================== */
+(function() {
+  const tempSlider = document.getElementById('drTempSlider');
+  const tempValDisplay = document.getElementById('drTempVal');
+  const weatherBtns = document.querySelectorAll('#dualRailTheater .weather-btn-pill');
+  const opBtns = document.querySelectorAll('#dualRailTheater .op-toggle-btn');
+  const btnPlay = document.getElementById('drBtnPlay');
+  const btnReset = document.getElementById('drBtnReset');
+
+  const seriesGroup = document.getElementById('seriesTrackGroup');
+  const parallelGroup = document.getElementById('parallelTrackGroup');
+  const cpBlockA = document.getElementById('cpBlockA');
+  const cpBlockB = document.getElementById('cpBlockB');
+  const cpChipA = document.getElementById('cpChipA');
+  const cpChipB = document.getElementById('cpChipB');
+  const drTrain = document.getElementById('drTrain');
+  const cargoLabel = document.getElementById('drCargoLabel');
+  const routeStatus = document.getElementById('drRouteStatus');
+  const codePreview = document.getElementById('drCodePreview');
+  const stdout = document.getElementById('drStdout');
+
+  const sPin1 = document.getElementById('sPin1');
+  const sPin2 = document.getElementById('sPin2');
+  const pPinMain = document.getElementById('pPinMain');
+
+  let currentTemp = 30;
+  let currentWeather = '晴天';
+  let currentOp = 'and'; // 'and' 或 'or'
+  let animTimer = null;
+
+  function updateVisualTopology() {
+    const isTempPass = currentTemp > 25;
+    const isWeatherPass = (currentWeather === '晴天');
+
+    tempValDisplay.innerText = currentTemp;
+    cargoLabel.innerText = `${currentTemp}°C/${currentWeather}`;
+
+    cpChipA.innerText = isTempPass ? 'True' : 'False';
+    cpChipA.className = 'condition-chip ' + (isTempPass ? 'is-true' : 'is-false');
+    cpBlockA.className = 'checkpoint-block ' + (isTempPass ? 'cp-pass' : 'cp-fail');
+
+    cpChipB.innerText = isWeatherPass ? 'True' : 'False';
+    cpChipB.className = 'condition-chip ' + (isWeatherPass ? 'is-true' : 'is-false');
+    cpBlockB.className = 'checkpoint-block ' + (isWeatherPass ? 'cp-pass' : 'cp-fail');
+
+    let overallPass = (currentOp === 'and') ? (isTempPass && isWeatherPass) : (isTempPass || isWeatherPass);
+
+    codePreview.innerText = `if ${currentTemp} > 25 ${currentOp} "${currentWeather}" == "晴天":`;
+
+    if (currentOp === 'and') {
+      // 串聯幾何佈局
+      seriesGroup.style.display = 'block';
+      parallelGroup.style.display = 'none';
+
+      // 串聯時，兩哨依序排列在主線上 (Y=80)
+      cpBlockA.style.left = '200px';
+      cpBlockA.style.top = '28px';
+
+      cpBlockB.style.left = '460px';
+      cpBlockB.style.top = '28px';
+
+      // 轉轍銷顏色反應
+      sPin1.setAttribute('fill', isTempPass ? '#22c55e' : '#ef4444');
+      sPin2.setAttribute('fill', isWeatherPass ? '#22c55e' : '#ef4444');
+    } else {
+      // 並聯幾何佈局
+      seriesGroup.style.display = 'none';
+      parallelGroup.style.display = 'block';
+
+      // 並聯時，哨所 A 在上軌 (Y=60)，哨所 B 在下軌 (Y=180)
+      cpBlockA.style.left = '330px';
+      cpBlockA.style.top = '10px';
+
+      cpBlockB.style.left = '330px';
+      cpBlockB.style.top = '130px';
+
+      pPinMain.setAttribute('fill', overallPass ? '#22c55e' : '#ef4444');
+    }
+
+    if (overallPass) {
+      routeStatus.innerText = '適合外出 (if 暢行)';
+      routeStatus.style.color = 'var(--accent-green)';
+      stdout.innerText = '天氣很好，適合外出';
+      stdout.className = 'term-result r-true';
+    } else {
+      routeStatus.innerText = '天氣不太好 (else 側線)';
+      routeStatus.style.color = 'var(--accent-terracotta)';
+      stdout.innerText = '天氣不太好';
+      stdout.className = 'term-result r-false';
+    }
+  }
+
+  function resetTrainToDepot() {
+    clearTimeout(animTimer);
+    drTrain.style.transition = 'none';
+    if (currentOp === 'and') {
+      drTrain.style.left = '20px';
+      drTrain.style.top = '55px';
+    } else {
+      drTrain.style.left = '20px';
+      drTrain.style.top = '115px';
+    }
+    setTimeout(() => {
+      drTrain.style.transition = 'all 0.65s cubic-bezier(0.25, 1, 0.5, 1)';
+    }, 50);
+    updateVisualTopology();
+  }
+
+  function runInspectionRun() {
+    resetTrainToDepot();
+    const isTempPass = currentTemp > 25;
+    const isWeatherPass = (currentWeather === '晴天');
+
+    if (currentOp === 'and') {
+      // ================= AND 串聯運行 =================
+      // 1. 開到第一道道岔 (X=140)
+      drTrain.style.left = '120px';
+
+      animTimer = setTimeout(() => {
+        if (!isTempPass) {
+          // 第一哨未過：在哨前直接切入側線 (X=260, Y=215 -> X=680, Y=215)
+          cpBlockB.className = 'checkpoint-block cp-bypassed';
+          drTrain.style.left = '250px';
+          drTrain.style.top = '215px';
+          animTimer = setTimeout(() => {
+            drTrain.style.left = '680px';
+          }, 650);
+        } else {
+          // 第一哨通過：穿過第一哨抵達第二道岔 (X=390, Y=55)
+          drTrain.style.left = '370px';
+
+          animTimer = setTimeout(() => {
+            if (!isWeatherPass) {
+              // 第二哨未過：在第二哨前切入側線
+              drTrain.style.left = '500px';
+              drTrain.style.top = '215px';
+              animTimer = setTimeout(() => {
+                drTrain.style.left = '680px';
+              }, 650);
+            } else {
+              // 雙雙通過：直行主線出站
+              drTrain.style.left = '680px';
+              drTrain.style.top = '55px';
+            }
+          }, 700);
+        }
+      }, 700);
+
+    } else {
+      // ================= OR 並聯運行 =================
+      // 1. 開到分裂道岔 (X=130)
+      drTrain.style.left = '120px';
+
+      animTimer = setTimeout(() => {
+        if (isTempPass) {
+          // 上軌條件成立：走上軌支線 (Y=35)，穿過第一哨
+          drTrain.style.left = '250px';
+          drTrain.style.top = '35px';
+
+          animTimer = setTimeout(() => {
+            drTrain.style.left = '490px'; // 穿過上哨
+            animTimer = setTimeout(() => {
+              // 匯流入 if 主線 (Y=115)
+              drTrain.style.left = '680px';
+              drTrain.style.top = '115px';
+            }, 600);
+          }, 600);
+
+        } else if (isWeatherPass) {
+          // 上軌不通、下軌成立：走下軌支線 (Y=155)，穿過第二哨
+          cpBlockA.className = 'checkpoint-block cp-fail';
+          drTrain.style.left = '250px';
+          drTrain.style.top = '155px';
+
+          animTimer = setTimeout(() => {
+            drTrain.style.left = '490px'; // 穿過下哨
+            animTimer = setTimeout(() => {
+              // 匯流入 if 主線 (Y=115)
+              drTrain.style.left = '680px';
+              drTrain.style.top = '115px';
+            }, 600);
+          }, 600);
+
+        } else {
+          // 兩路皆不通：切入底層 else 避車線 (Y=255)
+          drTrain.style.left = '240px';
+          drTrain.style.top = '255px';
+          animTimer = setTimeout(() => {
+            drTrain.style.left = '680px';
+          }, 650);
+        }
+      }, 700);
+    }
+  }
+
+  tempSlider.addEventListener('input', function() {
+    currentTemp = parseInt(this.value, 10);
+    resetTrainToDepot();
+  });
+
+  weatherBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      weatherBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentWeather = this.getAttribute('data-w');
+      resetTrainToDepot();
+    });
+  });
+
+  opBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      opBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentOp = this.getAttribute('data-op');
+      resetTrainToDepot();
+    });
+  });
+
+  btnPlay.addEventListener('click', runInspectionRun);
+  btnReset.addEventListener('click', resetTrainToDepot);
+
+  // 初始化畫面
+  resetTrainToDepot();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1474 @@
+<style>
+  :root {
+    --bg-primary: #fbf9f4;
+    --bg-card: #ffffff;
+    --bg-secondary: #f3efe6;
+    --text-main: #2d2926;
+    --text-muted: #665f57;
+    --border-color: #e5dec9;
+    --terracotta: #c2410c;
+    --amber: #b45309;
+    --navy: #1e3a8a;
+    --forest: #15803d;
+    --code-bg: #1e293b;
+    --code-text: #f8fafc;
+    --font-code: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    --radius: 10px;
+  }
+
+  .slide-body-sandbox * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .slide-body-sandbox {
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+    line-height: 1.75;
+  }
+
+  .slide-body-sandbox .container {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  .slide-body-sandbox header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .slide-body-sandbox .lesson-badge {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--terracotta);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .slide-body-sandbox h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.35;
+    margin-bottom: 12px;
+  }
+
+  .slide-body-sandbox .lead-text {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+  }
+
+  .slide-body-sandbox section {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 36px;
+    box-shadow: 0 4px 14px rgba(45, 41, 38, 0.04);
+  }
+
+  .slide-body-sandbox h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .slide-body-sandbox h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--amber);
+    margin: 24px 0 12px 0;
+  }
+
+  .slide-body-sandbox p {
+    margin-bottom: 16px;
+    color: var(--text-main);
+  }
+
+  .slide-body-sandbox ul,
+  .slide-body-sandbox ol {
+    margin: 0 0 16px 26px;
+    color: var(--text-main);
+  }
+
+  .slide-body-sandbox li {
+    margin-bottom: 8px;
+  }
+
+  /* 程式碼嚴格換行樣式 */
+  pre.code-block {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    font-family: var(--font-code);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin: 16px 0 20px 0;
+    overflow-x: auto;
+    white-space: pre !important;
+    word-break: normal;
+  }
+
+  pre.code-block code {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    white-space: pre !important;
+  }
+
+  .kw { color: #f472b6; font-weight: bold; }
+  .fn { color: #60a5fa; }
+  .str { color: #34d399; }
+  .num { color: #fbbf24; }
+  .cmt { color: #94a3b8; font-style: italic; }
+
+  .terminal-window {
+    background-color: #0f172a;
+    border-radius: var(--radius);
+    border: 1px solid #334155;
+    margin: 16px 0 24px 0;
+    overflow: hidden;
+  }
+
+  .terminal-header {
+    background-color: #1e293b;
+    padding: 8px 14px;
+    font-family: var(--font-code);
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #f59e0b; }
+  .dot-green { background: #10b981; }
+
+  .terminal-body {
+    padding: 14px 18px;
+    font-family: var(--font-code);
+    font-size: 0.9rem;
+    color: #e2e8f0;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+
+  .callout {
+    border-left: 4px solid var(--terracotta);
+    background-color: var(--bg-secondary);
+    padding: 16px 20px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 20px 0;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: var(--terracotta);
+    margin-bottom: 6px;
+  }
+
+  /* 動態教具容器規範 */
+  .widget-container {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 28px 0;
+  }
+
+  .widget-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--forest);
+    margin-bottom: 12px;
+    display: inline-block;
+    padding: 4px 10px;
+    background: #dcfce7;
+    border-radius: 6px;
+  }
+
+  .widget-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+    align-items: center;
+  }
+
+  button.btn-ctrl {
+    background-color: var(--navy);
+    color: #ffffff;
+    border: none;
+    padding: 9px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  button.btn-ctrl:hover {
+    background-color: #1d4ed8;
+  }
+
+  button.btn-ctrl:active {
+    transform: scale(0.97);
+  }
+
+  button.btn-ctrl.btn-alt {
+    background-color: var(--terracotta);
+  }
+  button.btn-ctrl.btn-alt:hover {
+    background-color: #9a3412;
+  }
+
+  button.btn-ctrl.btn-sec {
+    background-color: #475569;
+  }
+  button.btn-ctrl.btn-sec:hover {
+    background-color: #334155;
+  }
+
+  /* 角色與對話氣泡 */
+  .avatar-dialog-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .character-avatar {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .character-avatar svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.12));
+  }
+
+  .speech-bubble {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    position: relative;
+    flex-grow: 1;
+    color: var(--text-main);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+
+  .speech-bubble::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 18px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid #ffffff;
+  }
+
+  @keyframes avatarBlink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+  .eye-blink {
+    transform-origin: center;
+    animation: avatarBlink 3.8s infinite;
+  }
+
+  @keyframes avatarBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  .char-bounce {
+    animation: avatarBounce 2s ease-in-out infinite;
+  }
+
+  /* 6-3 專用：實體連續槽位軌道與動態推擠 */
+  .lane-stage {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+    overflow-x: auto;
+  }
+
+  .lane-track {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 110px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 2px dashed #cbd5e1;
+    position: relative;
+  }
+
+  .lane-slot {
+    position: relative;
+    width: 100px;
+    height: 74px;
+    background: #eff6ff;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #1e3a8a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, background 0.3s;
+  }
+
+  .slot-idx-tag {
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-family: var(--font-code);
+  }
+
+  .slot-val-tag {
+    font-size: 0.95rem;
+    font-family: var(--font-code);
+  }
+
+  .slot-shifting-right {
+    animation: shiftRight 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+
+  .slot-dropping {
+    animation: dropFromSky 0.45s ease forwards;
+    background: #fef08a !important;
+    border-color: #ca8a04 !important;
+  }
+
+  .slot-popping {
+    animation: popFloatAway 0.45s ease forwards;
+  }
+
+  @keyframes dropFromSky {
+    0% { transform: translateY(-50px) scale(0.8); opacity: 0; }
+    70% { transform: translateY(6px) scale(1.05); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  @keyframes popFloatAway {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-40px) scale(0.7); opacity: 0; }
+  }
+
+  /* 6-4 排序畫布 */
+  .sort-stage {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+    min-height: 230px;
+  }
+
+  .sort-track-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cards-row {
+    display: flex;
+    gap: 12px;
+    min-height: 74px;
+    padding: 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 2px dashed #cbd5e1;
+    margin-bottom: 18px;
+    align-items: center;
+    position: relative;
+  }
+
+  .num-card {
+    width: 64px;
+    height: 56px;
+    background: #eff6ff;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-code);
+    font-weight: bold;
+    color: #1e3a8a;
+    transition: transform 0.45s ease, background 0.3s, border-color 0.3s, opacity 0.4s;
+  }
+
+  .num-card.sorted-done {
+    background: #dcfce7;
+    border-color: #16a34a;
+    color: #14532d;
+  }
+
+  .return-none-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: var(--font-code);
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  /* 6-5 對決畫布 */
+  .duel-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .duel-stage {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .duel-card {
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .duel-card.list-side {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+  }
+
+  .duel-card.tuple-side {
+    background: #fef2f2;
+    border: 2px solid #fca5a5;
+  }
+
+  .duel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .duel-title {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .duel-slots {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .item-pill {
+    flex: 1;
+    text-align: center;
+    padding: 10px 4px;
+    background: #ffffff;
+    border-radius: 6px;
+    font-family: var(--font-code);
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .shield-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(220, 38, 38, 0.15);
+    border: 2px solid #dc2626;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b91c1c;
+    font-weight: 800;
+    font-size: 0.75rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+  }
+
+  .shield-overlay.blocked {
+    opacity: 1;
+    animation: shieldVibrate 0.4s ease;
+  }
+
+  @keyframes shieldVibrate {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.08) rotate(-2deg); }
+    75% { transform: scale(1.08) rotate(2deg); }
+  }
+
+  /* 6-2 尺規畫布 */
+  .slice-visualizer {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .ruler-container {
+    display: flex;
+    margin: 16px 0;
+    position: relative;
+  }
+
+  .ruler-col {
+    flex: 1;
+    text-align: center;
+    border-right: 1px dashed #cbd5e1;
+    padding: 8px 4px;
+  }
+
+  .ruler-col:last-child {
+    border-right: none;
+  }
+
+  .ruler-pos-idx {
+    font-family: var(--font-code);
+    font-size: 0.85rem;
+    color: #2563eb;
+    font-weight: 700;
+  }
+
+  .ruler-elem {
+    background: #f8fafc;
+    border: 1px solid #94a3b8;
+    border-radius: 6px;
+    padding: 10px 4px;
+    margin: 8px 2px;
+    font-weight: 600;
+    color: #0f172a;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+
+  .ruler-elem.selected {
+    background: #dbeafe;
+    border-color: #2563eb;
+    color: #1e3a8a;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.15);
+  }
+
+  .ruler-neg-idx {
+    font-family: var(--font-code);
+    font-size: 0.85rem;
+    color: #dc2626;
+    font-weight: 700;
+  }
+
+  .slice-inputs {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 16px;
+    font-family: var(--font-code);
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .slice-inputs input {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  /* 6-6 閉環畫布 */
+  .bracket-enclosure {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .bracket-hull {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 3px solid #3b82f6;
+    border-radius: 12px;
+  }
+
+  .bracket-char {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    user-select: none;
+  }
+
+  .bracket-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    flex-grow: 1;
+  }
+
+  .stage-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stage-name {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #64748b;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .stage-live {
+    font-family: var(--font-code);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    min-height: 28px;
+  }
+
+  .slide-body-sandbox footer {
+    margin-top: 50px;
+    padding: 26px 0;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.65;
+  }
+</style>
+<div class="container">
+
+  <!-- 6-1 -->
+  <section id="sec-6-1">
+    <h2>6-1 序列容器特性與記憶體配置機制</h2>
+    <p>在 Python 的記憶體架構中，串列（<code>list</code>）是一種高度動態的循序容器。直譯器底層配置的是一組<strong>連續的記憶體指標陣列（Array of Pointers）</strong>。每個槽位存放的均是指向實體物件的記憶體位址參照，而非直接把資料數值硬塞在槽位內。</p>
+
+    <h3>串列三大核心特性</h3>
+    <ul>
+      <li><strong>有序性（Ordered）</strong>：元素嚴格依照插入順序分配循序編號（索引從 0 起算）。</li>
+      <li><strong>可變性（Mutable）</strong>：串列建立後，其長度與槽位指標可隨時原地替換，無需重新配置整個容器物件。</li>
+      <li><strong>異質性（Heterogeneous）</strong>：由於槽位中儲存的是物件指標，同一個串列內允許混合容納型態截然不同的元素。</li>
+    </ul>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 1：建立串列（包含異質元素與巢狀結構）</span>
+my_list = [<span class="num">10</span>, <span class="str">'Python'</span>, <span class="num">3.14</span>, [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]]
+<span class="fn">print</span>(my_list)</code></pre>
+
+    <div class="terminal-window">
+      <div class="terminal-header"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span> 終端機輸出</div>
+      <div class="terminal-body">[10, 'Python', 3.14, [1, 2, 3]]</div>
+    </div>
+
+    <h3>內建聚合量測函式</h3>
+    <p>針對數值型序列，Python 提供多組 $O(n)$ 線性時間複雜度的原生統計函式：</p>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 2：常用內建統計函式</span>
+numbers = [<span class="num">4</span>, <span class="num">7</span>, <span class="num">1</span>, <span class="num">12</span>, <span class="num">9</span>]
+
+<span class="fn">print</span>(<span class="fn">len</span>(numbers))  <span class="cmt"># 計算元素總量: 5</span>
+<span class="fn">print</span>(<span class="fn">max</span>(numbers))  <span class="cmt"># 取得最大值: 12</span>
+<span class="fn">print</span>(<span class="fn">min</span>(numbers))  <span class="cmt"># 取得最小值: 1</span>
+<span class="fn">print</span>(<span class="fn">sum</span>(numbers))  <span class="cmt"># 元素總和: 33</span></code></pre>
+  </section>
+
+  <!-- 6-2 -->
+  <section id="sec-6-2">
+    <h2>6-2 序列索引定址與切片邊界計算</h2>
+    <p>直譯器為序列容器提供雙向對應定址：正向索引由 <code>0</code> 遞增至 <code>N - 1</code>；負向索引則自末端 <code>-1</code> 倒數至 <code>-N</code>。直譯器在解析負向索引 <code>-k</code> 時，內部等價執行 <code>N + (-k)</code> 計算真實位移。</p>
+
+    <h3>切片左閉右開原理：<code>[start:stop:step]</code></h3>
+    <p>切片運算子並非單純取單一索引，而是在元素接縫處劃定分割邊界，嚴格遵循「<strong>左閉右開（含頭不含尾）</strong>」原則：</p>
+    <ul>
+      <li><code>start</code>：擷取的起始邊界索引（包含此位置）。</li>
+      <li><code>stop</code>：擷取的終止邊界索引（<strong>不包含此位置</strong>）。</li>
+      <li><code>step</code>：每次推進的步長；當步長為負整數時，直譯器逆向走訪。</li>
+    </ul>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 3：雙向索引存取與切片操作</span>
+animals = [<span class="str">'cat'</span>, <span class="str">'dog'</span>, <span class="str">'rabbit'</span>, <span class="str">'horse'</span>]
+
+<span class="fn">print</span>(animals[<span class="num">0</span>])     <span class="cmt"># 正向索引取首位: 'cat'</span>
+<span class="fn">print</span>(animals[-<span class="num">1</span>])    <span class="cmt"># 負向索引取末位: 'horse'</span>
+<span class="fn">print</span>(animals[<span class="num">1</span>:<span class="num">3</span>])   <span class="cmt"># 切片索引 1 至 2: ['dog', 'rabbit']</span>
+<span class="fn">print</span>(animals[:<span class="num">2</span>])    <span class="cmt"># 省略起點，預設從 0 開始: ['cat', 'dog']</span>
+<span class="fn">print</span>(animals[<span class="num">2</span>:])    <span class="cmt"># 省略終點，延展至序列結尾: ['rabbit', 'horse']</span></code></pre>
+
+    <!-- 6-2 尺規教具 -->
+    <div class="widget-container">
+      <div class="widget-label">直譯器機制模擬：雙向尺規索引定址與切片投影儀</div>
+      
+      <div class="avatar-dialog-row">
+        <div class="character-avatar char-bounce">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="#3b82f6"/>
+            <circle cx="35" cy="42" r="6" fill="#ffffff" class="eye-blink"/>
+            <circle cx="65" cy="42" r="6" fill="#ffffff" class="eye-blink"/>
+            <circle cx="35" cy="42" r="3" fill="#0f172a"/>
+            <circle cx="65" cy="42" r="3" fill="#0f172a"/>
+            <path d="M 38 64 Q 50 74 62 64" stroke="#ffffff" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <polygon points="50,12 44,24 56,24" fill="#fbbf24"/>
+          </svg>
+        </div>
+        <div class="speech-bubble" id="sliceBubble">
+          我是<strong>探針小博士</strong>！調整下方 <code>start</code>、<code>stop</code> 與 <code>step</code>，我會為你投影出直譯器「含頭不含尾」選出的全新獨立串列複本！
+        </div>
+      </div>
+
+      <div class="slice-visualizer">
+        <div class="ruler-container" id="rulerRow"></div>
+
+        <div class="slice-inputs">
+          <span>運算式：<code>animals[</code></span>
+          <label>start: <input type="number" id="sliceStart" value="1" min="-4" max="4"></label>
+          <span>:</span>
+          <label>stop: <input type="number" id="sliceStop" value="3" min="-4" max="4"></label>
+          <span>:</span>
+          <label>step: <input type="number" id="sliceStep" value="1" min="-2" max="2"></label>
+          <span><code>]</code></span>
+          <button class="btn-ctrl" id="btnRunSlice">立即投影求值</button>
+        </div>
+
+        <div style="margin-top: 14px; font-family: var(--font-code); font-size: 0.95rem;">
+          投影產生的新獨立串列：<strong id="sliceResultText" style="color: var(--navy);">['dog', 'rabbit']</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6-3 -->
+  <section id="sec-6-3">
+    <h2>6-3 串列元素動態操作與原地修改（In-place Modification）</h2>
+    <p>串列支援豐富的原地修改方法。理解其運作機制的關鍵在於評估<strong>時間複雜度與記憶體搬移的效能成本</strong>。</p>
+
+    <h3>新增元素：<code>append()</code>、<code>extend()</code> 與 <code>insert()</code></h3>
+    <ul>
+      <li><code>append(x)</code>：於串列末端追加單一元素指標，時間複雜度為分攤常數時間 $O(1)$。</li>
+      <li><code>extend(iterable)</code>：逐一展開可迭代物件，整批追加至串列末端。</li>
+      <li><code>insert(index, x)</code>：於指定索引插入新指標。為保持陣列連續性，目標索引後的所有槽位指標必須集體向右平移一格，時間成本為 $O(n)$。</li>
+    </ul>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 4：串列的新增操作</span>
+fruits = [<span class="str">'apple'</span>, <span class="str">'banana'</span>]
+
+fruits.append(<span class="str">'cherry'</span>)
+<span class="fn">print</span>(fruits)  <span class="cmt"># ['apple', 'banana', 'cherry']</span>
+
+fruits.insert(<span class="num">1</span>, <span class="str">'orange'</span>)
+<span class="fn">print</span>(fruits)  <span class="cmt"># ['apple', 'orange', 'banana', 'cherry']</span>
+
+fruits.extend([<span class="str">'kiwi'</span>, <span class="str">'mango'</span>])
+<span class="fn">print</span>(fruits)  <span class="cmt"># ['apple', 'orange', 'banana', 'cherry', 'kiwi', 'mango']</span></code></pre>
+
+    <h3>移除元素：<code>pop()</code>、<code>remove()</code> 與 <code>clear()</code></h3>
+    <ul>
+      <li><code>pop([index])</code>：移除並傳回指定索引位置的元素（預設為末位 <code>-1</code>）。若彈出非末端元素，後續槽位需左移遞補（$O(n)$）。</li>
+      <li><code>remove(val)</code>：線性搜尋第一個數值相符的元素並移除；若不存在則拋出 <code>ValueError</code>。</li>
+      <li><code>clear()</code>：將串列內所有參照指標清空，長度歸零重設為 <code>[]</code>。</li>
+    </ul>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 5：串列的移除操作</span>
+numbers = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>]
+
+numbers.remove(<span class="num">20</span>)
+<span class="fn">print</span>(numbers)  <span class="cmt"># [10, 30, 40, 50]</span>
+
+val = numbers.pop()
+<span class="fn">print</span>(val)      <span class="cmt"># 傳回彈出值: 50</span>
+<span class="fn">print</span>(numbers)  <span class="cmt"># [10, 30, 40]</span>
+
+numbers.clear()
+<span class="fn">print</span>(numbers)  <span class="cmt"># []</span></code></pre>
+
+    <!-- 6-3 專屬動態教具：物理推擠與遞補模擬器 -->
+    <div class="widget-container">
+      <div class="widget-label">直譯器機制模擬：連續記憶體槽位動態增刪與實體推擠模擬器</div>
+
+      <div class="avatar-dialog-row">
+        <!-- 搬運小工匠 阿擠 -->
+        <div class="character-avatar" id="laneAvatar">
+          <svg viewBox="0 0 100 100">
+            <rect x="22" y="24" width="56" height="56" rx="12" fill="#0284c7"/>
+            <circle cx="38" cy="46" r="6" fill="#ffffff" class="eye-blink"/>
+            <circle cx="62" cy="46" r="6" fill="#ffffff" class="eye-blink"/>
+            <circle cx="38" cy="46" r="3" fill="#0f172a"/>
+            <circle cx="62" cy="46" r="3" fill="#0f172a"/>
+            <path d="M 38 62 Q 50 70 62 62" stroke="#ffffff" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <rect x="32" y="10" width="36" height="14" rx="4" fill="#fbbf24"/>
+          </svg>
+        </div>
+        <div class="speech-bubble" id="laneBubble">
+          我是<strong>槽位工匠阿擠</strong>！看好囉，串列底層是連續的格子！當你呼叫 <code>insert(1)</code> 時，我必須把後面的箱子<strong>集體向右推擠</strong>才能騰出空位！
+        </div>
+      </div>
+
+      <div class="widget-controls">
+        <button class="btn-ctrl" id="btnAppendFruit">fruits.append('cherry')</button>
+        <button class="btn-ctrl" id="btnInsertFruit">fruits.insert(1, 'orange')</button>
+        <button class="btn-ctrl btn-alt" id="btnPopFruit">fruits.pop(1)</button>
+        <button class="btn-ctrl btn-alt" id="btnRemoveFruit">fruits.remove('banana')</button>
+        <button class="btn-ctrl btn-sec" id="btnResetLane">重置陣列槽位</button>
+      </div>
+
+      <div class="lane-stage">
+        <div class="lane-track" id="laneTrack"></div>
+        <div id="laneLog" style="margin-top: 14px; font-family: var(--font-code); font-size: 0.85rem; color: #475569;">
+          就緒：點擊按鈕，觀察槽位在新增與刪除時的實體位移。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6-4 -->
+  <section id="sec-6-4">
+    <h2>6-4 序列排序演算法與原地異動評估</h2>
+    <p>初學者最常混淆的關鍵，在於「<strong>原地修改方法</strong>」與「<strong>產生獨立副本的函式</strong>」的本質差異。Python 的 Timsort 演算法在此兩者有完全不同的記憶體分配策略。</p>
+
+    <h3>原地排序 <code>list.sort()</code> vs. 獨立副本 <code>sorted()</code></h3>
+    <ul>
+      <li><strong><code>list.sort(reverse=False)</code></strong>：屬於<strong>物件方法</strong>。它直接在原串列的連續記憶體空間中進行指標重排。因為是原地異動，<strong>其回傳值固定為 <code>None</code></strong>。</li>
+      <li><strong><code>sorted(iterable, reverse=False)</code></strong>：屬於<strong>內建函式</strong>。直譯器會配置全新記憶體陣列，複製元素指標並完成排序後，<strong>回傳全新的獨立串列物件</strong>，原串列維持原封不動。</li>
+      <li><strong><code>list.reverse()</code></strong>：原地翻轉方法，直接顛倒原串列槽位指標，回傳值同樣為 <code>None</code>。</li>
+    </ul>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 6：list.sort() 與 sorted() 之對比</span>
+scores = [<span class="num">85</span>, <span class="num">78</span>, <span class="num">92</span>, <span class="num">68</span>]
+
+<span class="cmt"># 1. 使用 sorted() 產生新副本，原串列完全不變</span>
+sorted_scores = <span class="fn">sorted</span>(scores)
+<span class="fn">print</span>(sorted_scores)  <span class="cmt"># [68, 78, 85, 92]</span>
+<span class="fn">print</span>(scores)         <span class="cmt"># [85, 78, 92, 68] (維持原狀)</span>
+
+<span class="cmt"># 2. 使用 sort() 原地排序（注意：回傳 None）</span>
+scores.sort()
+<span class="fn">print</span>(scores)         <span class="cmt"># [68, 78, 85, 92] (原物件已被修改)</span></code></pre>
+
+    <div class="callout">
+      <div class="callout-title">避坑警示：常見初學者賦值陷阱</div>
+      <p>初學者極易誤寫 <code>scores = scores.sort()</code>。由於 <code>sort()</code> 為原地操作且不產生實體回傳值，此時 <code>scores</code> 變數將被綁定為 <code>None</code>，導致原有資料在變數範圍內被徹底覆蓋丟失！</p>
+    </div>
+
+    <!-- 6-4 排序教具 -->
+    <div class="widget-container">
+      <div class="widget-label">直譯器機制模擬：list.sort() 原地洗牌 vs sorted() 影分身投影對照儀</div>
+
+      <div class="avatar-dialog-row">
+        <div class="character-avatar" id="sortAvatar">
+          <svg viewBox="0 0 100 100">
+            <rect x="20" y="25" width="60" height="55" rx="10" fill="#f59e0b"/>
+            <circle cx="38" cy="48" r="6" fill="#ffffff" class="eye-blink"/>
+            <circle cx="62" cy="48" r="6" fill="#ffffff" class="eye-blink"/>
+            <circle cx="38" cy="48" r="3" fill="#1e293b"/>
+            <circle cx="62" cy="48" r="3" fill="#1e293b"/>
+            <line x1="38" y1="64" x2="62" y2="64" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
+            <line x1="50" y1="12" x2="50" y2="25" stroke="#f59e0b" stroke-width="4"/>
+            <circle cx="50" cy="10" r="5" fill="#ef4444"/>
+          </svg>
+        </div>
+        <div class="speech-bubble" id="sortBubble">
+          我是<strong>工匠波波</strong>！點擊按鈕，看我是直接在<strong>原陣列原地搬移換位</strong>，還是召喚法術<strong>複製出全新串列</strong>！
+        </div>
+      </div>
+
+      <div class="widget-controls">
+        <button class="btn-ctrl" id="btnRunSort">執行 scores.sort() 原地排序</button>
+        <button class="btn-ctrl" id="btnRunSorted">執行 sorted_scores = sorted(scores)</button>
+        <button class="btn-ctrl btn-alt" id="btnTrapSort">踩坑示範: scores = scores.sort()</button>
+        <button class="btn-ctrl btn-sec" id="btnResetSort">重設數列</button>
+      </div>
+
+      <div class="sort-stage">
+        <div class="sort-track-label">
+          <span>原始串列物件 <code>scores</code> (記憶體槽位 ID: 0x1A4F)</span>
+          <span id="sortStatusBadge"></span>
+        </div>
+        <div class="cards-row" id="origCardsRow"></div>
+
+        <div class="sort-track-label" style="margin-top: 10px;">
+          <span>接收端新串列 <code>sorted_scores</code> (記憶體槽位 ID: 0x9B2C)</span>
+          <span id="newStatusBadge" style="color: #64748b; font-size: 0.8rem;">尚未建立</span>
+        </div>
+        <div class="cards-row" id="newCardsRow">
+          <span style="color: #94a3b8; font-size: 0.85rem; padding-left: 8px;">（等待 sorted() 函式生成獨立副本...）</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6-5 -->
+  <section id="sec-6-5">
+    <h2>6-5 元組特性與結構賦值</h2>
+    <p>元組（<code>tuple</code>）使用小括號 <code>()</code> 定義。在直譯器內部，元組同樣配置連續槽位，但其被賦予了<strong>不可變性（Immutability）</strong>。一旦建立，該記憶體槽位即被唯讀封印，嚴禁新增、刪除或重新賦值。</p>
+
+    <h3>唯讀防護與執行期安全</h3>
+    <p>元組常用於儲存不應被竄改的關鍵資料（如經緯度座標、資料庫連線參數、RGB 色碼）。</p>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 7：元組不可變性保護機制</span>
+coordinates = (<span class="num">10</span>, <span class="num">20</span>)
+<span class="fn">print</span>(coordinates[<span class="num">0</span>])  <span class="cmt"># 讀取正常: 10</span>
+
+<span class="cmt"># 嘗試修改元組槽位會立即引發例外</span>
+<span class="cmt"># coordinates[0] = 5  # TypeError: 'tuple' object does not support item assignment</span></code></pre>
+
+    <!-- 6-5 對照教具 -->
+    <div class="widget-container">
+      <div class="widget-label">直譯器機制模擬：可變 List vs 唯讀 Tuple 記憶體防護對決</div>
+
+      <div class="duel-stage">
+        <!-- List 端 -->
+        <div class="duel-card list-side">
+          <div class="duel-header">
+            <div class="character-avatar" style="width: 44px; height: 44px;">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="#10b981"/>
+                <circle cx="36" cy="45" r="5" fill="#ffffff" class="eye-blink"/>
+                <circle cx="64" cy="45" r="5" fill="#ffffff" class="eye-blink"/>
+                <circle cx="36" cy="45" r="2.5" fill="#064e3b"/>
+                <circle cx="64" cy="45" r="2.5" fill="#064e3b"/>
+                <path d="M 36 62 Q 50 72 64 62" stroke="#064e3b" stroke-width="4" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div>
+              <div class="duel-title" style="color: #065f46;">活頁串列 List（可變 Mutable）</div>
+              <div style="font-size: 0.8rem; color: #047857;">角色：靈活軟泥怪「皮皮」</div>
+            </div>
+          </div>
+          <p style="font-size: 0.85rem; color: #065f46;">隨時接受槽位更新、動態增刪，彈性極高。</p>
+          <div class="duel-slots" id="listSlots">
+            <div class="item-pill">10</div>
+            <div class="item-pill">20</div>
+            <div class="item-pill">30</div>
+          </div>
+          <button class="btn-ctrl" id="btnMutateList" style="width: 100%; justify-content: center; background: #059669;">
+            修改槽位 [0] = 99
+          </button>
+        </div>
+
+        <!-- Tuple 端 -->
+        <div class="duel-card tuple-side">
+          <div class="duel-header">
+            <div class="character-avatar" style="width: 44px; height: 44px;">
+              <svg viewBox="0 0 100 100">
+                <rect x="22" y="20" width="56" height="60" rx="6" fill="#64748b"/>
+                <line x1="28" y1="46" x2="72" y2="46" stroke="#f1f5f9" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="40" cy="46" r="3" fill="#ef4444"/>
+                <circle cx="60" cy="46" r="3" fill="#ef4444"/>
+                <rect x="42" y="60" width="16" height="12" rx="2" fill="#334155"/>
+              </svg>
+            </div>
+            <div>
+              <div class="duel-title" style="color: #991b1b;">鋼鐵元組 Tuple（不可變 Immutable）</div>
+              <div style="font-size: 0.8rem; color: #b91c1c;">角色：裝甲守衛「鐵諾」</div>
+            </div>
+          </div>
+          <p style="font-size: 0.85rem; color: #991b1b;">直譯器固化防護，任何寫入意圖皆被鐵壁彈回。</p>
+          <div class="duel-slots" id="tupleSlots">
+            <div class="item-pill" style="position: relative;">
+              10
+              <div class="shield-overlay" id="tupleShield">🛡️ 攔截!</div>
+            </div>
+            <div class="item-pill">20</div>
+            <div class="item-pill">30</div>
+          </div>
+          <button class="btn-ctrl btn-alt" id="btnMutateTuple" style="width: 100%; justify-content: center;">
+            嘗試修改槽位 [0] = 99
+          </button>
+        </div>
+      </div>
+      <div id="duelLog" style="margin-top: 14px; font-family: var(--font-code); font-size: 0.85rem; color: #475569;">
+        就緒：點擊按鈕，檢視直譯器對兩種容器修改請求的底層反應。
+      </div>
+    </div>
+
+    <h3>元組解構賦值（Unpacking）</h3>
+    <p>Python 支援一行完成多變數對應拆解指派，當等號左側識別碼數量與右側元組長度一致時，直譯器會自動完成一對一的解構與綁定：</p>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 8：元組解構賦值與快速交換兩數</span>
+point = (<span class="num">100</span>, <span class="num">200</span>)
+x, y = point
+<span class="fn">print</span>(<span class="str">f"X: {x}, Y: {y}"</span>)  <span class="cmt"># X: 100, Y: 200</span>
+
+<span class="cmt"># 經典應用：無需中介暫存變數的數值互換</span>
+a = <span class="num">1</span>
+b = <span class="num">2</span>
+a, b = b, a  <span class="cmt"># 右側先封裝為 (2, 1)，隨即解構指派給 a, b</span>
+<span class="fn">print</span>(a, b)  <span class="cmt"># 2 1</span></code></pre>
+  </section>
+
+  <!-- 6-6 -->
+  <section id="sec-6-6">
+    <h2>6-6 宣告式序列建構：串列生成式（List Comprehension）</h2>
+    <p>串列生成式並非呼叫外部函式，而是<strong>在方括號 <code>[...]</code> 內部形成封閉的記憶體建構空間</strong>。它由 C 語言層級原生迴圈驅動，比起傳統先建立空串列再逐次 <code>append()</code> 具有更高的執行效能。</p>
+
+    <h3>方括號內的執行時序</h3>
+    <ol>
+      <li><strong>迴圈走訪（右側）</strong>：<code>for item in iterable</code> 依序取出原料元素。</li>
+      <li><strong>條件過濾閘門（中後段）</strong>：若宣告 <code>if condition</code>，立即檢驗元素是否符合資格，未通過者直接剔除。</li>
+      <li><strong>運算式求值（左側）</strong>：通過閘門之元素送入最前端 <code>expression</code> 運算，求值後直接推入方括號內部的新槽位。</li>
+    </ol>
+
+    <pre class="code-block"><code><span class="cmt"># 範例 9：串列生成式基礎與條件過濾</span>
+<span class="cmt"># 1. 計算 0 到 9 之平方數</span>
+squares = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>)]
+<span class="fn">print</span>(squares)  <span class="cmt"># [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+
+<span class="cmt"># 2. 加入 if 條件：僅篩選偶數進行平方</span>
+even_squares = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>) <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]
+<span class="fn">print</span>(even_squares)  <span class="cmt"># [0, 4, 16, 36, 64]</span></code></pre>
+
+    <!-- 6-6 閉環教具 -->
+    <div class="widget-container">
+      <div class="widget-label">直譯器機制模擬：方括號記憶體閉環工廠 [ x**2 for x in [1,2,3,4] if x%2==0 ]</div>
+
+      <div class="widget-controls">
+        <button class="btn-ctrl" id="btnStepComp">單步推進求值</button>
+        <button class="btn-ctrl" id="btnResetComp">重置生成閉環</button>
+      </div>
+
+      <div class="bracket-enclosure">
+        <div class="bracket-hull">
+          <div class="bracket-char">[</div>
+          <div class="bracket-content">
+            <div class="stage-card">
+              <div class="stage-name">(3) 投影求值: x**2</div>
+              <div class="stage-live" id="compEvalVal">-</div>
+            </div>
+            <div class="stage-card">
+              <div class="stage-name">(1) 走訪迴圈: for x in ...</div>
+              <div class="stage-live" id="compForVal">待命</div>
+            </div>
+            <div class="stage-card">
+              <div class="stage-name">(2) 條件閘門: if x%2==0</div>
+              <div class="stage-live" id="compIfVal">-</div>
+            </div>
+          </div>
+          <div class="bracket-char">]</div>
+        </div>
+
+        <div style="margin-top: 14px; font-family: var(--font-code); font-size: 0.95rem;">
+          閉環生成之新串列槽位：<span id="compResultArray" style="font-weight: 700; color: var(--forest);">[]</span>
+        </div>
+        <div id="compLog" style="margin-top: 8px; font-family: var(--font-code); font-size: 0.85rem; color: #64748b;">
+          點擊「單步推進求值」，觀察原料如何在方括號內部完成篩選、翻牌運算並組裝成新串列。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6-7 -->
+  <section id="sec-6-7">
+    <h2>6-7 綜合實作評量</h2>
+
+    <h3>實戰任務一：班級成績統計與排序系統</h3>
+    <p><strong>題目需求</strong>：給定一組未經整理的學生期末成績串列，計算班級總分、平均分、最高分與最低分；產出由高至低的成績排行榜，同時確保原始串列紀錄不被覆蓋摧毀。</p>
+
+    <pre class="code-block"><code><span class="cmt"># 實作 1：班級成績全功能統計系統</span>
+scores = [<span class="num">85</span>, <span class="num">78</span>, <span class="num">92</span>, <span class="num">68</span>, <span class="num">55</span>, <span class="num">94</span>]
+
+<span class="cmt"># 1. 內建量測函式彙整統計</span>
+total_score = <span class="fn">sum</span>(scores)
+count = <span class="fn">len</span>(scores)
+avg_score = total_score / count
+max_score = <span class="fn">max</span>(scores)
+min_score = <span class="fn">min</span>(scores)
+
+<span class="cmt"># 2. 產出排序獨立副本（降序），保護原資料完整</span>
+ranked_scores = <span class="fn">sorted</span>(scores, reverse=<span class="kw">True</span>)
+
+<span class="fn">print</span>(<span class="str">f"班級總分: {total_score}, 平均分: {avg_score:.2f}"</span>)
+<span class="fn">print</span>(<span class="str">f"最高分: {max_score}, 最低分: {min_score}"</span>)
+<span class="fn">print</span>(<span class="str">f"名次排序 (高至低): {ranked_scores}"</span>)
+<span class="fn">print</span>(<span class="str">f"原始登錄順序保持不變: {scores}"</span>)</code></pre>
+
+    <h3>實戰任務二：高效資料過濾器（串列生成式實務應用）</h3>
+    <p><strong>題目需求</strong>：給定原始商品定價數列，使用單一行「串列生成式」，篩選出所有大於等於 50 元的商品，並將其全部打 9 折（乘以 0.9）後轉為整數回傳。</p>
+
+    <pre class="code-block"><code><span class="cmt"># 實作 2：單行生成式處理</span>
+raw_prices = [<span class="num">12</span>, <span class="num">65</span>, <span class="num">48</span>, <span class="num">80</span>, <span class="num">95</span>, <span class="num">30</span>, <span class="num">100</span>]
+
+<span class="cmt"># 宣告式單行處理：過濾 &gt;= 50 並進行 9 折轉換</span>
+discounted = [<span class="fn">int</span>(p * <span class="num">0.9</span>) <span class="kw">for</span> p <span class="kw">in</span> raw_prices <span class="kw">if</span> p &gt;= <span class="num">50</span>]
+
+<span class="fn">print</span>(<span class="str">"原始價格清單:"</span>, raw_prices)
+<span class="fn">print</span>(<span class="str">"折扣篩選結果:"</span>, discounted)</code></pre>
+  </section>
+
+  <footer>
+    <p><strong>免責聲明與權益宣示</strong></p>
+    <p>本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+    如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。</p>
+  </footer>
+</div>
+<script>
+(function() {
+  /* ==========================================================
+     教具 1（6-2）：雙向切片尺規投影儀
+     ========================================================== */
+  const animals = ['cat', 'dog', 'rabbit', 'horse'];
+  const rulerRow = document.getElementById('rulerRow');
+  const sliceStart = document.getElementById('sliceStart');
+  const sliceStop = document.getElementById('sliceStop');
+  const sliceStep = document.getElementById('sliceStep');
+  const sliceResultText = document.getElementById('sliceResultText');
+  const sliceBubble = document.getElementById('sliceBubble');
+
+  function renderRuler() {
+    rulerRow.innerHTML = '';
+    const n = animals.length;
+    animals.forEach((val, i) => {
+      const col = document.createElement('div');
+      col.className = 'ruler-col';
+      col.innerHTML = `
+        <div class="ruler-pos-idx">+${i}</div>
+        <div class="ruler-elem" id="relem-${i}">'${val}'</div>
+        <div class="ruler-neg-idx">${i - n}</div>
+      `;
+      rulerRow.appendChild(col);
+    });
+  }
+
+  function runSlice() {
+    const start = parseInt(sliceStart.value, 10);
+    const stop = parseInt(sliceStop.value, 10);
+    const step = parseInt(sliceStep.value, 10);
+
+    if (isNaN(start) || isNaN(stop) || isNaN(step) || step === 0) {
+      sliceResultText.innerText = '參數格式無效（步長 step 不得為 0）';
+      return;
+    }
+
+    for (let i = 0; i < animals.length; i++) {
+      const el = document.getElementById(`relem-${i}`);
+      if (el) el.classList.remove('selected');
+    }
+
+    const n = animals.length;
+    let actualStart = start < 0 ? Math.max(n + start, 0) : Math.min(start, n);
+    let actualStop = stop < 0 ? Math.max(n + stop, 0) : Math.min(stop, n);
+    const res = [];
+
+    if (step > 0) {
+      for (let i = actualStart; i < actualStop; i += step) {
+        if (i >= 0 && i < n) {
+          res.push(animals[i]);
+          const el = document.getElementById(`relem-${i}`);
+          if (el) el.classList.add('selected');
+        }
+      }
+    } else {
+      actualStart = start < 0 ? n + start : start;
+      actualStop = stop < 0 ? n + stop : stop;
+      for (let i = actualStart; i > actualStop; i += step) {
+        if (i >= 0 && i < n) {
+          res.push(animals[i]);
+          const el = document.getElementById(`relem-${i}`);
+          if (el) el.classList.add('selected');
+        }
+      }
+    }
+
+    sliceResultText.innerText = JSON.stringify(res).replace(/"/g, "'");
+    sliceBubble.innerHTML = `直譯器依據邊界條件，擷取了 <strong>${res.length}</strong> 個元素，封裝並回傳一份全新的串列複本！`;
+  }
+
+  renderRuler();
+  runSlice();
+  document.getElementById('btnRunSlice').addEventListener('click', runSlice);
+
+  /* ==========================================================
+     教具 2（6-3 重修回歸）：連續記憶體槽位動態增刪與實體推擠模擬器
+     ========================================================== */
+  const laneTrack = document.getElementById('laneTrack');
+  const laneBubble = document.getElementById('laneBubble');
+  const laneLog = document.getElementById('laneLog');
+  let currentFruits = ['apple', 'banana'];
+
+  function renderLane(animType = '', animIdx = -1) {
+    laneTrack.innerHTML = '';
+    currentFruits.forEach((item, idx) => {
+      const slot = document.createElement('div');
+      slot.className = 'lane-slot';
+      slot.id = `slot-${idx}`;
+      slot.innerHTML = `
+        <span class="slot-idx-tag">[${idx}]</span>
+        <span class="slot-val-tag">'${item}'</span>
+      `;
+
+      if (animType === 'dropping' && idx === animIdx) {
+        slot.classList.add('slot-dropping');
+      } else if (animType === 'shift-right' && idx > animIdx) {
+        slot.classList.add('slot-shifting-right');
+      }
+
+      laneTrack.appendChild(slot);
+    });
+  }
+
+  // 1. append('cherry')
+  document.getElementById('btnAppendFruit').addEventListener('click', function() {
+    currentFruits.push('cherry');
+    renderLane('dropping', currentFruits.length - 1);
+    laneBubble.innerHTML = `在末端追加新槽位！<code>append()</code> 是直接接在最尾巴，<strong>完全不需要搬動前面的任何箱子</strong>，時間複雜度是超快的 O(1)！`;
+    laneLog.innerText = `[直譯器日誌] 於末端擴展槽位 [${currentFruits.length - 1}]，寫入指標 'cherry'。`;
+  });
+
+  // 2. insert(1, 'orange')
+  document.getElementById('btnInsertFruit').addEventListener('click', function() {
+    if (currentFruits.includes('orange')) {
+      laneLog.innerText = `[直譯器日誌] 槽位中已存在 'orange'，請先點擊重置以重複觀察。`;
+      return;
+    }
+    // 物理推擠：在索引 1 插入
+    currentFruits.splice(1, 0, 'orange');
+    renderLane('dropping', 1);
+    laneBubble.innerHTML = `<strong>注意看！大推擠！</strong><code>insert(1, 'orange')</code> 硬插在索引 1，原先的 1 號及後面的所有箱子全部必須向右平移一格！這就是 O(n) 的代價！`;
+    laneLog.innerText = `[直譯器日誌] 索引 1 之後所有元素指標向右偏移 1 位，插入全新元素 'orange'。`;
+  });
+
+  // 3. pop(1)
+  document.getElementById('btnPopFruit').addEventListener('click', function() {
+    if (currentFruits.length <= 1) {
+      laneLog.innerText = `[直譯器日誌] 元素不足，無法自索引 1 彈出。`;
+      return;
+    }
+    const targetSlot = document.getElementById('slot-1');
+    if (targetSlot) {
+      targetSlot.classList.add('slot-popping');
+      laneBubble.innerHTML = `<strong>向上抽離！</strong><code>pop(1)</code> 抓出索引 1 的箱子並傳回數值，後續所有箱子立刻向左滑動遞補缺口！`;
+      setTimeout(() => {
+        const removed = currentFruits.splice(1, 1);
+        renderLane();
+        laneLog.innerText = `[直譯器日誌] 彈出元素 '${removed}'，後續槽位自動向前遞補遞減索引。`;
+      }, 350);
+    }
+  });
+
+  // 4. remove('banana')
+  document.getElementById('btnRemoveFruit').addEventListener('click', function() {
+    const idx = currentFruits.indexOf('banana');
+    if (idx !== -1) {
+      const targetSlot = document.getElementById(`slot-${idx}`);
+      if (targetSlot) {
+        targetSlot.classList.add('slot-popping');
+        laneBubble.innerHTML = `<code>remove('banana')</code> 是從左到右尋找數值為 'banana' 的箱子並銷毀，後方箱子同樣向左補位！`;
+        setTimeout(() => {
+          currentFruits.splice(idx, 1);
+          renderLane();
+          laneLog.innerText = `[直譯器日誌] 成功搜尋並銷毀 'banana'，其餘元素向左對齊。`;
+        }, 350);
+      }
+    } else {
+      laneLog.innerText = `[直譯器日誌] 串列中已無 'banana'，若於 Python 執行將拋出 ValueError！`;
+    }
+  });
+
+  // 5. 重置
+  document.getElementById('btnResetLane').addEventListener('click', function() {
+    currentFruits = ['apple', 'banana'];
+    renderLane();
+    laneBubble.innerHTML = `槽位已重置為原始狀態：<code>['apple', 'banana']</code>。隨時可以再次測試推擠！`;
+    laneLog.innerText = `[直譯器日誌] 記憶體槽位重置完畢。`;
+  });
+
+  renderLane();
+
+  /* ==========================================================
+     教具 3（6-4）：list.sort() vs sorted() 排序對照教具
+     ========================================================== */
+  const initialScores = [85, 78, 92, 68];
+  let curOrig = [...initialScores];
+  const origRow = document.getElementById('origCardsRow');
+  const newRow = document.getElementById('newCardsRow');
+  const sortBubble = document.getElementById('sortBubble');
+  const sortStatusBadge = document.getElementById('sortStatusBadge');
+  const newStatusBadge = document.getElementById('newStatusBadge');
+
+  function renderSortStage(origArr, newArr = null) {
+    origRow.innerHTML = '';
+    origArr.forEach((num) => {
+      const card = document.createElement('div');
+      card.className = 'num-card';
+      card.innerText = num;
+      origRow.appendChild(card);
+    });
+
+    if (newArr === null) {
+      newRow.innerHTML = `<span style="color: #94a3b8; font-size: 0.85rem; padding-left: 8px;">（等待 sorted() 函式生成獨立副本...）</span>`;
+      newStatusBadge.innerText = '尚未建立';
+      newStatusBadge.style.color = '#64748b';
+    } else {
+      newRow.innerHTML = '';
+      newArr.forEach((num) => {
+        const card = document.createElement('div');
+        card.className = 'num-card sorted-done';
+        card.innerText = num;
+        newRow.appendChild(card);
+      });
+      newStatusBadge.innerText = '獨立新物件生成完畢';
+      newStatusBadge.style.color = '#15803d';
+    }
+  }
+
+  document.getElementById('btnRunSort').addEventListener('click', function() {
+    curOrig.sort((a, b) => a - b);
+    renderSortStage(curOrig, null);
+    sortStatusBadge.innerHTML = `<span class="return-none-badge">回傳值: None</span>`;
+    sortBubble.innerHTML = `<strong>原地排序完成！</strong>看見了嗎？卡片是在原本的槽位<strong>原地換位</strong>的！<code>list.sort()</code> 的回傳值是 <strong>None</strong>，原串列已被修改！`;
+  });
+
+  document.getElementById('btnRunSorted').addEventListener('click', function() {
+    const sortedCopy = [...curOrig].sort((a, b) => a - b);
+    renderSortStage(curOrig, sortedCopy);
+    sortStatusBadge.innerHTML = `<span style="color: #2563eb; font-size: 0.8rem; font-weight: bold;">原串列紋風不動</span>`;
+    sortBubble.innerHTML = `<strong>影分身成功！</strong><code>sorted()</code> 保留了原串列的順序，而在下方配置了全新的記憶體槽位存放排序好的結果！`;
+  });
+
+  document.getElementById('btnTrapSort').addEventListener('click', function() {
+    curOrig = [];
+    origRow.innerHTML = `<div style="color: #dc2626; font-family: var(--font-code); font-weight: bold; padding: 12px;">⚠️ 警告：scores 已變成 None！原串列資料徹底蒸發覆蓋！</div>`;
+    newRow.innerHTML = `<span style="color: #94a3b8; font-size: 0.85rem; padding-left: 8px;">-</span>`;
+    sortStatusBadge.innerHTML = `<span class="return-none-badge">變數值變成 None</span>`;
+    sortBubble.innerHTML = `<strong>大災難！</strong>你寫了 <code>scores = scores.sort()</code>！因為 <code>sort()</code> 回傳的是 None，你直接把原資料覆蓋成空氣了！`;
+  });
+
+  document.getElementById('btnResetSort').addEventListener('click', function() {
+    curOrig = [...initialScores];
+    renderSortStage(curOrig, null);
+    sortStatusBadge.innerHTML = '';
+    sortBubble.innerHTML = `數列已重置為原始狀態：[85, 78, 92, 68]。請選擇上方按鈕觀察差異！`;
+  });
+
+  renderSortStage(curOrig, null);
+
+  /* ==========================================================
+     教具 4（6-5）：可變 List vs 唯讀 Tuple 對抗教具
+     ========================================================== */
+  const listSlots = document.getElementById('listSlots');
+  const tupleShield = document.getElementById('tupleShield');
+  const duelLog = document.getElementById('duelLog');
+
+  document.getElementById('btnMutateList').addEventListener('click', function() {
+    const firstPill = listSlots.children[0];
+    firstPill.style.background = '#bbf7d0';
+    firstPill.style.transform = 'scale(1.1)';
+    firstPill.innerText = '99';
+    setTimeout(() => {
+      firstPill.style.transform = 'scale(1)';
+    }, 300);
+    duelLog.innerHTML = `<span style="color: #15803d; font-weight: bold;">[List 允許異動]</span> 成功！皮皮順利把索引 [0] 的指標抽換為 99。串列屬於可變容器 (Mutable)！`;
+  });
+
+  document.getElementById('btnMutateTuple').addEventListener('click', function() {
+    tupleShield.classList.remove('blocked');
+    void tupleShield.offsetWidth;
+    tupleShield.classList.add('blocked');
+    duelLog.innerHTML = `<span style="color: #dc2626; font-weight: bold;">[直譯器報錯 TypeError]</span> 鐵諾舉起防護盾牌！'tuple' object does not support item assignment。元組為不可變容器 (Immutable)！`;
+  });
+
+  /* ==========================================================
+     教具 5（6-6）：方括號內部閉環工廠
+     ========================================================== */
+  const compRaw = [1, 2, 3, 4];
+  let compIdx = 0;
+  let compResult = [];
+
+  const compForVal = document.getElementById('compForVal');
+  const compIfVal = document.getElementById('compIfVal');
+  const compEvalVal = document.getElementById('compEvalVal');
+  const compResultArray = document.getElementById('compResultArray');
+  const compLog = document.getElementById('compLog');
+
+  document.getElementById('btnStepComp').addEventListener('click', function() {
+    if (compIdx >= compRaw.length) {
+      compLog.innerText = '閉環內的所有原料已走訪完畢，全新串列定型完成！';
+      return;
+    }
+
+    const cur = compRaw[compIdx];
+    compForVal.innerText = `x = ${cur}`;
+    const isEven = cur % 2 === 0;
+
+    if (isEven) {
+      compIfVal.innerText = `${cur} % 2 == 0 ➔ 合格`;
+      compIfVal.style.color = '#16a34a';
+      const squared = cur * cur;
+      compEvalVal.innerText = `${cur}**2 = ${squared}`;
+      compResult.push(squared);
+      compResultArray.innerText = JSON.stringify(compResult);
+      compLog.innerText = `元素 ${cur} 通過條件過濾閘門，完成平方運算 ${squared}，收納於方括號內部。`;
+    } else {
+      compIfVal.innerText = `${cur} % 2 == 0 ➔ 剔除`;
+      compIfVal.style.color = '#dc2626';
+      compEvalVal.innerText = '跳過';
+      compLog.innerText = `元素 ${cur} 為奇數，未通過條件檢驗，直接在方括號內捨棄。`;
+    }
+    compIdx++;
+  });
+
+  document.getElementById('btnResetComp').addEventListener('click', function() {
+    compIdx = 0;
+    compResult = [];
+    compForVal.innerText = '待命';
+    compIfVal.innerText = '-';
+    compIfVal.style.color = 'inherit';
+    compEvalVal.innerText = '-';
+    compResultArray.innerText = '[]';
+    compLog.innerText = '生成閉環已重置，請點擊「單步推進求值」開始觀察。';
+  });
+})();
+</script>

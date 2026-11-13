@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 09：結構化例外處理與除錯（教師互動講義版）</title>
+  <style>
+    /* ==========================================================================
+       溫暖出版品風格系統 (Warm Editorial Theme)
+       ========================================================================== */
+    :root {
+      --bg-page: #fbf9f4;
+      --bg-card: #ffffff;
+      --bg-secondary: #f4efe6;
+      --text-main: #2d2926;
+      --text-muted: #6b635b;
+      --border-color: #e5dec9;
+      --accent-terracotta: #c2410c;
+      --accent-amber: #b45309;
+      --accent-blue: #1e3a8a;
+      --accent-green: #15803d;
+      --terminal-bg: #1e293b;
+      --terminal-text: #e2e8f0;
+      --code-bg: #f5f0e6;
+      --shadow-sm: 0 2px 4px rgba(45, 41, 38, 0.05);
+      --shadow-md: 0 4px 12px rgba(45, 41, 38, 0.08);
+      --shadow-lg: 0 8px 24px rgba(45, 41, 38, 0.12);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-code: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg-page); color: var(--text-main); font-family: var(--font-main); line-height: 1.8; padding: 40px 20px; }
+    .lecture-container { max-width: 1160px; margin: 0 auto; }
+
+    /* 頁首標題 */
+    .lecture-header { border-bottom: 2px solid var(--border-color); padding-bottom: 24px; margin-bottom: 40px; }
+    .lecture-badge { display: inline-block; background-color: var(--accent-blue); color: #ffffff; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.05em; padding: 4px 12px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; }
+    .lecture-title { font-size: 2.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+    .lecture-subtitle { font-size: 1.15rem; color: var(--text-muted); }
+
+    /* 章節區塊 */
+    .section-block { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 32px 36px; margin-bottom: 40px; box-shadow: var(--shadow-sm); }
+    h2.section-heading { font-size: 1.6rem; font-weight: 700; color: var(--text-main); border-left: 5px solid var(--accent-terracotta); padding-left: 14px; margin-bottom: 20px; }
+    h3.sub-heading { font-size: 1.25rem; font-weight: 600; color: var(--accent-blue); margin: 26px 0 12px 0; }
+    p { margin-bottom: 16px; font-size: 1.02rem; }
+
+    /* 程式碼展示 */
+    .code-wrapper { position: relative; margin: 18px 0 24px 0; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+    .code-header { background-color: #27272a; color: #a1a1aa; font-size: 0.8rem; padding: 6px 14px; font-family: var(--font-code); display: flex; justify-content: space-between; }
+    pre.code-block { background-color: var(--terminal-bg); color: var(--terminal-text); font-family: var(--font-code); font-size: 0.95rem; line-height: 1.65; padding: 16px 20px; overflow-x: auto; margin: 0; }
+    code.inline-code { background-color: var(--code-bg); color: var(--accent-terracotta); font-family: var(--font-code); font-size: 0.9em; padding: 2px 6px; border-radius: 4px; border: 1px solid #ebdcc7; }
+
+    /* 提示卡片 */
+    .info-card { background-color: var(--bg-secondary); border-left: 4px solid var(--accent-amber); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+    .alert-card { background-color: #fef2f2; border-left: 4px solid var(--accent-terracotta); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; }
+
+    /* 表格 */
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0 28px 0; font-size: 0.95rem; }
+    .comparison-table th, .comparison-table td { border: 1px solid var(--border-color); padding: 12px 16px; text-align: left; vertical-align: top; }
+    .comparison-table th { background-color: var(--bg-secondary); color: var(--text-main); font-weight: 600; }
+    .comparison-table tr:nth-child(even) { background-color: #faf7f0; }
+
+    /* ==========================================================================
+       動態教具專用共用控制樣式
+       ========================================================================== */
+    .theater-container { background-color: #faf7f0; border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; margin: 28px 0; box-shadow: var(--shadow-md); position: relative; }
+    .theater-title-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 18px; }
+    .theater-tag { background-color: var(--accent-terracotta); color: #ffffff; font-size: 0.8rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+    .preset-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .preset-btn { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 6px; font-family: var(--font-code); font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease; color: var(--text-main); }
+    .preset-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); transform: translateY(-1px); }
+    .preset-btn.active { background-color: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); box-shadow: var(--shadow-sm); }
+    .theater-controls { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; }
+    .btn-action-group { display: flex; gap: 10px; }
+    .theater-btn { padding: 9px 18px; border-radius: 6px; border: none; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-play { background-color: var(--accent-amber); color: #ffffff; }
+    .btn-play:hover { background-color: #92400e; }
+    .btn-step { background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-step:hover { background-color: var(--bg-secondary); }
+    .btn-reset { background-color: transparent; color: var(--text-muted); border: 1px solid transparent; }
+    .live-terminal { background-color: var(--terminal-bg); color: var(--terminal-text); font-family: var(--font-code); font-size: 0.88rem; border-radius: 6px; padding: 14px 18px; margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+    .term-row { display: flex; gap: 10px; }
+    .term-prompt { color: #38bdf8; user-select: none; }
+    .term-status { color: #fbbf24; }
+    .term-result { font-weight: 700; }
+    .term-result.r-success { color: #4ade80; }
+    .term-result.r-handled { color: #fb923c; }
+
+    /* ==========================================================================
+       9-1 教具：語法安檢員與 PVM 齒輪機台
+       ========================================================================== */
+    .compile-stage-canvas {
+      position: relative;
+      height: 380px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 30px;
+      overflow: hidden;
+    }
+    .inspector-zone {
+      width: 320px;
+      height: 320px;
+      background: #f8fafc;
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .zone-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .code-inspect-screen {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      height: 140px;
+      overflow-y: auto;
+      line-height: 1.6;
+      position: relative;
+    }
+    
+    /* 雷射動態掃描光束 */
+    .scan-beam {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+      box-shadow: 0 0 10px #38bdf8;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .is-scanning .scan-beam {
+      opacity: 1;
+      animation: laserSweep 1.2s infinite ease-in-out;
+    }
+    @keyframes laserSweep {
+      0% { top: 5%; }
+      50% { top: 90%; }
+      100% { top: 5%; }
+    }
+
+    .inspector-bot-unit {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .bot-svg-container {
+      width: 60px; height: 75px;
+      flex-shrink: 0;
+    }
+    .bot-speech-bubble {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      color: #334155;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .bot-speech-bubble::before {
+      content: "";
+      position: absolute;
+      left: -8px; top: 18px;
+      border-width: 5px 8px 5px 0;
+      border-style: solid;
+      border-color: transparent #cbd5e1 transparent transparent;
+    }
+    .stamp-mark {
+      position: absolute;
+      top: 50px; left: 60px;
+      padding: 8px 16px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      font-family: var(--font-code);
+      border: 4px solid;
+      border-radius: 8px;
+      transform: rotate(-15deg) scale(2);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 20;
+    }
+    .stamp-rejected { border-color: #ef4444; color: #ef4444; }
+    .stamp-approved { border-color: #10b981; color: #10b981; }
+    .stamp-show { opacity: 1; transform: rotate(-15deg) scale(1); }
+
+    /* 中央輸送通道與 .pyc 生成盒 */
+    .transfer-conveyor {
+      flex: 1;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      margin: 0 15px;
+    }
+    .conveyor-belt {
+      width: 100%;
+      height: 12px;
+      background: #cbd5e1;
+      border-radius: 6px;
+    }
+    .bytecode-payload-box {
+      position: absolute;
+      left: 10px;
+      width: 54px; height: 34px;
+      background: #3b82f6;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-family: var(--font-code);
+      font-weight: 800;
+      border-radius: 6px;
+      display: none; /* 初始完全隱藏，待編譯通過才生成 */
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);
+      transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 5;
+    }
+
+    .pvm-machine-zone {
+      width: 380px;
+      height: 320px;
+      background: #1e293b;
+      border: 3px solid #334155;
+      border-radius: 12px;
+      padding: 16px;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: var(--shadow-md);
+    }
+    .pvm-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+    }
+    .pvm-indicators {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .indicator-light {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #64748b;
+      transition: all 0.3s;
+    }
+    .indicator-light.active-green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+    .indicator-light.active-red { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+    .pvm-mechanism-room {
+      flex: 1;
+      background: #0f172a;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 10px;
+    }
+    .gear {
+      transform-origin: center;
+      transition: all 0.3s;
+    }
+    .gear-running-cw { animation: spinCW 2s infinite linear; }
+    .gear-running-ccw { animation: spinCCW 2s infinite linear; }
+    .gear-jammed { animation-play-state: paused !important; }
+    @keyframes spinCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes spinCCW { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+    .pvm-terminal-screen {
+      height: 70px;
+      background: #020617;
+      border-radius: 6px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      color: #a5f3fc;
+      overflow-y: auto;
+      line-height: 1.4;
+      border: 1px solid #1e293b;
+    }
+
+    /* ==========================================================================
+       9-2 教具：try 內部變數狀態殘留 (No Rollback) 與 雙向閘門
+       ========================================================================== */
+    .stage-92-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr 280px;
+      gap: 16px;
+    }
+    .code-trace-substage {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      line-height: 1.7;
+    }
+    .code-line-item {
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .code-line-item.active-line {
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 700;
+    }
+    .code-line-item.error-line {
+      background: #fee2e2;
+      color: #b91c1c;
+      font-weight: 700;
+    }
+
+    .track-substage {
+      position: relative;
+      height: 320px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .symbol-table-substage {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .symbol-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .symbol-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .symbol-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      transition: all 0.3s;
+    }
+    .symbol-row.assigned {
+      background: #ecfdf5;
+      border-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+    }
+    .symbol-row.unreached {
+      opacity: 0.4;
+      background: #f1f5f9;
+      text-decoration: line-through;
+    }
+    .symbol-var-name { font-weight: 700; color: #1e293b; }
+    .symbol-var-val { color: #0284c7; }
+
+    /* ==========================================================================
+       9-3 教具：四向道岔與攔截閘門模擬器
+       ========================================================================== */
+    .stage-canvas {
+      position: relative;
+      height: 380px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .svg-track-layer {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .station-marker {
+      position: absolute;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+    .station-try {
+      top: 155px;
+      left: 170px;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e3a8a;
+    }
+    .station-else {
+      top: 45px;
+      left: 450px;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #15803d;
+    }
+    .station-finally {
+      position: absolute;
+      top: 145px;
+      left: 720px;
+      width: 110px;
+      height: 90px;
+      background: rgba(245, 240, 230, 0.95);
+      border: 2px dashed #b45309;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #92400e;
+      z-index: 5;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s;
+    }
+    .station-finally.cleaning-active {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+    }
+    .cleaning-beam {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: #f59e0b;
+      box-shadow: 0 0 10px #f59e0b;
+      top: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .cleaning-active .cleaning-beam {
+      opacity: 1;
+      animation: scanBeam 0.8s infinite alternate ease-in-out;
+    }
+    @keyframes scanBeam {
+      from { top: 0; }
+      to { top: 96%; }
+    }
+    .safety-gate {
+      position: absolute;
+      width: 140px;
+      height: 52px;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #64748b;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 6;
+      box-shadow: var(--shadow-sm);
+    }
+    .gate-value-error {
+      top: 255px;
+      left: 380px;
+    }
+    .gate-zero-error {
+      top: 310px;
+      left: 540px;
+    }
+    .safety-gate.gate-intercepting {
+      border-color: #c2410c;
+      background: #fff7ed;
+      color: #c2410c;
+      transform: translateY(-8px);
+      box-shadow: 0 0 16px rgba(194, 65, 12, 0.3);
+    }
+    .safety-gate.gate-bypassed {
+      opacity: 0.35;
+      background: #f1f5f9;
+    }
+
+    /* 指令指標載車 */
+    .ip-carrier {
+      position: absolute;
+      width: 90px;
+      height: 52px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.35);
+      z-index: 10;
+      transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+    }
+    .carrier-tag {
+      font-family: var(--font-code);
+      font-size: 0.65rem;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 700;
+    }
+    .carrier-payload {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #fde047;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    /* 9-6 解答折疊按鈕樣式 */
+    .btn-toggle-solution {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--accent-blue);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .btn-toggle-solution:hover { background-color: #e8ded1; }
+    .solution-drawer { display: none; margin-top: 14px; }
+
+    /* 版權宣告 */
+    .disclaimer-box { border-top: 2px solid var(--border-color); margin-top: 50px; padding-top: 24px; color: var(--text-muted); font-size: 0.88rem; line-height: 1.7; }
+    .disclaimer-box h4 { color: var(--text-main); font-size: 0.95rem; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="lecture-container">
+
+  <!-- 9-1 章節 -->
+  <section class="section-block">
+    <h2 class="section-heading">9-1 程式錯誤分類與常見執行期例外分析 (Runtime Exceptions)</h2>
+    <p>撰寫 Python 程式時，錯誤主要可劃分為兩大生命週期階段：<strong>語法解析編譯期的「語法解析錯誤 (SyntaxError)」</strong>，以及<strong>虛擬機執行期的「執行期例外 (Runtime Exception)」</strong>[cite: 1, 6]。理解兩者的本質差異，是建立程式系統健全性防護的第一步[cite: 1, 6]。</p>
+
+    <!-- 9-1 動態教具：安檢員機器人與實體 PVM 齒輪機台 -->
+    <div class="theater-container" id="compileVsRuntimeTheater">
+      <div class="theater-title-bar">
+        <div>
+          <strong style="font-size: 1.1rem;">動態教具：語法安檢員與 PVM 齒輪直譯機台</strong>
+          <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;">(編譯安檢駁回 vs 齒輪機台運轉崩潰)</span>
+        </div>
+        <span class="theater-tag">直譯器管線核心</span>
+      </div>
+
+      <div class="preset-group">
+        <button class="preset-btn active" data-scenario="syntax_err">情境一：語法錯誤 (缺少冒號) ➔ 安檢員蓋章駁回，PVM 齒輪完全不轉 (0% 執行)</button>
+        <button class="preset-btn" data-scenario="runtime_err">情境二：執行期例外 (除以零) ➔ 通過安檢，PVM 齒輪運轉至該行卡死急停</button>
+        <button class="preset-btn" data-scenario="normal_run">情境三：常態執行 ➔ 通過安檢，PVM 齒輪順暢運轉產出成果</button>
+      </div>
+
+      <div class="compile-stage-canvas">
+        <!-- 左側：語法安檢站 -->
+        <div class="inspector-zone">
+          <div class="zone-title">
+            <span>階段一：原始碼語法安檢站</span>
+            <span id="inspectBadge" style="font-family: var(--font-code); color: #64748b;">待命中</span>
+          </div>
+          <div class="code-inspect-screen" id="inspectScreen">
+            <div class="scan-beam" id="scanBeam"></div>
+            <div id="sourceCodeText">def calculate()<br>&nbsp;&nbsp;return 100</div>
+          </div>
+          
+          <div class="stamp-mark stamp-rejected" id="stampRejected">REJECTED</div>
+          <div class="stamp-mark stamp-approved" id="stampApproved">VERIFIED</div>
+
+          <div class="inspector-bot-unit">
+            <div class="bot-svg-container">
+              <svg viewBox="0 0 60 75" width="60" height="75">
+                <line x1="30" y1="15" x2="30" y2="5" stroke="#64748b" stroke-width="3"/>
+                <circle cx="30" cy="4" r="3" fill="#38bdf8" id="botAntennaLight"/>
+                <rect x="15" y="15" width="30" height="22" rx="4" fill="#334155"/>
+                <circle cx="23" cy="24" r="3" fill="#38bdf8" id="botEyeL"/>
+                <circle cx="37" cy="24" r="3" fill="#38bdf8" id="botEyeR"/>
+                <rect x="12" y="40" width="36" height="28" rx="6" fill="#1e3a8a"/>
+                <rect x="18" y="46" width="24" height="16" rx="2" fill="#0f172a"/>
+                <circle cx="30" cy="54" r="4" fill="#22c55e" id="botChestCore"/>
+              </svg>
+            </div>
+            <div class="bot-speech-bubble" id="botSpeech">
+              安檢員就緒。準備進行 Lexer 與 Parser 語法結構檢驗。
+            </div>
+          </div>
+        </div>
+
+        <!-- 中央輸送通道 (位元組碼 .pyc 容器) -->
+        <div class="transfer-conveyor">
+          <div class="conveyor-belt"></div>
+          <div class="bytecode-payload-box" id="bytecodeBox">.pyc</div>
+        </div>
+
+        <!-- 右側：PVM 實體執行齒輪機台 -->
+        <div class="pvm-machine-zone">
+          <div class="pvm-header">
+            <strong style="color: #38bdf8;">階段二：Python 虛擬機 (PVM) 直譯機台</strong>
+            <div class="pvm-indicators">
+              <span style="font-size: 0.72rem; color: #94a3b8;">機台動力</span>
+              <div class="indicator-light" id="pvmPowerLight"></div>
+            </div>
+          </div>
+
+          <div class="pvm-mechanism-room" id="mechRoom">
+            <svg class="gear" id="gear1" width="80" height="80" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="30" fill="none" stroke="#64748b" stroke-width="12" stroke-dasharray="14,6"/>
+              <circle cx="50" cy="50" r="16" fill="#334155"/>
+              <circle cx="50" cy="50" r="6" fill="#94a3b8"/>
+            </svg>
+            <svg class="gear" id="gear2" width="60" height="60" viewBox="0 0 100 100" style="margin-top: -20px;">
+              <circle cx="50" cy="50" r="28" fill="none" stroke="#94a3b8" stroke-width="12" stroke-dasharray="12,6"/>
+              <circle cx="50" cy="50" r="14" fill="#475569"/>
+              <circle cx="50" cy="50" r="5" fill="#cbd5e1"/>
+            </svg>
+            <div id="mechStatusOverlay" style="position: absolute; font-family: var(--font-code); font-size: 0.8rem; font-weight: 800; color: #94a3b8;">
+              機台離線
+            </div>
+          </div>
+
+          <div class="pvm-terminal-screen" id="pvmScreen">
+            [PVM 指令執行佇列待命中]
+          </div>
+        </div>
+      </div>
+
+      <div class="theater-controls">
+        <div class="btn-action-group">
+          <button class="theater-btn btn-play" id="btnCompilePlay">🎬 啟動安檢與運轉</button>
+          <button class="theater-btn btn-reset" id="btnCompileReset">🔄 重設機台</button>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+          執行狀態：<strong id="compilePhaseLabel" style="color: var(--accent-blue);">準備就緒</strong>
+        </div>
+      </div>
+
+      <div class="live-terminal">
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span id="termCompileLog">點擊「啟動安檢與運轉」觀察安檢員與 PVM 齒輪機台的互動！</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-heading">語法錯誤 vs. 執行期例外的本質邊界</h3>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>維度</th>
+          <th>語法解析錯誤 (SyntaxError)</th>
+          <th>執行期例外 (Exception)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>發生時機</strong></td>
+          <td>直譯器將原始碼編譯為位元組碼（Bytecode）的階段。</td>
+          <td>位元組碼已成功載入，直譯器虛擬機在逐行執行指令時。</td>
+        </tr>
+        <tr>
+          <td><strong>直譯器行為</strong></td>
+          <td>程式碼<strong>完全未啟動</strong>，連第一行指令都不會執行。</td>
+          <td>出錯前的程式碼皆已正常執行，直到遇到非法操作瞬間中斷。</td>
+        </tr>
+        <tr>
+          <td><strong>能否被攔截</strong></td>
+          <td>無法在當前檔案內以 <code class="inline-code">try...except</code> 攔截。</td>
+          <td><strong>可透過結構化語法完全攔截並進行自我修復。</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-heading">五大核心內建例外分析</h3>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>built_in_exceptions.py</span></div>
+      <pre class="code-block"># 1. ValueError: 引數型態相符，但數值內容無法解析
+num = int("hello_python")
+
+# 2. TypeError: 運算子作用於不相容的資料型態
+total = "總金額：" + 100
+
+# 3. KeyError: 嘗試從字典存取不存在的鍵 (Key)
+user = {"name": "Alex"}
+email = user["email"]
+
+# 4. IndexError: 嘗試存取超出序列長度的有效索引 (Index)
+numbers = [10, 20, 30]
+target = numbers[5]
+
+# 5. ZeroDivisionError: 數值運算中除數為零
+quotient = 100 / 0</pre>
+    </div>
+  </section>
+
+  <!-- 9-2 章節 -->
+  <section class="section-block">
+    <h2 class="section-heading">9-2 結構化例外攔截語法：try...except 分支控制</h2>
+    <p>當程式執行可能引發異常的不確定操作時，我們必須設置結構化防護網[cite: 1, 6]。初學者最常產生的盲區是：<strong>「以為 try 區塊像資料庫交易一樣，出錯時會自動復原（Rollback）所有改過的變數」</strong>[cite: 1, 6]。事實上，Python 是逐行直譯執行的，<strong>出錯前已經賦值的變數會永久留在記憶體符號表中</strong>[cite: 1, 6]！</p>
+
+    <!-- 9-2 動態教具：變數狀態殘留 (No Rollback) 與 雙向攔截閘門 -->
+    <div class="theater-container" id="basicTryExceptTheater">
+      <div class="theater-title-bar">
+        <div>
+          <strong style="font-size: 1.1rem;">動態教具：try 區塊變數狀態殘留模擬器 (No Rollback)</strong>
+          <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;">(觀察中途跳轉至 except 時，已儲存變數的記憶體駐留現象)</span>
+        </div>
+        <span class="theater-tag">記憶體殘留心智模型</span>
+      </div>
+
+      <div class="preset-group">
+        <button class="preset-btn active" data-scenario="crash_midway">情境 A：中途轉型引爆 (user_input="abc") ➔ step=1 永久留存，後續變數未定義</button>
+        <button class="preset-btn" data-scenario="full_success">情境 B：全數順暢執行 (user_input="5") ➔ 依序執行完畢，所有變數成功賦值</button>
+      </div>
+
+      <div class="stage-92-layout">
+        <!-- 欄位 1：原始碼追蹤面板 -->
+        <div class="code-trace-substage">
+          <div style="font-weight: 700; color: #475569; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">
+            📄 程式碼逐行追蹤
+          </div>
+          <div class="code-line-item" id="codeLine1">1: try:</div>
+          <div class="code-line-item" id="codeLine2">&nbsp;&nbsp;&nbsp;&nbsp;step = 1</div>
+          <div class="code-line-item" id="codeLine3">&nbsp;&nbsp;&nbsp;&nbsp;status = "處理中"</div>
+          <div class="code-line-item" id="codeLine4">&nbsp;&nbsp;&nbsp;&nbsp;val = 100 / int(inp)</div>
+          <div class="code-line-item" id="codeLine5">&nbsp;&nbsp;&nbsp;&nbsp;is_done = True</div>
+          <div class="code-line-item" id="codeLine6">6: except ValueError:</div>
+          <div class="code-line-item" id="codeLine7">&nbsp;&nbsp;&nbsp;&nbsp;status = "救援成功"</div>
+        </div>
+
+        <!-- 欄位 2：軌道與指令指標推進 -->
+        <div class="track-substage">
+          <svg class="svg-track-layer" viewBox="0 0 450 320">
+            <!-- try 內部主線 -->
+            <line x1="20" y1="100" x2="300" y2="100" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+            <!-- 常態通行放行線 -->
+            <line x1="300" y1="100" x2="430" y2="100" stroke="#e2e8f0" stroke-width="8" id="track92Normal"/>
+            <!-- except 維修避車線 (下方) -->
+            <path d="M 300 100 Q 330 100 340 180 L 340 240 L 430 240" stroke="#e2e8f0" stroke-width="8" fill="none" id="track92Except"/>
+            <circle cx="300" cy="100" r="10" fill="#94a3b8" id="switchDot92"/>
+          </svg>
+
+          <!-- try 警戒區外框標籤 -->
+          <div class="station-marker" style="top: 20px; left: 60px; background: #eff6ff; border: 1px solid #93c5fd; color: #1e3a8a;">
+            <span>🛡️</span> <span>try 警戒防護區間</span>
+          </div>
+
+          <!-- except 閘門建築本體 (獨立在軌道上方，小車停在軌道上，絕不遮擋) -->
+          <div class="safety-gate" id="gate92" style="top: 170px; left: 160px;">
+            <div style="font-size: 0.68rem; color: #94a3b8;">維修站閘門</div>
+            <div>except ValueError</div>
+          </div>
+
+          <!-- 指令指標檢驗車 -->
+          <div class="ip-carrier" id="carrier92" style="top: 74px; left: 20px;">
+            <span class="carrier-tag">IP</span>
+            <span class="carrier-payload" id="payload92">進入 try</span>
+          </div>
+        </div>
+
+        <!-- 欄位 3：記憶體符號表 (Symbol Table Watcher) -->
+        <div class="symbol-table-substage">
+          <div class="symbol-title">
+            <span>記憶體符號表 (Symbol Table)</span>
+            <span style="font-size: 0.72rem; color: var(--accent-terracotta);">No Rollback</span>
+          </div>
+          <div class="symbol-grid">
+            <div class="symbol-row" id="symRowStep">
+              <span class="symbol-var-name">step</span>
+              <span class="symbol-var-val" id="symValStep">&lt;未宣告&gt;</span>
+            </div>
+            <div class="symbol-row" id="symRowStatus">
+              <span class="symbol-var-name">status</span>
+              <span class="symbol-var-val" id="symValStatus">&lt;未宣告&gt;</span>
+            </div>
+            <div class="symbol-row" id="symRowVal">
+              <span class="symbol-var-name">val</span>
+              <span class="symbol-var-val" id="symValVal">&lt;未宣告&gt;</span>
+            </div>
+            <div class="symbol-row" id="symRowDone">
+              <span class="symbol-var-name">is_done</span>
+              <span class="symbol-var-val" id="symValDone">&lt;未宣告&gt;</span>
+            </div>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">
+            💡 <strong>教學關鍵</strong>：程式出錯跳出時，已賦值的變數<strong>永遠保留在記憶體中</strong>！
+          </div>
+        </div>
+      </div>
+
+      <div class="theater-controls">
+        <div class="btn-action-group">
+          <button class="theater-btn btn-step" id="btn92Step">⏭ 單步執行 (Step)</button>
+          <button class="theater-btn btn-reset" id="btn92Reset">🔄 重設</button>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+          當前指令：<strong id="label92Line" style="color: var(--accent-blue);">準備就緒</strong>
+        </div>
+      </div>
+
+      <div class="live-terminal">
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span id="term92Log">點擊「單步執行」，觀察指令指標逐行推進時，變數如何存入符號表並於出錯時殘留。</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-heading">多重例外分支與群組合併宣告</h3>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>multi_except.py</span></div>
+      <pre class="code-block">raw_data = {"score": "0"}
+
+try:
+    divisor = int(raw_data["score"])
+    result = 100 / divisor
+except KeyError as err:
+    print(f"結構異常：字典遺失必要鍵名 -> {err}")
+except ValueError as err:
+    print(f"轉型異常：無法轉為整數 -> {err}")
+except ZeroDivisionError as err:
+    print(f"計算異常：除數不可為零 -> {err}")
+except Exception as err:
+    print(f"未預期異常：{type(err).__name__} -> {err}")</pre>
+    </div>
+  </section>
+
+  <!-- 9-3 章節 -->
+  <section class="section-block">
+    <h2 class="section-heading">9-3 完整防護架構：try...except...else...finally 協同控制流</h2>
+    <p>Python 提供了完整的四段式例外處理控制拓撲，嚴謹地分離「正常推進」、「錯誤修復」與「確定性收尾」三個維度[cite: 1, 6]：</p>
+    <ul style="margin-left: 24px; margin-bottom: 20px;">
+      <li><strong><code class="inline-code">try</code></strong>：宣告高風險警戒區，監聽內部是否拋出例外物件[cite: 1, 6]。</li>
+      <li><strong><code class="inline-code">except</code></strong>：專屬救援維修站，僅在例外發生且型態匹配時觸發[cite: 1, 6]。</li>
+      <li><strong><code class="inline-code">else</code></strong>：安全放行站，<strong>僅在 try 區塊 100% 順暢、毫無任何例外發生時</strong>執行[cite: 1, 6]。</li>
+      <li><strong><code class="inline-code">finally</code></strong>：確定性沖洗艙，<strong>無論出錯與否、無論是否命中 except，指令指標必定強制執行</strong>[cite: 1, 6]。</li>
+    </ul>
+
+    <!-- 9-3 動態教具：修復後的四向分流軌道與攔截閘門模擬器 -->
+    <div class="theater-container" id="exceptionSwitchTheater">
+      <div class="theater-title-bar">
+        <div>
+          <strong style="font-size: 1.1rem;">動態教具：結構化四向道岔與攔截閘門模擬器</strong>
+          <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 8px;">(外部輸入注入 ➔ try運算爆發 ➔ 閘門阻截 ➔ 必經 finally 資源沖洗艙)</span>
+        </div>
+        <span class="theater-tag">完整四向架構</span>
+      </div>
+
+      <div class="preset-group">
+        <button class="preset-btn active" data-scenario="normal">情境一：合法數值輸入 ("5") ➔ 順暢通過 try 進入 else</button>
+        <button class="preset-btn" data-scenario="val_err">情境二：非法文字輸入 ("abc") ➔ try 內轉型失敗，觸發 ValueError 閘門</button>
+        <button class="preset-btn" data-scenario="zero_err">情境三：除數為零輸入 ("0") ➔ try 內除法失敗，觸發 ZeroDivisionError 閘門</button>
+      </div>
+
+      <!-- 物理軌道畫布 -->
+      <div class="stage-canvas" id="stageCanvas">
+        <svg class="svg-track-layer" viewBox="0 0 940 380">
+          <line x1="20" y1="190" x2="320" y2="190" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+          <path d="M 320 190 Q 380 190 420 80 L 660 80 Q 700 80 740 190" stroke="#e2e8f0" stroke-width="8" fill="none" id="pathElse"/>
+          <path d="M 320 190 Q 360 190 400 280 L 520 280 Q 560 330 620 330 L 660 330 Q 700 330 740 190" stroke="#e2e8f0" stroke-width="8" fill="none" id="pathExcept"/>
+          <line x1="720" y1="190" x2="920" y2="190" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="320" cy="190" r="10" fill="#94a3b8" id="switchCore"/>
+        </svg>
+
+        <!-- try 加工站 -->
+        <div class="station-marker station-try" id="markerTry">
+          <span>🛠️</span> <span id="labelTryChamber">try 加工艙: 等待原料</span>
+        </div>
+
+        <!-- else 站點 -->
+        <div class="station-marker station-else" id="markerElse">
+          <span>🌿</span> <span>else 常態放行站 (無錯誤)</span>
+        </div>
+
+        <!-- finally 沖洗艙 -->
+        <div class="station-finally" id="stationFinally">
+          <div class="cleaning-beam"></div>
+          <span style="font-size: 1.2rem;">🚿</span>
+          <span style="font-weight: 700; font-size: 0.82rem;">finally 艙</span>
+          <span style="font-size: 0.7rem; color: #78350f;">必經資源釋放</span>
+        </div>
+
+        <!-- 機械攔截閘門 1 (ValueError) -->
+        <div class="safety-gate gate-value-error" id="gateVal">
+          <div style="font-size: 0.7rem; color: #94a3b8;">GATE 1</div>
+          <div>except ValueError</div>
+        </div>
+
+        <!-- 機械攔截閘門 2 (ZeroDivisionError) -->
+        <div class="safety-gate gate-zero-error" id="gateZero">
+          <div style="font-size: 0.7rem; color: #94a3b8;">GATE 2</div>
+          <div>except ZeroDivision</div>
+        </div>
+
+        <!-- 指令指標載車 (攜帶外部輸入 raw_input) -->
+        <div class="ip-carrier" id="ipCarrier">
+          <span class="carrier-tag">IP #1</span>
+          <span class="carrier-payload" id="carrierPayload">輸入: "5"</span>
+        </div>
+      </div>
+
+      <div class="theater-controls">
+        <div class="btn-action-group">
+          <button class="theater-btn btn-play" id="btnPlay">🎬 自動推進 (Play)</button>
+          <button class="theater-btn btn-step" id="btnStep">⏭ 單步推進 (Step)</button>
+          <button class="theater-btn btn-reset" id="btnReset">🔄 返回起點 (Reset)</button>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--text-muted);">
+          道岔狀態：<strong id="switchStatusLabel" style="color: var(--accent-blue);">待發線整備中</strong>
+        </div>
+      </div>
+
+      <div class="live-terminal">
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span id="termCodePreview">val = 100 / int(inp)</span>
+        </div>
+        <div class="term-row">
+          <span class="term-status">[直譯器狀態日誌]</span>
+          <span id="termLog">系統就緒。請選擇測試情境並啟動單步推進。</span>
+        </div>
+        <div class="term-row">
+          <span class="term-prompt">&gt;&gt;&gt;</span>
+          <span class="term-result" id="termStdout">標準輸出待命中...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9-4 章節 -->
+  <section class="section-block">
+    <h2 class="section-heading">9-4 主動防禦與錯誤處理策略對比：自然崩潰 vs. raise 拋出 vs. try 攔截</h2>
+    <p>在現代高可靠度軟體架構中，錯誤處理的三種思維分別扮演著截然不同的系統職責：</p>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>維度</th>
+          <th>1. 放任程式自然崩潰（被動）</th>
+          <th>2. 主動使用 raise 拋出（進攻型防守）</th>
+          <th>3. 使用 try...except 攔截（防禦修復）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>系統角色</strong></td>
+          <td><strong>毫無防備的受害者</strong></td>
+          <td><strong>嚴格把關的品管安檢員</strong></td>
+          <td><strong>具備備援方案的維修工程師</strong></td>
+        </tr>
+        <tr>
+          <td><strong>核心架構思維</strong></td>
+          <td>聽天由命，任由非法數值污染系統底層，直到崩潰。</td>
+          <td><strong>快速失敗原則 (Fail-Fast)</strong>：在髒資料擴散前主動中斷。</td>
+          <td><strong>優雅降級 (Graceful Degradation)</strong>：吸收已知風險，保障主程序延續。</td>
+        </tr>
+        <tr>
+          <td><strong>程式碼職責邊界</strong></td>
+          <td>未做任何邊界檢查與資料防呆。</td>
+          <td><strong>模組/函式內部</strong>：檢查傳入引數，若不合法則<strong>拒絕繼續計算</strong>。</td>
+          <td><strong>呼叫端/外部流程</strong>：呼叫高風險功能時，提供後備防護措施。</td>
+        </tr>
+        <tr>
+          <td><strong>實務生活情境</strong></td>
+          <td>ATM 吐出負數鈔票，直到結算日報表失衡引發全面災難。</td>
+          <td>提款金額小於零時，ATM 立即發出警報並退卡拒絕交易。</td>
+          <td>用戶在 ATM 插入髒污卡片時，螢幕提示重新操作而非直接死當。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="sub-heading">主動觸發例外：raise 語法規格與快速失敗</h3>
+    <div class="code-wrapper">
+      <div class="code-header"><span>python</span><span>fail_fast_raise.py</span></div>
+      <pre class="code-block">def calculate_shipping_fee(weight_kg):
+    if weight_kg &lt;= 0:
+        raise ValueError(f"包裹重量必須大於 0 kg，當前輸入為：{weight_kg}")
+    
+    base_fee = 60
+    return base_fee + (weight_kg * 15)
+
+try:
+    fee = calculate_shipping_fee(-3.5)
+except ValueError as err:
+    print(f"業務邏輯攔截成功：{err}")</pre>
+    </div>
+  </section>
+
+  <!-- 9-5 章節 -->
+  <section class="section-block">
+    <h2 class="section-heading">9-5 執行期 Traceback 呼叫堆疊排查與除錯技巧</h2>
+    <p>當直譯器拋出未被捕獲的例外時，終端機會印出 <strong>Traceback (most recent call last)</strong>，這不是程式當機的宣判，而是直譯器留下的現場還原線索[cite: 1, 6]。</p>
+
+    <div class="code-wrapper">
+      <div class="code-header"><span>text</span><span>traceback_dissection.txt</span></div>
+      <pre class="code-block">Traceback (most recent call last):
+  File "main.py", line 18, in &lt;module&gt;
+    process_order("VIP_998")               # 1. 呼叫起點：全域最外層進入點
+  File "main.py", line 12, in process_order
+    discount = calculate_discount(order_id) # 2. 深入第一層函式呼叫
+  File "main.py", line 5, in calculate_discount
+    rate = rates_table[user_level]         # 3. 事故發生點：引發崩潰之程式碼行
+KeyError: 'VIP_LEVEL_DIAMOND'              # 4. 關鍵根因：例外類別名稱與診斷摘要！</pre>
+    </div>
+
+    <div class="info-card">
+      <strong>高效排查指引：</strong><br>
+      1. <strong>先看最末行</strong>：取得例外類別名稱與摘要（例如 <code class="inline-code">KeyError: 'VIP_LEVEL_DIAMOND'</code>）[cite: 1, 6]。<br>
+      2. <strong>由底向上找自己寫的檔案與行號</strong>：快速排除第三方套件，精確定位核心問題點[cite: 1, 6]。
+    </div>
+  </section>
+
+  <!-- 9-6 章節 -->
+  <section class="section-block">
+    <h2 class="section-heading">9-6 課堂綜合實作挑戰</h2>
+
+    <h3 class="sub-heading">實戰任務一：具防呆與例外防護之數值輸入處理</h3>
+    <p><strong>情境需求：</strong>設計一個控制台持續輸入的除法計算函式。要求使用者依序輸入被除數與除數，程式必須針對「非法文字輸入（ValueError）」以及「除以零異常（ZeroDivisionError）」提供精確提示並要求重新輸入，直到計算成功產出結果為止[cite: 1, 6]。</p>
+
+    <button class="btn-toggle-solution" onclick="toggleSolution('sol1', this)">👁️ 展開參考解答程式碼</button>
+    <div id="sol1" class="solution-drawer">
+      <div class="code-wrapper">
+        <div class="code-header"><span>python</span><span>robust_calculator_solution.py</span></div>
+        <pre class="code-block">def safe_division_calculator():
+    print("=== 數值安全計算機已啟動 ===")
+    
+    while True:
+        try:
+            raw_a = input("請輸入被除數 (Numerator)：")
+            raw_b = input("請輸入除數 (Denominator)：")
+            
+            num_a = float(raw_a)
+            num_b = float(raw_b)
+            result = num_a / num_b
+
+        except ValueError:
+            print("【輸入防呆警報】輸入內容包含非數字字元，請重新輸入純數字！\n")
+            continue
+        except ZeroDivisionError:
+            print("【數學運算警報】除數不可為零 (Division by Zero)，請重新指定非零數值！\n")
+            continue
+        else:
+            print(f"✅ 計算成功：{num_a} ÷ {num_b} = {result:.4f}")
+            break
+        finally:
+            print("--- [系統日誌] 該次輸入檢驗週期結束 ---")
+
+# 執行函式
+safe_division_calculator()</pre>
+      </div>
+    </div>
+
+    <h3 class="sub-heading" style="margin-top: 36px;">實戰任務二：串列與字典安全查詢防護函式</h3>
+    <p><strong>情境需求：</strong>外部資料結構常出現缺漏。請撰寫兩個安全查詢防護函式：<br>
+    1. <code class="inline-code">safe_list_get(target_list, index, default)</code>：防止索引越界引發 IndexError。<br>
+    2. <code class="inline-code">safe_dict_get(target_dict, key, default)</code>：防止鍵不存在引發 KeyError。</p>
+
+    <button class="btn-toggle-solution" onclick="toggleSolution('sol2', this)">👁️ 展開參考解答程式碼</button>
+    <div id="sol2" class="solution-drawer">
+      <div class="code-wrapper">
+        <div class="code-header"><span>python</span><span>safe_access_helpers.py</span></div>
+        <pre class="code-block">def safe_list_get(target_list, index, default=None):
+    """
+    防禦性存取串列指定索引元素。若索引越界則安全回傳 default 預設值。
+    """
+    try:
+        return target_list[index]
+    except IndexError:
+        return default
+
+def safe_dict_get(target_dict, key, default=None):
+    """
+    防禦性存取字典指定鍵。若鍵不存在則安全回傳 default 預設值。
+    """
+    try:
+        return target_dict[key]
+    except KeyError:
+        return default
+
+# 驗證測試
+users = ["Alex", "Brenda", "Charlie"]
+configs = {"theme": "dark", "port": 8080}
+
+print("取得索引 1：", safe_list_get(users, 1, "訪客"))
+print("取得索引 99 (越界防護)：", safe_list_get(users, 99, "查無此用戶"))
+print("讀取既有設定：", safe_dict_get(configs, "theme", "light"))
+print("讀取未定義鍵 (防護崩潰)：", safe_dict_get(configs, "timeout", 30))</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 免責聲明與權益宣示 -->
+  <footer class="disclaimer-box">
+    <h4>免責聲明與權益宣示</h4>
+    <p>本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。<br>
+    如有授權需求，請以 Email 聯繫至：andywangkenichi@gmail.com。敬請尊重智慧財產權，避免不當使用。</p>
+  </footer>
+
+</div>
+
+<!-- ==========================================================================
+     原生腳本區（嚴格 IIFE 隔離封裝）
+     ========================================================================== -->
+<script>
+function toggleSolution(id, btn) {
+  const drawer = document.getElementById(id);
+  if (drawer.style.display === 'block') {
+    drawer.style.display = 'none';
+    btn.innerText = '👁️ 展開參考解答程式碼';
+  } else {
+    drawer.style.display = 'block';
+    btn.innerText = '🙈 收合參考解答程式碼';
+  }
+}
+
+// 9-1 動態教具：安檢員機器人與實體 PVM 齒輪機台
+(function() {
+  const sourceCodeText = document.getElementById('sourceCodeText');
+  const inspectBadge = document.getElementById('inspectBadge');
+  const inspectScreen = document.getElementById('inspectScreen');
+  const stampRejected = document.getElementById('stampRejected');
+  const stampApproved = document.getElementById('stampApproved');
+  const botAntennaLight = document.getElementById('botAntennaLight');
+  const botEyeL = document.getElementById('botEyeL');
+  const botEyeR = document.getElementById('botEyeR');
+  const botChestCore = document.getElementById('botChestCore');
+  const botSpeech = document.getElementById('botSpeech');
+
+  const bytecodeBox = document.getElementById('bytecodeBox');
+  const pvmPowerLight = document.getElementById('pvmPowerLight');
+  const gear1 = document.getElementById('gear1');
+  const gear2 = document.getElementById('gear2');
+  const mechStatusOverlay = document.getElementById('mechStatusOverlay');
+  const pvmScreen = document.getElementById('pvmScreen');
+
+  const compilePhaseLabel = document.getElementById('compilePhaseLabel');
+  const termCompileLog = document.getElementById('termCompileLog');
+  const btnRun = document.getElementById('btnCompilePlay');
+  const btnReset = document.getElementById('btnCompileReset');
+  const presetBtns = document.querySelectorAll('#compileVsRuntimeTheater .preset-btn');
+
+  let currentScenario = 'syntax_err';
+
+  const scenarios = {
+    syntax_err: {
+      code: "def calc()\n  return 100",
+      isSyntaxOk: false,
+      errMsg: "SyntaxError: expected ':' at line 1",
+      runtimeOk: false
+    },
+    runtime_err: {
+      code: "x = 100\ny = 0\nres = x / y",
+      isSyntaxOk: true,
+      bytecode: "LOAD_CONST 100\nSTORE_NAME x\nLOAD_CONST 0\nSTORE_NAME y\nBINARY_TRUE_DIVIDE (Crash!)",
+      runtimeOk: false,
+      runtimeErrMsg: "ZeroDivisionError: division by zero"
+    },
+    normal_run: {
+      code: "x = 100\ny = 5\nres = x / y",
+      isSyntaxOk: true,
+      bytecode: "LOAD_CONST 100\nLOAD_CONST 5\nBINARY_TRUE_DIVIDE\nRETURN 20.0",
+      runtimeOk: true
+    }
+  };
+
+  function reset() {
+    sourceCodeText.innerText = scenarios[currentScenario].code;
+    inspectBadge.innerText = "待命中";
+    inspectBadge.style.color = "#64748b";
+    inspectScreen.classList.remove('is-scanning');
+
+    stampRejected.className = "stamp-mark stamp-rejected";
+    stampApproved.className = "stamp-mark stamp-approved";
+
+    botAntennaLight.setAttribute('fill', '#38bdf8');
+    botEyeL.setAttribute('fill', '#38bdf8');
+    botEyeR.setAttribute('fill', '#38bdf8');
+    botChestCore.setAttribute('fill', '#22c55e');
+    botSpeech.innerText = "安檢員就緒。準備進行 Lexer 與 Parser 語法結構檢驗。";
+
+    // 關鍵修復：.pyc 初始完全隱藏，不可外露
+    bytecodeBox.style.display = 'none';
+    bytecodeBox.style.left = '10px';
+
+    pvmPowerLight.className = "indicator-light";
+    gear1.className = "gear";
+    gear2.className = "gear";
+    mechStatusOverlay.innerText = "機台離線";
+    mechStatusOverlay.style.color = "#94a3b8";
+    pvmScreen.innerText = "[PVM 指令執行佇列待命中]";
+
+    compilePhaseLabel.innerText = "準備就緒";
+    termCompileLog.innerText = "就緒。請點擊「啟動安檢與運轉」。";
+  }
+
+  function run() {
+    reset();
+    const sc = scenarios[currentScenario];
+
+    // 啟動動態雷射掃描
+    inspectBadge.innerText = "語法安檢中...";
+    inspectBadge.style.color = "#0284c7";
+    inspectScreen.classList.add('is-scanning');
+    botSpeech.innerText = "🔍 正在逐行比對語法規格（Syntax Trees & Tokens）...";
+    compilePhaseLabel.innerText = "【階段一】安檢員機器人掃描語法中...";
+
+    setTimeout(() => {
+      inspectScreen.classList.remove('is-scanning');
+
+      if (!sc.isSyntaxOk) {
+        // 語法錯誤：駁回印章，.pyc 永遠不生成，PVM 維持斷電
+        stampRejected.classList.add('stamp-show');
+        botAntennaLight.setAttribute('fill', '#ef4444');
+        botEyeL.setAttribute('fill', '#ef4444');
+        botEyeR.setAttribute('fill', '#ef4444');
+        botChestCore.setAttribute('fill', '#ef4444');
+        botSpeech.innerText = `🚨 抓到語法錯誤！${sc.errMsg}。直接退件，絕不放行！`;
+
+        inspectBadge.innerText = "安檢駁回 (SyntaxError)";
+        inspectBadge.style.color = "#ef4444";
+        compilePhaseLabel.innerText = "❌ 語法錯誤！編譯期即中斷，PVM 齒輪機台完全不運轉 (0% 執行)";
+        termCompileLog.innerText = `[直譯器編譯報警] ${sc.errMsg}！位元組碼未產生，虛擬機維持斷電狀態。`;
+      } else {
+        // 語法合規：蓋合格印章，.pyc 誕生並輸送進機台
+        stampApproved.classList.add('stamp-show');
+        botSpeech.innerText = "✅ 語法結構合規！位元組碼編譯完成，放行注入 PVM 直譯機台！";
+        inspectBadge.innerText = "檢驗合格 (Bytecode Ready)";
+        inspectBadge.style.color = "#10b981";
+
+        // 生成 .pyc 方塊並推入輸送帶
+        bytecodeBox.style.display = 'flex';
+        setTimeout(() => {
+          bytecodeBox.style.left = '160px'; // 平滑滑入機台
+        }, 50);
+
+        compilePhaseLabel.innerText = "語法無誤，位元組碼已注入 PVM 機台，機台通電啟動！";
+
+        setTimeout(() => {
+          pvmPowerLight.classList.add('active-green');
+          gear1.className = "gear gear-running-cw";
+          gear2.className = "gear gear-running-ccw";
+          mechStatusOverlay.innerText = "⚙️ 齒輪直譯運轉中...";
+          mechStatusOverlay.style.color = "#38bdf8";
+          pvmScreen.innerText = sc.bytecode;
+
+          setTimeout(() => {
+            if (!sc.runtimeOk) {
+              gear1.className = "gear gear-running-cw gear-jammed";
+              gear2.className = "gear gear-running-ccw gear-jammed";
+              pvmPowerLight.className = "indicator-light active-red";
+              mechStatusOverlay.innerText = "🚨 齒輪卡死急停！";
+              mechStatusOverlay.style.color = "#ef4444";
+              pvmScreen.innerText += `\n❌ 執行期崩潰：${sc.runtimeErrMsg}！`;
+
+              compilePhaseLabel.innerText = "🚨 虛擬機在逐行直譯到除法指令時發生執行期崩潰！";
+              termCompileLog.innerText = `[PVM 執行期報警] 雖然通過了語法安檢，但在運行時發生 ${sc.runtimeErrMsg}，齒輪機台緊急跳電！`;
+            } else {
+              pvmPowerLight.classList.add('active-green');
+              mechStatusOverlay.innerText = "✅ 運算成功產出";
+              mechStatusOverlay.style.color = "#4ade80";
+              pvmScreen.innerText += "\n✅ 指令全部執行成功，回傳數值：20.0";
+
+              compilePhaseLabel.innerText = "✅ 全流程正常執行完畢！";
+              termCompileLog.innerText = "[PVM 順暢執行] 所有指令皆正常推進，齒輪機台平穩完成運算。";
+            }
+          }, 1200);
+        }, 900);
+      }
+    }, 1200);
+  }
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentScenario = this.getAttribute('data-scenario');
+      reset();
+    });
+  });
+
+  btnRun.addEventListener('click', run);
+  btnReset.addEventListener('click', reset);
+  reset();
+})();
+
+// 9-2 動態教具：變數狀態殘留 (No Rollback) 與 雙向閘門
+(function() {
+  const carrier = document.getElementById('carrier92');
+  const payload = document.getElementById('payload92');
+  const gate = document.getElementById('gate92');
+  const trackNormal = document.getElementById('track92Normal');
+  const trackExcept = document.getElementById('track92Except');
+  const switchDot = document.getElementById('switchDot92');
+
+  const codeLine2 = document.getElementById('codeLine2');
+  const codeLine3 = document.getElementById('codeLine3');
+  const codeLine4 = document.getElementById('codeLine4');
+  const codeLine5 = document.getElementById('codeLine5');
+  const codeLine7 = document.getElementById('codeLine7');
+
+  const symRowStep = document.getElementById('symRowStep');
+  const symRowStatus = document.getElementById('symRowStatus');
+  const symRowVal = document.getElementById('symRowVal');
+  const symRowDone = document.getElementById('symRowDone');
+
+  const symValStep = document.getElementById('symValStep');
+  const symValStatus = document.getElementById('symValStatus');
+  const symValVal = document.getElementById('symValVal');
+  const symValDone = document.getElementById('symValDone');
+
+  const labelLine = document.getElementById('label92Line');
+  const termLog = document.getElementById('term92Log');
+  const btnStep = document.getElementById('btn92Step');
+  const btnReset = document.getElementById('btn92Reset');
+  const presetBtns = document.querySelectorAll('#basicTryExceptTheater .preset-btn');
+
+  let currentScenario = 'crash_midway';
+  let stepIndex = 0;
+
+  function reset() {
+    stepIndex = 0;
+    carrier.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+    carrier.style.left = '20px';
+    carrier.style.top = '74px';
+    carrier.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)';
+    payload.innerText = "進入 try";
+
+    gate.className = 'safety-gate';
+    trackNormal.setAttribute('stroke', '#e2e8f0');
+    trackExcept.setAttribute('stroke', '#e2e8f0');
+    switchDot.setAttribute('fill', '#94a3b8');
+
+    // 程式碼高亮重設
+    [codeLine2, codeLine3, codeLine4, codeLine5, codeLine7].forEach(el => el.className = 'code-line-item');
+
+    // 符號表復位
+    [symRowStep, symRowStatus, symRowVal, symRowDone].forEach(r => r.className = 'symbol-row');
+    symValStep.innerText = '<未宣告>';
+    symValStatus.innerText = '<未宣告>';
+    symValVal.innerText = '<未宣告>';
+    symValDone.innerText = '<未宣告>';
+
+    labelLine.innerText = "準備就緒";
+    termLog.innerText = "系統就緒。請點擊「單步執行」觀察變數存入與出錯跳轉時的狀態。";
+  }
+
+  function advance() {
+    stepIndex++;
+    if (stepIndex === 1) {
+      // 執行 Line 2: step = 1
+      carrier.style.left = '100px';
+      payload.innerText = "step = 1";
+      codeLine2.classList.add('active-line');
+      symRowStep.classList.add('assigned');
+      symValStep.innerText = "1";
+      labelLine.innerText = "Line 2: step = 1";
+      termLog.innerText = "[Step 1] 執行 step = 1。變數成功寫入符號表！";
+
+    } else if (stepIndex === 2) {
+      // 執行 Line 3: status = "處理中"
+      codeLine2.className = 'code-line-item';
+      codeLine3.classList.add('active-line');
+      carrier.style.left = '190px';
+      payload.innerText = 'status="..."';
+      symRowStatus.classList.add('assigned');
+      symValStatus.innerText = '"處理中"';
+      labelLine.innerText = 'Line 3: status = "處理中"';
+      termLog.innerText = '[Step 2] 執行 status = "處理中"。該變數亦成功寫入記憶體！';
+
+    } else if (stepIndex === 3) {
+      // 執行 Line 4: 高風險運算
+      codeLine3.className = 'code-line-item';
+      carrier.style.left = '290px';
+      labelLine.innerText = "Line 4: val = 100 / int(inp)";
+
+      if (currentScenario === 'crash_midway') {
+        // 出錯炸裂！
+        codeLine4.classList.add('error-line');
+        payload.innerText = 'int("abc") 💥';
+        switchDot.setAttribute('fill', '#c2410c');
+        trackExcept.setAttribute('stroke', '#fdba74');
+        carrier.style.background = 'linear-gradient(135deg, #c2410c 0%, #ea580c 100%)';
+        
+        // 駛入專屬停靠維修軌 (left: 310px, top: 214px)，絕不與 Gate 閘門文字重疊
+        carrier.style.left = '310px';
+        carrier.style.top = '214px';
+        gate.classList.add('gate-intercepting');
+
+        symRowVal.classList.add('unreached');
+        symValVal.innerText = '<未建立 / 崩潰>';
+        symRowDone.classList.add('unreached');
+        symValDone.innerText = '<被略過>';
+
+        labelLine.innerText = "🚨 Line 4 爆發 ValueError！跳轉至 except 閘門";
+        termLog.innerText = "🚨【致命細節】Line 4 轉型崩潰！控制流程直接跳轉進 except。請看右側符號表：step=1 與 status 依然完好存在！Python 不會復原 (No Rollback)，而後方的 is_done 則永遠未被執行！";
+
+      } else {
+        // 順利通過
+        codeLine4.classList.add('active-line');
+        payload.innerText = '100 / 5';
+        switchDot.setAttribute('fill', '#10b981');
+        trackNormal.setAttribute('stroke', '#86efac');
+        symRowVal.classList.add('assigned');
+        symValVal.innerText = "20.0";
+        labelLine.innerText = "Line 4: 運算成功 val = 20.0";
+        termLog.innerText = "[Step 3] 轉型與除法完全合法，val 順利寫入數值 20.0！";
+      }
+
+    } else if (stepIndex === 4) {
+      if (currentScenario === 'crash_midway') {
+        // 維修結束，執行 except 救援程式碼
+        codeLine4.className = 'code-line-item';
+        codeLine7.classList.add('active-line');
+        carrier.style.left = '390px';
+        carrier.style.top = '214px';
+        carrier.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)';
+        payload.innerText = "救援完畢";
+        symValStatus.innerText = '"救援成功"';
+        labelLine.innerText = 'Line 7: status = "救援成功"';
+        termLog.innerText = "[Step 4] except 區塊捕獲並處置完畢。後續程式依然可以讀取 step 與 status 的值！";
+        stepIndex = 99;
+      } else {
+        // 常態執行 Line 5: is_done = True
+        codeLine4.className = 'code-line-item';
+        codeLine5.classList.add('active-line');
+        carrier.style.left = '390px';
+        payload.innerText = "done=True";
+        symRowDone.classList.add('assigned');
+        symValDone.innerText = "True";
+        labelLine.innerText = "Line 5: is_done = True";
+        termLog.innerText = "[Step 4] 全區塊順暢無誤，所有變數皆全數成功賦值！";
+        stepIndex = 99;
+      }
+    }
+  }
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentScenario = this.getAttribute('data-scenario');
+      reset();
+    });
+  });
+
+  btnStep.addEventListener('click', () => {
+    if (stepIndex >= 99) reset();
+    advance();
+  });
+  btnReset.addEventListener('click', reset);
+  reset();
+})();
+
+// 9-3 動態教具：完整四向道岔與攔截閘門模擬器
+(function() {
+  const carrier = document.getElementById('ipCarrier');
+  const carrierPayload = document.getElementById('carrierPayload');
+  const labelTryChamber = document.getElementById('labelTryChamber');
+  const gateVal = document.getElementById('gateVal');
+  const gateZero = document.getElementById('gateZero');
+  const stationFinally = document.getElementById('stationFinally');
+  const switchCore = document.getElementById('switchCore');
+  const pathElse = document.getElementById('pathElse');
+  const pathExcept = document.getElementById('pathExcept');
+
+  const switchStatusLabel = document.getElementById('switchStatusLabel');
+  const termCodePreview = document.getElementById('termCodePreview');
+  const termLog = document.getElementById('termLog');
+  const termStdout = document.getElementById('termStdout');
+
+  const btnPlay = document.getElementById('btnPlay');
+  const btnStep = document.getElementById('btnStep');
+  const btnReset = document.getElementById('btnReset');
+  const presetBtns = document.querySelectorAll('#exceptionSwitchTheater .preset-btn');
+
+  let currentScenario = 'normal';
+  let currentStep = 0;
+  let playTimer = null;
+
+  // 關鍵修復：載車攜帶的是原始輸入數值，而非尚未在 try 執行的算式！
+  const scenariosData = {
+    normal: {
+      inputVal: '"5"',
+      exprInTry: "100 / int('5')",
+      type: "NORMAL",
+      stdout: "20.0"
+    },
+    val_err: {
+      inputVal: '"abc"',
+      exprInTry: "100 / int('abc')",
+      type: "VALUE_ERROR",
+      stdout: "【維修】攔截到 ValueError：字串無法轉為整數"
+    },
+    zero_err: {
+      inputVal: '"0"',
+      exprInTry: "100 / int('0')",
+      type: "ZERO_DIVISION",
+      stdout: "【維修】攔截到 ZeroDivisionError：除數不可為零"
+    }
+  };
+
+  function resetState() {
+    clearTimeout(playTimer);
+    currentStep = 0;
+
+    carrier.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+    carrier.style.left = '20px';
+    carrier.style.top = '165px';
+    carrier.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)';
+    carrierPayload.innerText = `輸入: ${scenariosData[currentScenario].inputVal}`;
+
+    labelTryChamber.innerText = "try 加工艙: 等待原料";
+    gateVal.className = 'safety-gate gate-value-error';
+    gateZero.className = 'safety-gate gate-zero-error';
+    stationFinally.className = 'station-finally';
+
+    pathElse.setAttribute('stroke', '#e2e8f0');
+    pathExcept.setAttribute('stroke', '#e2e8f0');
+    switchCore.setAttribute('fill', '#94a3b8');
+
+    switchStatusLabel.innerText = "待發線整備中";
+    termCodePreview.innerText = `inp = ${scenariosData[currentScenario].inputVal} \ntry: val = 100 / int(inp)`;
+    termLog.innerText = "載車攜帶外部輸入準備就緒。點擊「單步推進」觀察其進入 try 加工艙後的運算！";
+    termStdout.innerText = "標準輸出待命中...";
+    termStdout.className = "term-result";
+  }
+
+  function advanceStep() {
+    currentStep++;
+    const sc = scenariosData[currentScenario];
+
+    if (currentStep === 1) {
+      // 載車駛入 try 加工艙
+      carrier.style.left = '180px';
+      carrier.style.top = '165px';
+      labelTryChamber.innerText = `執行: ${sc.exprInTry}`;
+      switchStatusLabel.innerText = "進入 try 區間運算中...";
+      termLog.innerText = `[Step 1] 指令指標載運 ${sc.inputVal} 進入 try 加工艙。正在艙內執行運算：${sc.exprInTry}`;
+
+    } else if (currentStep === 2) {
+      // 在 try 內部運算並判定分流
+      if (sc.type === 'NORMAL') {
+        switchCore.setAttribute('fill', '#22c55e');
+        pathElse.setAttribute('stroke', '#86efac');
+        carrier.style.left = '460px';
+        carrier.style.top = '55px';
+
+        switchStatusLabel.innerText = "無異常！道岔切換至 else 常態通行線";
+        termLog.innerText = "[Step 2 - 正常] 運算毫無異常。道岔引導小車安全駛入 else 專屬放行線！";
+        termStdout.innerText = `計算結果成功產出：${sc.stdout}`;
+        termStdout.className = "term-result r-success";
+
+        gateVal.classList.add('gate-bypassed');
+        gateZero.classList.add('gate-bypassed');
+      } else {
+        switchCore.setAttribute('fill', '#c2410c');
+        pathExcept.setAttribute('stroke', '#fdba74');
+        carrier.style.background = 'linear-gradient(135deg, #c2410c 0%, #ea580c 100%)';
+
+        carrier.style.left = '330px';
+        carrier.style.top = '220px';
+
+        switchStatusLabel.innerText = "🚨 try 內運算引爆異常！切斷常態線，緊急駛入維修線";
+        termLog.innerText = `[Step 2 - 異常] try 區間內部運算崩潰！直譯器實例化例外物件，道岔立即將小車導流至維修避車線！`;
+      }
+
+    } else if (currentStep === 3) {
+      if (sc.type === 'NORMAL') {
+        carrier.style.left = '640px';
+        carrier.style.top = '55px';
+        termLog.innerText = "[Step 3] 常態運算完畢，載車準備進入 mandatory cleanup 沖洗艙。";
+      } else if (sc.type === 'VALUE_ERROR') {
+        carrier.style.left = '400px';
+        carrier.style.top = '255px';
+        gateVal.classList.add('gate-intercepting');
+        gateZero.classList.add('gate-bypassed');
+
+        switchStatusLabel.innerText = "Gate 1 (ValueError) 垂直升起阻截！";
+        termLog.innerText = "[Step 3 - 攔截] 例外型態與 except ValueError 吻合！閘門升起攔截，執行修復邏輯。";
+        termStdout.innerText = sc.stdout;
+        termStdout.className = "term-result r-handled";
+      } else if (sc.type === 'ZERO_DIVISION') {
+        gateVal.classList.add('gate-bypassed');
+        carrier.style.left = '560px';
+        carrier.style.top = '305px';
+        gateZero.classList.add('gate-intercepting');
+
+        switchStatusLabel.innerText = "穿透 Gate 1，Gate 2 (ZeroDivision) 垂直升起阻截！";
+        termLog.innerText = "[Step 3 - 攔截] ValueError 不匹配，穿透至第二道閘門。ZeroDivisionError 攔截成功！";
+        termStdout.innerText = sc.stdout;
+        termStdout.className = "term-result r-handled";
+      }
+
+    } else if (currentStep === 4) {
+      carrier.style.left = '730px';
+      carrier.style.top = '165px';
+      carrier.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)';
+      stationFinally.classList.add('cleaning-active');
+
+      switchStatusLabel.innerText = "必經關卡：進入 finally 沖洗艙！";
+      termLog.innerText = "[Step 4 - 收尾保證] 無論從 else 來還是由 except 修復，小車必定穿過 finally 艙執行資源清理！";
+
+    } else if (currentStep >= 5) {
+      stationFinally.classList.remove('cleaning-active');
+      carrier.style.left = '850px';
+      carrier.style.top = '165px';
+
+      switchStatusLabel.innerText = "✅ 全流程安全結束，主程序持續延續！";
+      termLog.innerText = "[Step 5 - 完成] 流程已完備收尾。程式未發生崩潰，控制權返回後續主流程。";
+      currentStep = 99;
+    }
+  }
+
+  function playAll() {
+    resetState();
+    function runNext() {
+      if (currentStep < 99) {
+        advanceStep();
+        if (currentStep < 99) {
+          playTimer = setTimeout(runNext, 1200);
+        }
+      }
+    }
+    runNext();
+  }
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentScenario = this.getAttribute('data-scenario');
+      resetState();
+    });
+  });
+
+  btnPlay.addEventListener('click', playAll);
+  btnStep.addEventListener('click', () => {
+    clearTimeout(playTimer);
+    if (currentStep >= 99) resetState();
+    advanceStep();
+  });
+  btnReset.addEventListener('click', resetState);
+
+  resetState();
+})();
+</script>
+
+</body>
+</html>

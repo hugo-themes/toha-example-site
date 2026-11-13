@@ -1,0 +1,791 @@
+{{ define "header" }}
+<meta name="description" content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Title }}{{ end }}" />
+<meta name="access" content="{{ .Params.access | default "private" }}" />
+<style>
+  /* ── 全域：隱藏 sidebar / toc，content-section 佔滿版面 ── */
+  .type-slides .sidebar-section,
+  .type-slides .toc-section {
+    display: none !important;
+  }
+  .type-slides .content-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    flex: 1 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    /* 補償 fixed navbar 50px，確保內容不被蓋到 */
+    padding-top: 50px !important;
+  }
+  .type-slides .content-section .content {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    /* content 本身不再需要 padding-top，由 content-section 統一補償 */
+    padding-top: 0 !important;
+  }
+
+  /* ══════════════════════════════════════════════
+     HERO SECTION
+  ══════════════════════════════════════════════ */
+  .slide-hero {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 50%, #f0fdf4 100%);
+    padding: 1rem 2rem 0.85rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(147, 197, 253, 0.25);
+  }
+  .slide-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(167, 243, 208, 0.2);
+  }
+
+  /* 兩欄：左側標題區，右上角 meta */
+  .slide-hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 1.5rem;
+    align-items: start;
+    position: relative;
+    z-index: 1;
+  }
+  .slide-hero-left { min-width: 0; }
+  .slide-hero-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    justify-content: flex-end;
+    padding-top: 0.1rem;
+    flex-shrink: 0;
+  }
+
+  /* 麵包屑 */
+  .slide-breadcrumb {
+    font-size: 0.82rem;
+    color: #2563eb;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .slide-breadcrumb a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .slide-breadcrumb a:hover { text-decoration: underline; }
+  .slide-breadcrumb span { color: #64748b; }
+
+  /* 主標題 */
+  .slide-hero h1 {
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.35rem 0;
+    line-height: 1.25;
+  }
+
+  /* Meta badges（右上角）*/
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    color: #475569;
+  }
+  .badge-public {
+    background: #dcfce7;
+    color: #166534;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .badge-public::before {
+    content: '●';
+    color: #22c55e;
+    font-size: 0.6rem;
+  }
+  .badge-private {
+    background: #fff7ed;
+    color: #9a3412;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .badge-category {
+    background: rgba(37, 99, 235, 0.1);
+    color: #1d4ed8;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+
+  /* 課程描述：單行不截斷 */
+  .slide-description {
+    font-size: 0.87rem;
+    color: #334155;
+    line-height: 1.5;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 640px) {
+    .slide-hero-inner { grid-template-columns: 1fr; }
+    .slide-hero-right { justify-content: flex-start; }
+    .slide-description { white-space: normal; }
+  }
+
+  /* 右側：學習重點（inline 橫向，放在 interactive header 右側）*/
+  .slide-summary-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: 320px;
+  }
+  .slide-summary-inline-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+  }
+  .slide-summary-inline ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.6rem;
+  }
+  .slide-summary-inline li {
+    font-size: 0.75rem;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .slide-summary-inline li::before {
+    content: '✅';
+    font-size: 0.65rem;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .slide-summary-inline { display: none; }
+  }
+
+  /* ══════════════════════════════════════════════
+     IFRAME 包裝區
+  ══════════════════════════════════════════════ */
+  .slide-iframe-outer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    /* 左欄（講義）70%，右欄（學習重點）30% */
+    display: grid;
+    grid-template-columns: 70fr 30fr;
+    grid-template-rows: 1fr auto; /* 上方填滿剩餘高度，下方 nav */
+    gap: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  /* 左欄：header + iframe 垂直疊放 */
+  .slide-iframe-left {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* 右欄：學習重點卡片 */
+  .slide-summary-aside {
+    grid-column: 2;
+    grid-row: 1;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    overflow-y: auto;
+    align-self: start; /* 不要撐滿高度，貼頂 */
+  }
+  .slide-summary-aside h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.65rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .slide-summary-aside ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .slide-summary-aside li {
+    font-size: 0.82rem;
+    color: #374151;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    line-height: 1.5;
+  }
+  .slide-summary-aside li::before {
+    content: '✅';
+    font-size: 0.72rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* 底部 nav：橫跨兩欄 */
+  .slide-iframe-outer > .slide-footer-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0.4rem 0;
+  }
+
+  /* RWD：小螢幕合併為單欄 */
+  @media (max-width: 800px) {
+    .slide-iframe-outer {
+      grid-template-columns: 1fr;
+    }
+    .slide-summary-aside {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .slide-iframe-outer > .slide-footer-nav {
+      grid-row: 3;
+    }
+  }
+
+  /* 互動式講義 Header 卡片 */
+  .slide-interactive-header {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px 14px 0 0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .slide-interactive-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .slide-interactive-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .slide-interactive-label {
+    display: flex;
+    flex-direction: column;
+  }
+  .slide-interactive-label-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .slide-interactive-label-title strong {
+    font-size: 1rem;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  .badge-interactive {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .slide-interactive-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* 全螢幕按鈕 */
+  .slide-fullscreen-btn {
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .slide-fullscreen-btn:hover { background: #0f2644; }
+  .slide-fullscreen-btn svg {
+    width: 15px; height: 15px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* iframe 本體 */
+  .slide-iframe-container {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+  body.has-slide-iframe {
+    overflow: hidden !important;
+  }
+  #slide-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+  body.has-slide-iframe .slide-footer-nav {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0.4rem 1.5rem;
+  }
+
+  /* ══════════════════════════════════════════════
+     非 iframe 模式（Markdown / content.html）
+  ══════════════════════════════════════════════ */
+  .slide-body-sandbox {
+    /* 不使用 all:initial，避免清掉父層 padding-top 導致內容蓋到 navbar */
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+    word-wrap: break-word;
+    max-width: 1120px;
+    margin: 2rem auto;
+    padding: 0 1.5rem 3rem 1.5rem;
+    box-sizing: border-box;
+  }
+  .slide-body-sandbox * { box-sizing: border-box; }
+  .slide-body-sandbox img { max-width: 100%; height: auto; }
+
+  /* ══════════════════════════════════════════════
+     BOTTOM NAV
+  ══════════════════════════════════════════════ */
+  .slide-footer-nav {
+    max-width: 1200px;
+    margin: 1.5rem auto 2rem auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .slide-nav-btn {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #0f172a;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-width: 0;
+  }
+  .slide-nav-btn.next {
+    grid-template-columns: 1fr auto;
+  }
+  .slide-nav-btn:hover {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    text-decoration: none;
+    color: #1d4ed8;
+  }
+  .slide-nav-btn.disabled {
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* 左欄（prev）/ 右欄（next）：「←上一課」或「下一課→」*/
+  .slide-nav-btn .nav-label-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.75rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2563eb;
+    white-space: nowrap;
+    /* prev：靠左；next：靠右（由 justify-self 控制） */
+    justify-self: start;
+  }
+  .slide-nav-btn.next .nav-label-cell {
+    justify-self: end;
+    border-left: 1px solid #e2e8f0;
+    border-right: none;
+  }
+  .slide-nav-btn.prev .nav-label-cell {
+    border-right: 1px solid #e2e8f0;
+  }
+
+  /* 課名欄：ellipsis，prev 靠右，next 靠左 */
+  .slide-nav-btn .nav-title-cell {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1e293b;
+    overflow: hidden;
+  }
+  .slide-nav-btn .nav-title-cell span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+  /* prev：課名靠右 */
+  .slide-nav-btn.prev .nav-title-cell {
+    justify-content: flex-end;
+    text-align: right;
+  }
+  /* next：課名靠左 */
+  .slide-nav-btn.next .nav-title-cell {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  /* 中間「回到課程列表」按鈕 */
+  .slide-nav-list-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.6rem 1.1rem;
+    text-decoration: none;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .slide-nav-list-btn:hover {
+    border-color: #64748b;
+    box-shadow: 0 0 0 3px rgba(100,116,139,0.08);
+    text-decoration: none;
+    color: #0f172a;
+  }
+
+  @media (max-width: 600px) {
+    .slide-footer-nav {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+    }
+    .slide-nav-list-btn {
+      grid-column: 1 / -1;
+      order: -1;
+    }
+  }
+</style>
+{{ end }}
+
+{{ define "navbar" }}
+{{ partial "navigators/navbar.html" . }}
+{{ end }}
+
+{{ define "content" }}
+<section class="content-section" id="content-section" data-access="{{ .Params.access | default "private" }}">
+  <div class="content">
+
+    {{/* ── HERO ── */}}
+    <div class="slide-hero">
+      <div class="slide-hero-inner">
+
+        <div class="slide-hero-left">
+          <nav class="slide-breadcrumb" aria-label="breadcrumb">
+            <a href="{{ "/slides/" | relLangURL }}">Slides</a>
+            <span>/</span>
+            {{ with .Parent }}
+              <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+              <span>/</span>
+            {{ end }}
+            <span style="color:#0f172a; font-weight:600;">{{ .Title }}</span>
+          </nav>
+
+          <h1>{{ .Title }}</h1>
+
+          {{ with .Description }}
+          <p class="slide-description">{{ . }}</p>
+          {{ end }}
+        </div>
+
+        <div class="slide-hero-right">
+          {{ if .Date }}
+          <span class="meta-item">
+            <span>📅</span>
+            <span>{{ .Date | time.Format ":date_full" }}</span>
+          </span>
+          {{ end }}
+          {{ if eq .Params.access "public" }}
+            <span class="badge-public">Public</span>
+          {{ else }}
+            <span class="badge-private">🔒 Private</span>
+          {{ end }}
+          {{ range .Params.categories }}
+            <span class="badge-category">{{ . }}</span>
+          {{ end }}
+        </div>
+
+      </div>
+    </div>
+    {{/* ── END HERO ── */}}
+
+    {{ if .Params.iframe }}
+    {{/* ── IFRAME 模式 ── */}}
+    <div class="slide-iframe-outer">
+
+      {{/* 左欄：互動式講義 Header + iframe */}}
+      <div class="slide-iframe-left">
+
+      {{/* 互動式講義 Header */}}
+      <div class="slide-interactive-header">
+        <div class="slide-interactive-header-left">
+          <div class="slide-interactive-icon">🧪</div>
+          <div class="slide-interactive-label">
+            <div class="slide-interactive-label-title">
+              <strong>{{ i18n "slide_interactive_title" | default "互動式講義" }}</strong>
+              <span class="badge-interactive">Interactive Lesson</span>
+            </div>
+          </div>
+        </div>
+        <div class="slide-interactive-header-right">
+          <button class="slide-fullscreen-btn" onclick="toggleSlideFullscreen()" aria-label="全螢幕切換">
+            <svg id="fullscreen-icon-expand" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            <svg id="fullscreen-icon-compress" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none;"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+            <span id="fullscreen-btn-text">{{ i18n "slide_fullscreen" | default "全螢幕學習模式" }}</span>
+          </button>
+        </div>
+      </div>
+
+      {{/* iframe */}}
+      <div class="slide-iframe-container">
+        <iframe id="slide-iframe" src="{{ .Params.iframe }}" title="{{ .Title }}" allowfullscreen></iframe>
+      </div>
+
+      </div>{{/* end .slide-iframe-left */}}
+
+      {{/* 右欄：學習重點卡片 */}}
+      {{ if .Params.summary_points }}
+      <aside class="slide-summary-aside">
+        <h4>🎯 {{ i18n "slide_summary_title" | default "本課學習重點" }}</h4>
+        <ul>
+          {{ range .Params.summary_points }}
+          <li>{{ . }}</li>
+          {{ end }}
+        </ul>
+      </aside>
+      {{ end }}
+
+      {{/* 底部導航：橫跨兩欄 */}}
+      <nav class="slide-footer-nav" aria-label="課程導覽">
+        {{ with .PrevInSection }}
+        <a href="{{ .RelPermalink }}" class="slide-nav-btn prev">
+          <span class="nav-label-cell">← {{ i18n "slide_prev" | default "上一課" }}</span>
+          <span class="nav-title-cell"><span>{{ .Title }}</span></span>
+        </a>
+        {{ else }}
+        <span class="slide-nav-btn disabled"></span>
+        {{ end }}
+
+        {{ with .Parent }}
+        <a href="{{ .RelPermalink }}" class="slide-nav-list-btn">
+          <span>☰</span>
+          <span>{{ i18n "slide_back_to_list" | default "回到課程列表" }}</span>
+        </a>
+        {{ end }}
+
+        {{ with .NextInSection }}
+        <a href="{{ .RelPermalink }}" class="slide-nav-btn next">
+          <span class="nav-title-cell"><span>{{ .Title }}</span></span>
+          <span class="nav-label-cell">{{ i18n "slide_next" | default "下一課" }} →</span>
+        </a>
+        {{ else }}
+        <span class="slide-nav-btn disabled"></span>
+        {{ end }}
+      </nav>
+
+    </div>
+
+    <script>
+      function toggleSlideFullscreen() {
+        var iframe = document.getElementById('slide-iframe');
+        var expandIcon = document.getElementById('fullscreen-icon-expand');
+        var compressIcon = document.getElementById('fullscreen-icon-compress');
+        var btnText = document.getElementById('fullscreen-btn-text');
+
+        if (!document.fullscreenElement) {
+          var elem = iframe;
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
+      }
+      document.addEventListener('fullscreenchange', function () {
+        var expandIcon = document.getElementById('fullscreen-icon-expand');
+        var compressIcon = document.getElementById('fullscreen-icon-compress');
+        var btnText = document.getElementById('fullscreen-btn-text');
+        if (document.fullscreenElement) {
+          expandIcon.style.display = 'none';
+          compressIcon.style.display = 'block';
+          btnText.textContent = '{{ i18n "slide_exit_fullscreen" | default "退出全螢幕" }}';
+        } else {
+          expandIcon.style.display = 'block';
+          compressIcon.style.display = 'none';
+          btnText.textContent = '{{ i18n "slide_fullscreen" | default "全螢幕學習模式" }}';
+        }
+      });
+
+      // 計算 slide-iframe-outer 頂部到頁面頂端的距離（用 offsetTop 累加，不受 scroll 影響）
+      function fitIframeHeight() {
+        var outer = document.querySelector('.slide-iframe-outer');
+        if (!outer) return;
+        // load 時 scroll=0，getBoundingClientRect().top 就是 outer 距視窗頂端的距離
+        var rect = outer.getBoundingClientRect();
+        var available = window.innerHeight - rect.top;
+        outer.style.height = Math.max(200, Math.floor(available)) + 'px';
+        document.body.classList.add('has-slide-iframe');
+      }
+
+      window.addEventListener('load', fitIframeHeight);
+      window.addEventListener('resize', function() {
+        // resize 時先移除 overflow:hidden，讓 outer 回到正常流，重算高度
+        document.body.classList.remove('has-slide-iframe');
+        requestAnimationFrame(function() {
+          window.scrollTo(0, 0);
+          requestAnimationFrame(fitIframeHeight);
+        });
+      });
+    </script>
+
+    {{ else }}
+    {{/* ── Markdown / content.html 模式 ── */}}
+    <div class="slide-body-sandbox">
+      {{ $htmlFile := .Resources.Get "content.html" }}
+      {{ if not $htmlFile }}
+        {{ range .Translations }}
+          {{ if not $htmlFile }}
+            {{ $htmlFile = .Resources.Get "content.html" }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ if $htmlFile }}
+        {{ $htmlFile.Content | safeHTML }}
+      {{ else }}
+        {{ .Content }}
+      {{ end }}
+    </div>
+    {{ end }}
+
+    {{/* ── BOTTOM NAV（非 iframe 模式才顯示，iframe 模式的 nav 已在 outer 容器內）── */}}
+    {{ if not .Params.iframe }}
+    <nav class="slide-footer-nav" aria-label="課程導覽">
+      {{/* 上一課 */}}
+      {{ with .PrevInSection }}
+      <a href="{{ .RelPermalink }}" class="slide-nav-btn prev">
+        <span class="nav-label-cell">← {{ i18n "slide_prev" | default "上一課" }}</span>
+        <span class="nav-title-cell"><span>{{ .Title }}</span></span>
+      </a>
+      {{ else }}
+      <span class="slide-nav-btn disabled"></span>
+      {{ end }}
+
+      {{/* 中間：回到課程列表 */}}
+      {{ with .Parent }}
+      <a href="{{ .RelPermalink }}" class="slide-nav-list-btn">
+        <span>☰</span>
+        <span>{{ i18n "slide_back_to_list" | default "回到課程列表" }}</span>
+      </a>
+      {{ end }}
+
+      {{/* 下一課 */}}
+      {{ with .NextInSection }}
+      <a href="{{ .RelPermalink }}" class="slide-nav-btn next">
+        <span class="nav-title-cell"><span>{{ .Title }}</span></span>
+        <span class="nav-label-cell">{{ i18n "slide_next" | default "下一課" }} →</span>
+      </a>
+      {{ else }}
+      <span class="slide-nav-btn disabled"></span>
+      {{ end }}
+    </nav>
+    {{/* ── END BOTTOM NAV ── */}}
+    {{ end }}
+
+  </div>
+</section>
+{{ end }}

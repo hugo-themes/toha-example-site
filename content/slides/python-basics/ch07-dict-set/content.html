@@ -1,0 +1,1337 @@
+<style>
+/* ==========================================================================
+    溫暖出版品風格系統 (Warm Editorial Theme)
+    ========================================================================== */
+:root {
+    --bg-main: #fbf9f4;
+    --bg-card: #ffffff;
+    --bg-panel: #f4efe6;
+    --text-main: #2d2926;
+    --text-muted: #665f57;
+    --border-color: #e5dfd5;
+    
+    --accent-terracotta: #c2410c;
+    --accent-amber: #b45309;
+    --accent-blue: #1e3a8a;
+    --accent-green: #15803d;
+    --accent-red: #dc2626;
+    
+    --code-bg: #1e293b;
+    --code-text: #f8fafc;
+    --terminal-header: #334155;
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(45,41,38,0.08);
+    --font-mono: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+}
+
+.slide-body-sandbox * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.slide-body-sandbox {
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    line-height: 1.75;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+.slide-body-sandbox .container {
+    width: 100%;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* ==========================================================================
+    第一層：章節標題技術純淨性
+    ========================================================================== */
+.slide-body-sandbox section {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 32px;
+    margin-bottom: 36px;
+    box-shadow: var(--shadow-sm);
+}
+
+.slide-body-sandbox header.unit-header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+}
+
+.slide-body-sandbox .unit-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-terracotta);
+    background-color: #ffedd5;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+}
+
+.slide-body-sandbox h1.unit-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.slide-body-sandbox .unit-meta {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.slide-body-sandbox h2.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.slide-body-sandbox h3.subsection-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent-amber);
+    margin-top: 28px;
+    margin-bottom: 12px;
+}
+
+.slide-body-sandbox p {
+    margin-bottom: 16px;
+    color: var(--text-main);
+}
+
+.slide-body-sandbox .lead-paragraph {
+    font-size: 17px;
+    font-weight: 500;
+    color: #3f3933;
+}
+
+/* ==========================================================================
+    代碼衛生規範：零行號、標準 PEP 8
+    ========================================================================== */
+pre.code-block {
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    padding: 18px 20px;
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 16px 0 24px 0;
+    box-shadow: var(--shadow-sm);
+}
+
+code.inline-code {
+    background-color: #f1ede4;
+    color: var(--accent-terracotta);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.callout {
+    background-color: var(--bg-card);
+    border-left: 4px solid var(--accent-amber);
+    padding: 16px 20px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin: 20px 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.callout-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-main);
+    font-size: 15px;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+table.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    font-size: 14px;
+}
+
+table.trace-table th, table.trace-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+table.trace-table th {
+    background-color: var(--bg-panel);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ==========================================================================
+    第二層與第三層：動態教具專用樣式 (Widgets Core)
+    ========================================================================== */
+.widget-container {
+    background-color: var(--bg-card);
+    border: 2px solid #dfd7cc;
+    border-radius: var(--radius-lg);
+    margin: 36px 0 52px 0;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+/* 第二層：功能標籤 (客觀機制標註) */
+.widget-frame-label {
+    background-color: #ede5d8;
+    border-bottom: 1px solid var(--border-color);
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    letter-spacing: 0.05em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.widget-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-green);
+    background: #ffffff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+}
+
+.widget-status-badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-green);
+    border-radius: 50%;
+}
+
+/* 第三層：畫布佈局 */
+.widget-canvas {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    background-color: #ffffff;
+}
+
+@media (max-width: 960px) {
+    .widget-canvas {
+    grid-template-columns: 1fr;
+    }
+}
+
+/* 控制面板 */
+.control-panel {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.panel-group-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+.preset-btn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-preset {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-main);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.btn-preset:hover {
+    border-color: var(--accent-blue);
+    background-color: #f8fafc;
+    transform: translateX(3px);
+}
+
+.preset-tag {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+}
+
+.tag-safe { background-color: #dcfce7; color: #166534; }
+.tag-danger { background-color: #fee2e2; color: #991b1b; }
+.tag-update { background-color: #fef3c7; color: #92400e; }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-select, .form-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: #fff;
+}
+
+.btn-action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-exec { background-color: var(--accent-terracotta); color: #fff; }
+.btn-exec:hover { background-color: #9a3412; }
+.btn-rst { background-color: #e2e8f0; color: var(--text-main); }
+.btn-rst:hover { background-color: #cbd5e1; }
+
+/* 機制演繹展示舞台 */
+.visual-stage {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* 實體雜湊桶架 (Hash Bucket Rack) */
+.hash-rack-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    background-color: #fdfcfa;
+}
+
+.rack-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.bucket-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 640px) {
+    .bucket-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.bucket-slot {
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.bucket-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed #e2e8f0;
+    padding-bottom: 4px;
+}
+
+.slot-item {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: all 0.3s;
+}
+
+.slot-item .k-name { color: var(--accent-blue); font-weight: 700; }
+.slot-item .v-val { color: var(--accent-terracotta); }
+
+/* 高亮動畫態 */
+.bucket-slot.highlight-target {
+    border-color: var(--accent-terracotta);
+    background-color: #fff7ed;
+    box-shadow: 0 0 12px rgba(194, 65, 12, 0.25);
+    transform: translateY(-3px);
+}
+
+.bucket-slot.highlight-error {
+    border-color: var(--accent-red);
+    background-color: #fef2f2;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.25);
+}
+
+/* 指令管線判定條 */
+.pipeline-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-panel);
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    border-left: 4px solid var(--accent-blue);
+}
+
+.pipeline-pulse-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    flex-shrink: 0;
+}
+
+.pulse-error { background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+.pulse-warning { background-color: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.8); }
+
+/* 虛擬終端機視窗 */
+.terminal-window {
+    background-color: var(--code-bg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+}
+
+.terminal-bar {
+    background-color: var(--terminal-header);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terminal-dots { display: flex; gap: 6px; }
+.tdot { width: 10px; height: 10px; border-radius: 50%; }
+.tdot-r { background: #ef4444; }
+.tdot-y { background: #f59e0b; }
+.tdot-g { background: #10b981; }
+
+.terminal-screen {
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #f8fafc;
+    min-height: 140px;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.term-prompt { color: #38bdf8; }
+.term-out { color: #f8fafc; }
+.term-error { color: #f87171; font-weight: bold; }
+.term-success { color: #4ade80; }
+
+/* ==========================================================================
+    動態教具二：多層巢狀結構鑽取解析器樣式 (Drill-down Widget)
+    ========================================================================== */
+.drill-tree-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    padding: 18px;
+}
+
+.drill-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+}
+
+.crumb-pill {
+    background: #e2e8f0;
+    color: var(--text-main);
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.crumb-pill.active {
+    background: var(--accent-blue);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.nested-card-viewer {
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    min-height: 130px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.key-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid #94a3b8;
+    border-radius: 4px;
+    margin: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #ffffff;
+}
+
+.key-badge:hover {
+    border-color: var(--accent-terracotta);
+    background: #fff7ed;
+    transform: translateY(-2px);
+}
+
+.key-badge.target-key {
+    border-color: var(--accent-terracotta);
+    background: #ffedd5;
+    font-weight: 700;
+}
+
+/* 版權宣告 */
+.slide-body-sandbox footer.copyright-box {
+    margin-top: 50px;
+    padding: 24px;
+    background-color: #f4efe6;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.8;
+}
+
+.slide-body-sandbox footer.copyright-box h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+</style>
+<div class="container">
+
+<!-- 7-1 字典本質與雜湊映射機制 -->
+<section>
+    <h2 class="section-title">7-1 字典本質與雜湊映射機制</h2>
+    <p class="lead-paragraph">
+    若將串列（List）視為依照整數編號排隊的儲物櫃，字典（Dictionary）則是以專屬「識別標籤（Key）」進行物件對映的關聯儲存系統。
+    </p>
+    <p>
+    在底層實作上，Python 字典採用雜湊表（Hash Table）架構。當直譯器存取一個鍵（Key）時，會透過雜湊運算換算記憶體槽位，使字典在檢索、新增或刪除元素時，均能在平均 <code class="inline-code">O(1)</code> 的常數時間內完成。
+    </p>
+
+    <h3 class="subsection-title">1. 字典宣告與鍵的合法性規範</h3>
+    <pre class="code-block"><code># 1. 字典字面值定義
+student = {
+"name": "小明",
+"age": 18,
+"grade": "高三"
+}
+
+# 2. 建立空字典的兩種方式
+empty_dict_a = {}
+empty_dict_b = dict()
+
+# 3. 透過成對序列建構字典
+pairs = [("id", 101), ("status", "active")]
+user_info = dict(pairs)</code></pre>
+
+    <div class="callout">
+    <div class="callout-title">技術核心：鍵（Key）的雜湊約束（Hashable）</div>
+    <p style="font-size: 14px;">
+        字典的「值（Value）」可為任意型態且允許重複；但「鍵（Key）」具備絕對唯一性，且<strong>必須是不可變物件（Hashable）</strong>，例如 <code class="inline-code">str</code>、<code class="inline-code">int</code> 或 <code class="inline-code">tuple</code>。若誤將可變物件（如 <code class="inline-code">list</code>）作為鍵，直譯器會立即拋出 <code class="inline-code">TypeError: unhashable type: 'list'</code>。
+    </p>
+    </div>
+</section>
+
+<!-- 7-2 字典元素操作與安全讀取機制 -->
+<section>
+    <h2 class="section-title">7-2 字典元素操作與安全讀取機制</h2>
+    <p>
+    字典是可變容器（Mutable）。使用 <code class="inline-code">d[key] = value</code> 語法時，若鍵已存在則會就地覆蓋更新；若不存在則會新增該筆項目。但在讀取與刪除時，必須格外防範因鍵不存在所引發的程式中斷。
+    </p>
+
+    <!-- ===================================================================
+        動態教具一：字典雜湊定址與防禦存取演繹教具
+        =================================================================== -->
+    <div class="widget-container">
+    <!-- 第二層：教具功能標籤 -->
+    <div class="widget-frame-label">
+        <span>【直譯器機制模擬：字典雜湊定址與防禦存取演繹教具】</span>
+        <span class="widget-status-badge">動態模擬核心：已就緒</span>
+    </div>
+
+    <!-- 第三層：教具內部畫布 -->
+    <div class="widget-canvas" id="hashWidgetApp">
+        <!-- 左側控制面板 -->
+        <div class="control-panel">
+        <div class="panel-group-title">實務情境快速測試 (Presets)</div>
+        <div class="preset-btn-grid">
+            <button class="btn-preset" data-action="get_bracket" data-key="name" data-val="" data-def="">
+            <span>讀取現有鍵: ['name']</span>
+            <span class="preset-tag tag-safe">成功 O(1)</span>
+            </button>
+            <button class="btn-preset" data-action="get_bracket" data-key="phone" data-val="" data-def="">
+            <span>危險讀取: ['phone']</span>
+            <span class="preset-tag tag-danger">KeyError 錯誤</span>
+            </button>
+            <button class="btn-preset" data-action="get_safe" data-key="phone" data-val="" data-def="未登記">
+            <span>防禦讀取: .get('phone')</span>
+            <span class="preset-tag tag-safe">安全降級</span>
+            </button>
+            <button class="btn-preset" data-action="set_val" data-key="age" data-val="19" data-def="">
+            <span>覆蓋更新: ['age'] = 19</span>
+            <span class="preset-tag tag-update">就地更新</span>
+            </button>
+            <button class="btn-preset" data-action="pop_val" data-key="grade" data-val="" data-def="無">
+            <span>彈出取出: .pop('grade')</span>
+            <span class="preset-tag tag-update">移轉拔除</span>
+            </button>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 4px 0;">
+
+        <div class="panel-group-title">手動直譯指令設定 (Manual Controls)</div>
+        <div class="form-group">
+            <label class="form-label" for="hwActionSelect">操作指令</label>
+            <select id="hwActionSelect" class="form-select">
+            <option value="get_bracket">1. student[key]（中括號讀取）</option>
+            <option value="get_safe">2. student.get(key, default)（安全防禦取值）</option>
+            <option value="set_val">3. student[key] = value（新增或覆蓋寫入）</option>
+            <option value="pop_val">4. student.pop(key, default)（安全彈出拔除）</option>
+            <option value="del_stmt">5. del student[key]（陳述句刪除）</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="hwInputKey">目標鍵 (Key)</label>
+            <input type="text" id="hwInputKey" class="form-input" value="name" placeholder="輸入 key 名稱">
+        </div>
+
+        <div class="form-group" id="hwValGroup">
+            <label class="form-label" for="hwInputVal">寫入數值 (Value)</label>
+            <input type="text" id="hwInputVal" class="form-input" value="" placeholder="輸入寫入值">
+        </div>
+
+        <div class="form-group" id="hwDefGroup">
+            <label class="form-label" for="hwInputDef">防禦備用預設值 (Default)</label>
+            <input type="text" id="hwInputDef" class="form-input" value="未登記" placeholder="查無鍵時回傳">
+        </div>
+
+        <div class="btn-action-row">
+            <button class="btn-action btn-exec" id="hwBtnRun">執行直譯指令</button>
+            <button class="btn-action btn-rst" id="hwBtnReset">重置記憶體</button>
+        </div>
+        </div>
+
+        <!-- 右側實體雜湊架與終端機 -->
+        <div class="visual-stage">
+        <div class="hash-rack-card">
+            <div class="rack-header">
+            <span>雜湊表記憶體槽位架 (Hash Table Buckets @ Heap)</span>
+            <span id="hwBucketStats">槽位容量：4 | 元素：3 項</span>
+            </div>
+            <div class="bucket-grid" id="hwBucketGrid">
+            <!-- 由 JS 動態繪製 4 個實體槽位 -->
+            </div>
+        </div>
+
+        <div class="pipeline-status-bar">
+            <span class="pipeline-pulse-dot" id="hwStatusPulse"></span>
+            <span id="hwStatusText">直譯管線：待命中。請點選上方情境按鈕觀察雜湊定址。</span>
+        </div>
+
+        <div class="terminal-window">
+            <div class="terminal-bar">
+            <div class="terminal-dots">
+                <div class="tdot tdot-r"></div>
+                <div class="tdot tdot-y"></div>
+                <div class="tdot tdot-g"></div>
+            </div>
+            <span style="color: #94a3b8; font-size: 12px; font-family: var(--font-mono); margin-left: 8px;">Python 3.11 Terminal (Interactive Shell)</span>
+            </div>
+            <div class="terminal-screen" id="hwTerminalScreen">
+            <div class="term-out">Python 3.11.4 [Hash Table Engine Initialized]</div>
+            <div class="term-out">&gt;&gt;&gt; student = {'name': '小明', 'age': 18, 'grade': '高三'}</div>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- 靜態追蹤表 -->
+    <h3 class="subsection-title">2. 字典取值與刪除防禦性對照表</h3>
+    <div class="table-container">
+    <table class="trace-table">
+        <thead>
+        <tr>
+            <th>操作語法</th>
+            <th>語法類別</th>
+            <th>目標鍵存在時之行為</th>
+            <th>目標鍵不存在時之行為</th>
+            <th>回傳值處理</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code class="inline-code">d[key]</code></td>
+            <td>索引存取運算子</td>
+            <td>正常回傳對應的 Value</td>
+            <td><strong>拋出 KeyError 並引發程式中斷</strong></td>
+            <td>直接回傳 Value</td>
+        </tr>
+        <tr>
+            <td><code class="inline-code">d.get(key, default)</code></td>
+            <td>防禦性方法</td>
+            <td>正常回傳對應的 Value</td>
+            <td><strong>不報錯，安全降級回傳 default</strong></td>
+            <td>回傳 Value 或 default</td>
+        </tr>
+        <tr>
+            <td><code class="inline-code">del d[key]</code></td>
+            <td>陳述句 (Statement)</td>
+            <td>自雜湊表中刪除該鍵值對</td>
+            <td><strong>拋出 KeyError 並引發程式中斷</strong></td>
+            <td>無（None）</td>
+        </tr>
+        <tr>
+            <td><code class="inline-code">d.pop(key, default)</code></td>
+            <td>內建方法</td>
+            <td>刪除項目，並將原值彈出傳回</td>
+            <td>若無 default 拋出 KeyError；若有則回傳 default</td>
+            <td>回傳彈出的 Value 或 default</td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+</section>
+
+<!-- 7-3 字典視圖與走訪解構 -->
+<section>
+    <h2 class="section-title">7-3 字典視圖與走訪解構</h2>
+    <p>
+    Python 提供了三種動態視圖物件（View Objects）：<code class="inline-code">keys()</code>、<code class="inline-code">values()</code> 與 <code class="inline-code">items()</code>。視圖物件會即時反映字典底層的變動，不需額外耗費記憶體進行複製。
+    </p>
+    <pre class="code-block"><code>student = {"name": "小明", "age": 18, "grade": "高三"}
+
+# 1. 迭代所有的鍵（Keys）
+for key in student.keys():
+print("鍵:", key)
+
+# 2. 迭代所有的值（Values）
+for val in student.values():
+print("值:", val)
+
+# 3. 鍵值同步解構走訪（Items）
+for key, val in student.items():
+print(f"屬性 [{key}] -> {val}")</code></pre>
+</section>
+
+<!-- 7-4 複合容器架構解析 -->
+<section>
+    <h2 class="section-title">7-4 複合容器架構解析：巢狀字典與層級探索</h2>
+    <p class="lead-paragraph">
+    在實際網路爬蟲或串接 RESTful Web API 時，資料幾乎皆以多層階層的巢狀結構（Nested Structures / JSON）返回。
+    </p>
+
+    <!-- ===================================================================
+        動態教具二：多層巢狀結構探索解析器 (Drill-down Widget)
+        =================================================================== -->
+    <div class="widget-container">
+    <div class="widget-frame-label">
+        <span>【直譯器機制模擬：多層巢狀結構探索與層級定位解析器】</span>
+        <span class="widget-status-badge">API JSON 解析器：已就緒</span>
+    </div>
+
+    <div class="widget-canvas" style="grid-template-columns: 320px 1fr;" id="drillApp">
+        <div class="control-panel">
+        <div class="panel-group-title">模擬 API 回傳原始結構</div>
+        <pre style="background:#1e293b; color:#93c5fd; padding:12px; border-radius:6px; font-family:var(--font-mono); font-size:12px; line-height:1.5;">api_response = {
+"status": 200,
+"data": {
+"user": {
+    "name": "小明",
+    "roles": ["admin", "editor"]
+}
+}
+}</pre>
+        <div class="panel-group-title" style="margin-top:10px;">目標路徑探索模擬</div>
+        <div class="preset-btn-grid">
+            <button class="btn-preset" id="drillBtnUser">
+            <span>定位使用者: ['data']['user']</span>
+            <span class="preset-tag tag-safe">進入 Dict</span>
+            </button>
+            <button class="btn-preset" id="drillBtnName">
+            <span>取名字: ...['user']['name']</span>
+            <span class="preset-tag tag-safe">取得 '小明'</span>
+            </button>
+            <button class="btn-preset" id="drillBtnRole">
+            <span>取首要角色: ...['roles'][0]</span>
+            <span class="preset-tag tag-safe">索引 [0]</span>
+            </button>
+        </div>
+        <button class="btn-action btn-rst" id="drillBtnReset" style="margin-top:12px;">重置探索路徑</button>
+        </div>
+
+        <div class="visual-stage">
+        <div class="drill-tree-container">
+            <div style="font-size:13px; font-weight:700; color:var(--accent-blue);">目前取值路徑 (Chain Evaluation Breadcrumbs):</div>
+            <div class="drill-breadcrumbs" id="drillBreadcrumbs">
+            <!-- 動態麵包屑 -->
+            </div>
+
+            <div style="font-size:13px; font-weight:700; color:var(--text-muted); margin-top:8px;">目前選取物件層級內容 (Current Object Inspector):</div>
+            <div class="nested-card-viewer" id="drillViewer">
+            <!-- 動態呈現子項目 -->
+            </div>
+        </div>
+
+        <div class="pipeline-status-bar" id="drillStatusBar">
+            <span class="pipeline-pulse-dot" id="drillPulse"></span>
+            <span id="drillStatusMsg">已就緒。點擊麵包屑或卡片中的 Key 即可向下層探索。</span>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <h3 class="subsection-title">1. 串列包字典（List of Dicts）與庫存範例</h3>
+    <pre class="code-block"><code># 模擬電商商品清單
+inventory = [
+{"id": "A01", "name": "機械鍵盤", "price": 2800, "stock": 12},
+{"id": "A02", "name": "無線滑鼠", "price": 1200, "stock": 45},
+{"id": "A03", "name": "人體工學椅", "price": 8900, "stock": 4}
+]
+
+total_valuation = 0
+for item in inventory:
+subtotal = item["price"] * item["stock"]
+total_valuation += subtotal
+print(f"商品：{item['name']} | 庫存總值：{subtotal} 元")
+
+print(f"總庫存資產總值：{total_valuation} 元")</code></pre>
+</section>
+
+<!-- 7-5 字典推導式運算 -->
+<section>
+    <h2 class="section-title">7-5 字典推導式運算（Dictionary Comprehension）</h2>
+    <p>
+    字典推導式能以一行簡潔的程式碼動態建立鍵值對應映射，並支援條件過濾：
+    </p>
+    <pre class="code-block"><code># 1. 數值與平方的動態映射
+numbers = [1, 2, 3, 4, 5]
+square_map = {num: num ** 2 for num in numbers}
+print(square_map)  # {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+
+# 2. 字母與 ASCII 碼映射（僅篩選偶數編碼）
+letters = ["a", "b", "c", "d", "e"]
+even_ascii_dict = {ch: ord(ch) for ch in letters if ord(ch) % 2 == 0}
+print(even_ascii_dict)  # {'b': 98, 'd': 100}</code></pre>
+</section>
+
+<!-- 7-6 集合本質與集合代數運算 -->
+<section>
+    <h2 class="section-title">7-6 集合本質與集合代數運算</h2>
+    <p class="lead-paragraph">
+    集合（Set）是儲存「唯一、不可變元素」的無序容器。它就像是只有鍵而沒有值的雜湊結構。
+    </p>
+
+    <h3 class="subsection-title">1. 集合移除重複的特性與基本操作</h3>
+    <pre class="code-block"><code># 利用 set 快速移除串列中的重複項目
+raw_data = ["Python", "AI", "Python", "Web", "AI", "Cloud"]
+unique_set = set(raw_data)
+print(unique_set)  # {'Python', 'Cloud', 'AI', 'Web'}（無序）
+
+unique_set.add("DevOps")     # 新增元素
+unique_set.discard("Web")    # 找不到元素也不會引發錯誤的移除方法</code></pre>
+
+    <h3 class="subsection-title">2. 集合代數運算（交集、聯集、差集）</h3>
+    <div class="table-container">
+    <table class="trace-table">
+        <thead>
+        <tr>
+            <th>運算名稱</th>
+            <th>運算子</th>
+            <th>方法</th>
+            <th>邏輯說明</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>交集 (Intersection)</strong></td>
+            <td><code class="inline-code">A & B</code></td>
+            <td><code class="inline-code">A.intersection(B)</code></td>
+            <td>同時存在於 A 與 B 的共同元素</td>
+        </tr>
+        <tr>
+            <td><strong>聯集 (Union)</strong></td>
+            <td><code class="inline-code">A | B</code></td>
+            <td><code class="inline-code">A.union(B)</code></td>
+            <td>合併 A 與 B 的所有元素，重複者僅留一份</td>
+        </tr>
+        <tr>
+            <td><strong>差集 (Difference)</strong></td>
+            <td><code class="inline-code">A - B</code></td>
+            <td><code class="inline-code">A.difference(B)</code></td>
+            <td>存在於 A 但排除掉存在於 B 的元素</td>
+        </tr>
+        <tr>
+            <td><strong>對稱差集 (Symmetric Diff)</strong></td>
+            <td><code class="inline-code">A ^ B</code></td>
+            <td><code class="inline-code">A.symmetric_difference(B)</code></td>
+            <td>僅存在於 A 或 B 其中一方的元素</td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <pre class="code-block"><code>group_a = {"Python", "Git", "SQL"}
+group_b = {"Python", "Docker", "AWS"}
+
+print("共同掌握技能 (交集):", group_a & group_b)  # {'Python'}
+print("整體技能清單 (聯集):", group_a | group_b)  # {'Python', 'Git', 'SQL', 'Docker', 'AWS'}
+print("A 組獨有技能 (差集):", group_a - group_b)  # {'Git', 'SQL'}</code></pre>
+</section>
+
+<!-- 官方免責聲明與權益宣示 (嚴格保護) -->
+<footer class="copyright-box">
+    <h4>免責聲明與權益宣示</h4>
+    <p>
+    本教材內容屬於王健安專為教學目的所編寫，僅供授課學生參考使用。未經本人口頭、書面許可，嚴禁將本教材全部或部分內容挪作其他用途或於其他平台分享、發表、複製、轉載、修改或散佈。任何未經授權之使用將可能涉及侵權，並保留追究法律責任的權利。
+    </p>
+    <p>
+    如有授權需求，請以 Email 聯繫至：<code class="inline-code">andywangkenichi@gmail.com</code>。敬請尊重智慧財產權，避免不當使用。
+    </p>
+</footer>
+</div>
+<script>
+// 教具一：字典雜湊定址與防禦存取模擬器
+(function() {
+    const BUCKET_COUNT = 4;
+    let mockDict = {
+    "name": "小明",
+    "age": 18,
+    "grade": "高三"
+    };
+
+    // 簡易雜湊演算法模擬：hash(str) % 4
+    function getHashIndex(keyStr) {
+    let code = 0;
+    for (let i = 0; i < keyStr.length; i++) {
+        code += keyStr.charCodeAt(i);
+    }
+    return code % BUCKET_COUNT;
+    }
+
+    // DOM 元件快取
+    const bucketGrid = document.getElementById("hwBucketGrid");
+    const bucketStats = document.getElementById("hwBucketStats");
+    const statusPulse = document.getElementById("hwStatusPulse");
+    const statusText = document.getElementById("hwStatusText");
+    const termScreen = document.getElementById("hwTerminalScreen");
+
+    const actionSelect = document.getElementById("hwActionSelect");
+    const inputKey = document.getElementById("hwInputKey");
+    const inputVal = document.getElementById("hwInputVal");
+    const inputDef = document.getElementById("hwInputDef");
+    const valGroup = document.getElementById("hwValGroup");
+    const defGroup = document.getElementById("hwDefGroup");
+    const btnRun = document.getElementById("hwBtnRun");
+    const btnReset = document.getElementById("hwBtnReset");
+    const presetButtons = document.querySelectorAll("#hashWidgetApp .btn-preset");
+
+    // 渲染 4 個實體雜湊槽位
+    function renderBuckets(highlightIndex = null, isError = false) {
+    bucketGrid.innerHTML = "";
+    const buckets = Array.from({ length: BUCKET_COUNT }, () => []);
+
+    Object.keys(mockDict).forEach(k => {
+        const idx = getHashIndex(k);
+        buckets[idx].push({ key: k, val: mockDict[k] });
+    });
+
+    const totalItems = Object.keys(mockDict).length;
+    bucketStats.textContent = `槽位容量：${BUCKET_COUNT} | 元素：${totalItems} 項`;
+
+    for (let i = 0; i < BUCKET_COUNT; i++) {
+        const slot = document.createElement("div");
+        slot.className = "bucket-slot";
+        if (highlightIndex === i) {
+        slot.classList.add(isError ? "highlight-error" : "highlight-target");
+        }
+
+        slot.innerHTML = `<div class="bucket-label">Bucket #${i} [Slot]</div>`;
+
+        if (buckets[i].length === 0) {
+        const emptyNotice = document.createElement("div");
+        emptyNotice.style.fontSize = "11px";
+        emptyNotice.style.color = "#94a3b8";
+        emptyNotice.style.fontStyle = "italic";
+        emptyNotice.style.marginTop = "8px";
+        emptyNotice.textContent = "(空槽位)";
+        slot.appendChild(emptyNotice);
+        } else {
+        buckets[i].forEach(item => {
+            const itemCard = document.createElement("div");
+            itemCard.className = "slot-item";
+            const displayVal = typeof item.val === "string" ? `'${item.val}'` : item.val;
+            itemCard.innerHTML = `
+            <span class="k-name">'${item.key}'</span>
+            <span class="v-val">: ${displayVal}</span>
+            `;
+            slot.appendChild(itemCard);
+        });
+        }
+
+        bucketGrid.appendChild(slot);
+    }
+    }
+
+    function logTerminal(text, type = "normal") {
+    const line = document.createElement("div");
+    if (type === "error") line.className = "term-error";
+    else if (type === "success") line.className = "term-success";
+    else if (type === "prompt") line.className = "term-prompt";
+    else line.className = "term-out";
+    line.textContent = text;
+    termScreen.appendChild(line);
+    termScreen.scrollTop = termScreen.scrollHeight;
+    }
+
+    function updateControlFields() {
+    const act = actionSelect.value;
+    if (act === "set_val") {
+        valGroup.style.display = "flex";
+        defGroup.style.display = "none";
+    } else if (act === "get_safe" || act === "pop_val") {
+        valGroup.style.display = "none";
+        defGroup.style.display = "flex";
+    } else {
+        valGroup.style.display = "none";
+        defGroup.style.display = "none";
+    }
+    }
+
+    actionSelect.addEventListener("change", updateControlFields);
+
+    presetButtons.forEach(btn => {
+    btn.addEventListener("click", function() {
+        actionSelect.value = this.dataset.action;
+        inputKey.value = this.dataset.key;
+        inputVal.value = this.dataset.val;
+        inputDef.value = this.dataset.def;
+        updateControlFields();
+        executeHashAction();
+    });
+    });
+
+    function executeHashAction() {
+    const act = actionSelect.value;
+    const key = inputKey.value.trim();
+    const val = inputVal.value.trim();
+    const def = inputDef.value.trim();
+
+    if (!key) {
+        alert("請輸入目標鍵 (Key)");
+        return;
+    }
+
+    const bucketIdx = getHashIndex(key);
+    const exists = Object.prototype.hasOwnProperty.call(mockDict, key);
+
+    if (act === "get_bracket") {
+        logTerminal(`>>> student['${key}']`, "prompt");
+        if (exists) {
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot";
+        statusText.textContent = `雜湊定址命中！hash('${key}') -> Bucket #${bucketIdx}，以 O(1) 提取物件。`;
+        logTerminal(`${typeof mockDict[key] === 'string' ? `'${mockDict[key]}'` : mockDict[key]}`);
+        } else {
+        renderBuckets(bucketIdx, true);
+        statusPulse.className = "pipeline-pulse-dot pulse-error";
+        statusText.textContent = `直譯中斷！hash('${key}') 槽位查無此鍵，拋出 KeyError 阻斷執行！`;
+        logTerminal(`Traceback (most recent call last):`, "error");
+        logTerminal(`KeyError: '${key}'`, "error");
+        }
+    } 
+    else if (act === "get_safe") {
+        const fallback = def !== "" ? `'${def}'` : "None";
+        logTerminal(`>>> student.get('${key}', ${fallback})`, "prompt");
+        if (exists) {
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot";
+        statusText.textContent = `安全讀取命中：目標鍵存在於 Bucket #${bucketIdx}，正常返回數值。`;
+        logTerminal(`${typeof mockDict[key] === 'string' ? `'${mockDict[key]}'` : mockDict[key]}`);
+        } else {
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot pulse-warning";
+        statusText.textContent = `安全防禦啟動：查無目標鍵，啟動預設值降級機制，避免當機。`;
+        logTerminal(`${fallback}`, "success");
+        }
+    } 
+    else if (act === "set_val") {
+        const numVal = isNaN(Number(val)) || val === "" ? val : Number(val);
+        const valDisplay = typeof numVal === 'string' ? `'${numVal}'` : numVal;
+        logTerminal(`>>> student['${key}'] = ${valDisplay}`, "prompt");
+
+        mockDict[key] = numVal;
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot";
+        statusText.textContent = exists 
+        ? `就地覆蓋：鍵 '${key}' 已在 Bucket #${bucketIdx}，新指標已重新繫結。`
+        : `擴展註冊：新鍵 '${key}' 已成功指派並存入 Bucket #${bucketIdx}。`;
+    } 
+    else if (act === "pop_val") {
+        const fallback = def !== "" ? `'${def}'` : "None";
+        logTerminal(`>>> student.pop('${key}', ${fallback})`, "prompt");
+        if (exists) {
+        const popped = mockDict[key];
+        delete mockDict[key];
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot";
+        statusText.textContent = `成功彈出：已自 Bucket #${bucketIdx} 刪除鍵 '${key}' 並回傳其值。`;
+        logTerminal(`${typeof popped === 'string' ? `'${popped}'` : popped}`);
+        } else {
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot pulse-warning";
+        statusText.textContent = `安全防禦：pop 查無此鍵，平穩傳回指定預設值。`;
+        logTerminal(`${fallback}`, "success");
+        }
+    } 
+    else if (act === "del_stmt") {
+        logTerminal(`>>> del student['${key}']`, "prompt");
+        if (exists) {
+        delete mockDict[key];
+        renderBuckets(bucketIdx, false);
+        statusPulse.className = "pipeline-pulse-dot";
+        statusText.textContent = `陳述句刪除：已刪除 Bucket #${bucketIdx} 中的鍵 '${key}'。`;
+        } else {
+        renderBuckets(bucketIdx, true);
+        statusPulse.className = "pipeline-pulse-dot pulse-error";
+        statusText.textContent = `語法中斷：del 不具備防禦機制，查無此鍵拋出 KeyError！`;
+        logTerminal(`KeyError: '${key}'`, "error");
+        }
+    }
+    }
+
+    btnRun.addEventListener("click", executeHashAction);
+
+    btnReset.addEventListener("click", function() {
+    mockDict = { "name": "小明", "age": 18, "grade": "高三" };
+    renderBuckets();
+    statusPulse.className = "pipeline-pulse-dot";
+    statusText.textContent = "記憶體已重置為初始狀態。";
+    logTerminal(">>> # 字典已還原至初始狀態", "prompt");
+    });
+
+    updateControlFields();
+    renderBuckets();
+})();
+
+// 教具二：多層巢狀結構探索解析器
+(function() {
+    const fullData = {
+    "status": 200,
+    "data": {
+        "user": {
+        "name": "小明",
+        "roles": ["admin", "editor"]
+        }
+    }
+    };
+
+    let currentPath = ["api_response"];
+
+    const breadcrumbEl = document.getElementById("drillBreadcrumbs");
+    const viewerEl = document.getElementById("drillViewer");
+    const statusMsg = document.getElementById("drillStatusMsg");
+    const pulseEl = document.getElementById("drillPulse");
+
+    const btnUser = document.getElementById("drillBtnUser");
+    const btnName = document.getElementById("drillBtnName");
+    const btnRole = document.getElementById("drillBtnRole");
+    const btnReset = document.getElementById("drillBtnReset");
+
+    function resolveObject(path) {
+    let current = fullData;
+    for (let i = 1; i < path.length; i++) {
+        const seg = path[i];
+        current = current[seg];
+    }
+    return current;
+    }
+
+    function renderDrillUI() {
+    // 1. 繪製麵包屑
+    breadcrumbEl.innerHTML = "";
+    currentPath.forEach((p, idx) => {
+        const span = document.createElement("span");
+        span.className = "crumb-pill" + (idx === currentPath.length - 1 ? " active" : "");
+        span.textContent = idx === 0 ? p : (typeof p === "number" ? `[${p}]` : `['${p}']`);
+        span.addEventListener("click", () => {
+        currentPath = currentPath.slice(0, idx + 1);
+        renderDrillUI();
+        });
+        breadcrumbEl.appendChild(span);
+    });
+
+    // 2. 呈現當前層級的子內容
+    viewerEl.innerHTML = "";
+    const targetObj = resolveObject(currentPath);
+
+    if (targetObj !== null && typeof targetObj === "object") {
+        const isArr = Array.isArray(targetObj);
+        const typeHeader = document.createElement("div");
+        typeHeader.style.fontSize = "12px";
+        typeHeader.style.color = "#64748b";
+        typeHeader.style.marginBottom = "8px";
+        typeHeader.textContent = isArr ? "容器型態：List（請使用整數索引 [index] 存取）" : "容器型態：Dict（請使用鍵名 ['key'] 存取）";
+        viewerEl.appendChild(typeHeader);
+
+        const keys = Object.keys(targetObj);
+        keys.forEach(k => {
+        const badge = document.createElement("span");
+        badge.className = "key-badge";
+        const valPreview = typeof targetObj[k] === "object" ? (Array.isArray(targetObj[k]) ? "[List]" : "{Dict}") : `'${targetObj[k]}'`;
+        badge.innerHTML = `<strong>${isArr ? `[${k}]` : `'${k}'`}</strong>: <span style="color:#c2410c;">${valPreview}</span>`;
+        badge.addEventListener("click", () => {
+            currentPath.push(isArr ? Number(k) : k);
+            renderDrillUI();
+        });
+        viewerEl.appendChild(badge);
+        });
+    } else {
+        // 純量終點
+        viewerEl.innerHTML = `
+        <div style="padding:10px; background:#f0fdf4; border-radius:4px; color:#166534; font-weight:700;">
+            探索終點純量數值：${typeof targetObj === "string" ? `'${targetObj}'` : targetObj}
+        </div>
+        `;
+    }
+
+    // 狀態更新
+    statusMsg.textContent = `目前路徑取值深度：${currentPath.length - 1} 層 ｜ 路徑程式碼：${buildPathCode()}`;
+    }
+
+    function buildPathCode() {
+    let s = "api_response";
+    for (let i = 1; i < currentPath.length; i++) {
+        const seg = currentPath[i];
+        s += typeof seg === "number" ? `[${seg}]` : `['${seg}']`;
+    }
+    return s;
+    }
+
+    btnUser.addEventListener("click", () => {
+    currentPath = ["api_response", "data", "user"];
+    renderDrillUI();
+    });
+
+    btnName.addEventListener("click", () => {
+    currentPath = ["api_response", "data", "user", "name"];
+    renderDrillUI();
+    });
+
+    btnRole.addEventListener("click", () => {
+    currentPath = ["api_response", "data", "user", "roles", 0];
+    renderDrillUI();
+    });
+
+    btnReset.addEventListener("click", () => {
+    currentPath = ["api_response"];
+    renderDrillUI();
+    });
+
+    renderDrillUI();
+})();
+</script>

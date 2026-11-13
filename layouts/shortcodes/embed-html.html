@@ -1,0 +1,70 @@
+{{/*
+  embed-html shortcode
+  用法: {{< embed-html src="/slides-html/coding-basics/oop/index.html" height="600px" >}}
+  參數:
+    src    - HTML 檔案路徑（相對於 static 資料夾，以 / 開頭）
+    height - iframe 高度（預設 600px）
+    width  - iframe 寬度（預設 100%）
+    fullscreen - 是否顯示全螢幕按鈕（預設 true）
+*/}}
+{{ $src := .Get "src" }}
+{{ $height := .Get "height" | default "600px" }}
+{{ $width := .Get "width" | default "100%" }}
+{{ $fullscreen := .Get "fullscreen" | default "true" }}
+{{ $id := printf "embed-iframe-%s" (md5 $src) }}
+
+<div class="embed-html-container" style="position: relative; width: {{ $width }}; margin: 1.5rem 0;">
+  {{ if eq $fullscreen "true" }}
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem;">
+    <button class="embed-fullscreen-btn" onclick="toggleEmbedFullscreen('{{ $id }}')" aria-label="全螢幕切換" style="background: #4a5568; color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s;">
+      <svg class="embed-icon-expand" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg class="embed-icon-compress" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:currentColor;display:none;"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+      <span class="embed-btn-text">全螢幕</span>
+    </button>
+  </div>
+  {{ end }}
+  <iframe id="{{ $id }}" src="{{ $src }}" style="width: 100%; height: {{ $height }}; border: 1px solid #e0e0e0; border-radius: 8px;" loading="lazy" allowfullscreen></iframe>
+</div>
+
+{{ if eq $fullscreen "true" }}
+<script>
+(function() {
+  if (window._embedFullscreenInit) return;
+  window._embedFullscreenInit = true;
+
+  window.toggleEmbedFullscreen = function(iframeId) {
+    var iframe = document.getElementById(iframeId);
+    if (!iframe) return;
+    if (!document.fullscreenElement) {
+      if (iframe.requestFullscreen) iframe.requestFullscreen();
+      else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+      else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+  };
+
+  document.addEventListener('fullscreenchange', function() {
+    var containers = document.querySelectorAll('.embed-html-container');
+    containers.forEach(function(container) {
+      var expandIcon = container.querySelector('.embed-icon-expand');
+      var compressIcon = container.querySelector('.embed-icon-compress');
+      var btnText = container.querySelector('.embed-btn-text');
+      if (!expandIcon || !compressIcon || !btnText) return;
+      var iframe = container.querySelector('iframe');
+      if (document.fullscreenElement === iframe) {
+        expandIcon.style.display = 'none';
+        compressIcon.style.display = 'block';
+        btnText.textContent = '退出全螢幕';
+      } else {
+        expandIcon.style.display = 'block';
+        compressIcon.style.display = 'none';
+        btnText.textContent = '全螢幕';
+      }
+    });
+  });
+})();
+</script>
+{{ end }}

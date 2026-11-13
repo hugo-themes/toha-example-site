@@ -27,7 +27,6 @@
       "typeit": "github.com/hugo-toha/toha/v4"
     }
   },
-  "dependencies": {},
   "devDependencies": {
     "@fontsource/mulish": "4.5.13",
     "@fortawesome/fontawesome-free": "^6.6.0",
@@ -51,6 +50,7 @@
     "mermaid": "^11.10.0",
     "plyr": "^3.7.2",
     "popper.js": "^1.16.1",
+    "staticrypt": "^3.5.4",
     "typeit": "^8.8.7"
   },
   "name": "hugo-toha.github.io",

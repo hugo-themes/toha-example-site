@@ -1,0 +1,21 @@
+# Copyright Notice
+copyright: © 2026 Copyright.
+
+# Meta description for your site.  This will help the search engines to find your site.
+description: 王健安的個人簡歷與部落格。
+
+# specify the list of custom menus that you want to show in the top navbar.
+# they will be separated by a divider from the main menus.
+customMenus:
+- name: 授課講義
+  url: /zh-tw/slides/
+  hideFromNavbar: false
+  showOnFooter: false
+
+# Specify OpenGraph Headers
+openGraph:
+  title: 王健安的部落格
+  type: website
+  description: 王健安的個人簡歷與部落格。
+  image: images/author/王健安_半身照.jpg
+  url: https://wang-jian-an.github.io/

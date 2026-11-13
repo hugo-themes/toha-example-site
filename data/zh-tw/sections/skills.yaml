@@ -1,0 +1,64 @@
+# section information
+section:
+  name: 技能
+  id: skills
+  enable: true
+  weight: 2
+  showOnNavbar: true
+  template: sections/skills.html
+  # Can optionally hide the title in sections
+  # hideTitle: true
+
+# Your Skills.
+# Give a summary of you each skill in the summary section.
+skills:
+- name: Go 後端開發
+  logo: "/images/sections/skills/go.png"
+  summary: "熟悉 Go 與 Gin 框架，具備 RESTful API 開發經驗，並能運用 Goroutine 與 Channel 建構高效能的並行服務。"
+  url: "https://golang.org/"
+
+- name: SQL
+  logo: ""
+  summary: ""
+
+- name: AWS雲端架構
+  logo: "/images/sections/skills/aws-logo.png"
+  summary: "熟悉 AWS 核心雲端服務，具備運算、網路、儲存與 AI 應用部署經驗，能設計可擴展的雲端系統架構。"
+  url: https://aws.amazon.com/cn/free/webapps/?trk=9d5c4709-8a98-47b7-ab9b-b09c92e9ee25&sc_channel=ps&ef_id=EAIaIQobChMImJbd26q5lQMVuOUWBR0lex6GEAAYASAAEgLLJvD_BwE&gads_camp=23533257979&gads_ag=198422390531&gads_ad=795925071305&gads_kw=aws%20cloud&gads_matchtype=e&gads_network=g&gads_device=c&gads_geo=9198554&gad_campaignid=23533257979&gbraid=0AAAAADjHtp8oDhkcEFLEVe_1huyOukYsL&gclid=EAIaIQobChMImJbd26q5lQMVuOUWBR0lex6GEAAYASAAEgLLJvD_BwE
+
+- name: Azure雲端架構
+  logo: "/images/sections/skills/Microsoft_Azure.png"
+  summary: ""
+
+- name: Docker
+  logo: "/images/sections/skills/docker.svg"
+  summary: ""
+  url: "https://www.docker.com/"
+
+- name: 統計分析
+  logo: "/images/sections/skills/statistical-logo.jpg"
+  summary: ""
+
+- name: Linux
+  logo: "/images/sections/skills/linux.png"
+  summary: ""
+
+- name: Git
+  logo: "/images/sections/skills/git.png"
+  summary: ""
+  url: "https://git-scm.com/"
+
+- name: Python
+  logo: /images/sections/skills/python-logo.jpg
+  summary: "Python"
+
+- name: 系統設計
+  summary: 系統設計
+
+- name: n8n
+  logo: /images/sections/skills/n8n-logo.png
+  summary: 
+
+- name: Google Looker Studio
+  logo: /images/sections/skills/ic_data_studio.png
+  summary: 

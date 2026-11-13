@@ -1,4 +1,4 @@
-module github.com/hugo-themes/toha-example-site
+module github.com/Wang-Jian-An/Wang-Jian-An.github.io
 
 go 1.25
 

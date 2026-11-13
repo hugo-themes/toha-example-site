@@ -1,0 +1,271 @@
+{{ define "navbar" }}
+    {{ partial "navigators/navbar.html" . }}
+{{ end }}
+
+{{ define "sidebar" }}
+  <section class="sidebar-section" id="sidebar-section">
+    <div class="sidebar-holder" id="sidebar-holder">
+      <div class="sidebar" id="sidebar">
+        <form class="mx-auto" method="get" action="{{ "search" | relLangURL }}">
+          <input type="text" name="keyword" value="" placeholder="{{ i18n "search" }}" data-search="" id="search-box" />
+        </form>
+        <div class="sidebar-tree">
+          <ul class="tree" id="tree">
+            <li id="list-heading"><a href="#" class="category-filter active-category" data-section-filter="all">{{ .Title }}</a></li>
+            <div class="subtree">
+              {{ range .Sections }}
+              <li>
+                <i data-feather="folder"></i>
+                <a class="list-link category-filter" href="#" data-section-filter="{{ .Title }}">{{ .Title }}</a>
+              </li>
+              {{ end }}
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- 拖曳把手 -->
+    <div id="sidebar-resizer" style="
+      position: absolute;
+      right: -4px;
+      top: 0;
+      width: 8px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 100;
+      background: transparent;
+    "></div>
+  </section>
+
+  <style>
+    /* 禁止 sidebar 滾動，文字自動換行 */
+    .sidebar-holder {
+      overflow: hidden !important;
+    }
+    .sidebar-holder .sidebar {
+      overflow: hidden !important;
+    }
+    .sidebar-tree {
+      width: auto !important;
+      overflow: hidden !important;
+    }
+    .sidebar-tree .tree li,
+    .sidebar-tree .tree a {
+      white-space: normal !important;
+      word-break: break-word !important;
+      width: 100% !important;
+    }
+    /* 拖曳時游標全頁變形 */
+    body.sidebar-resizing {
+      cursor: col-resize !important;
+      user-select: none !important;
+    }
+    /* sidebar-section 需要 relative 讓把手定位 */
+    #sidebar-section {
+      position: relative !important;
+    }
+    /* 分類過濾：選取時藍色，平時保持原色 */
+    .category-filter {
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .category-filter.active-category {
+      color: #1a73e8 !important;
+      font-weight: 600;
+    }
+    /* 被過濾隱藏的卡片 */
+    #post-card-holder .post-card.section-hidden {
+      display: none !important;
+      visibility: hidden !important;
+      position: absolute !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    /* 講義卡片高度自適應與重點列表樣式 */
+    body.type-slides .post-card .card-body {
+      height: auto !important;
+      min-height: 13rem;
+      overflow: visible !important;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide-card-summary {
+      list-style: none;
+      padding: 0;
+      margin: 0.6rem 0 0.5rem 0;
+      font-size: 0.82rem;
+      color: #475569;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .slide-card-summary li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      line-height: 1.45;
+    }
+    .slide-card-summary li::before {
+      content: '✓';
+      color: #10b981;
+      font-weight: 700;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      flex-shrink: 0;
+    }
+    .slide-card-categories {
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+    html[data-theme='dark'] .slide-card-summary {
+      color: #94a3b8;
+    }
+    html[data-theme='dark'] .slide-card-summary li::before {
+      color: #34d399;
+    }
+  </style>
+
+  <script>
+    (function() {
+      const resizer = document.getElementById('sidebar-resizer');
+      const sidebarSection = document.getElementById('sidebar-section');
+      const wrapper = sidebarSection ? sidebarSection.closest('.wrapper') : null;
+      if (!resizer || !sidebarSection) return;
+
+      let startX, startWidth;
+
+      resizer.addEventListener('mousedown', function(e) {
+        startX = e.clientX;
+        startWidth = sidebarSection.getBoundingClientRect().width;
+        document.body.classList.add('sidebar-resizing');
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        e.preventDefault();
+      });
+
+      function onMouseMove(e) {
+        const dx = e.clientX - startX;
+        const newWidth = Math.max(80, Math.min(400, startWidth + dx));
+        sidebarSection.style.flex = 'none';
+        sidebarSection.style.width = newWidth + 'px';
+        sidebarSection.style.maxWidth = newWidth + 'px';
+      }
+
+      function onMouseUp() {
+        document.body.classList.remove('sidebar-resizing');
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+    })();
+  </script>
+
+  <script>
+    // 分類過濾：事件委派綁在 document
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('.category-filter');
+      if (!link) return;
+      e.preventDefault();
+
+      document.querySelectorAll('.category-filter').forEach(function (f) {
+        f.classList.remove('active-category');
+      });
+      link.classList.add('active-category');
+
+      const selected = link.getAttribute('data-section-filter');
+      const cards = document.querySelectorAll('#post-card-holder .post-card');
+
+      cards.forEach(function (card) {
+        if (selected === 'all') {
+          card.classList.remove('section-hidden');
+        } else {
+          const section = card.getAttribute('data-section') || '';
+          const cats = card.getAttribute('data-categories') || '';
+          const match = section === selected || cats.indexOf(selected) !== -1;
+          if (match) {
+            card.classList.remove('section-hidden');
+          } else {
+            card.classList.add('section-hidden');
+          }
+        }
+      });
+    });
+  </script>
+{{ end }}
+
+{{ define "content" }}
+<section class="content-section" id="content-section">
+  <div class="content container-fluid" id="content">
+    <div class="container-fluid post-card-holder" id="post-card-holder">
+      {{ $slides := .RegularPagesRecursive }}
+      {{ $slides = where $slides "Params.hidden" "!=" true }}
+      {{ range $slides }}
+      <div class="post-card" data-section="{{ .CurrentSection.Title }}" data-categories="{{ range .Params.categories }}{{ . }};{{ end }}">
+        <div class="card">
+          <div class="card-head">
+            <a href="{{ .RelPermalink }}" class="post-card-link" style="width: 100%;">
+              {{ $hero := "" }}
+              {{ $heroResource := .Resources.GetMatch "{hero.*,thumbnail.*}" }}
+              {{ if $heroResource }}
+                {{ $hero = $heroResource }}
+              {{ end }}
+              {{ if $hero }}
+              <img class="card-img-top" src='{{ $hero.RelPermalink }}' alt="Hero Image" loading="lazy"
+                style="width: 60%; margin: 0.75rem auto 0; min-width: 0; aspect-ratio: 1/1; object-fit: cover; display: block; border-radius: 0.5rem;">
+              {{ else if .Params.cover_image }}
+              <img class="card-img-top" src='{{ .Params.cover_image }}' alt="Cover Image" loading="lazy"
+                style="width: 60%; margin: 0.75rem auto 0; min-width: 0; aspect-ratio: 1/1; object-fit: cover; display: block; border-radius: 0.5rem;">
+              {{ else }}
+              <div class="card-img-top d-flex align-items-center justify-content-center"
+                style="width: 60%; margin: 0.75rem auto 0; aspect-ratio: 1/1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.5rem;">
+                <span style="font-size: 2.5rem; color: white;">{{ .Params.cover_emoji | default "📖" }}</span>
+              </div>
+              {{ end }}
+            </a>
+          </div>
+          <div class="card-body">
+            <a href="{{ .RelPermalink }}" class="post-card-link">
+              <h5 class="card-title">{{ .Title }}</h5>
+              {{ if .Params.summary_points }}
+              <ul class="slide-card-summary">
+                {{ range .Params.summary_points }}
+                <li>{{ . }}</li>
+                {{ end }}
+              </ul>
+              {{ else if .Params.description }}
+              <p class="card-text post-summary">{{ .Params.description }}</p>
+              {{ else if .Summary }}
+              <p class="card-text post-summary">{{ .Summary | plainify }}</p>
+              {{ end }}
+            </a>
+            {{ if .Params.categories }}
+            <div class="slide-card-categories">
+              {{ range .Params.categories }}
+              <span class="badge bg-secondary" style="font-size: 0.75rem;">{{ . }}</span>
+              {{ end }}
+            </div>
+            {{ end }}
+          </div>
+          <div class="card-footer">
+            <span class="float-start">
+              {{ if .Date }}{{ .Date | time.Format ":date_full" }}{{ end }}
+              {{ if eq .Params.access "public" }}
+                · <span style="color: #2e7d32;">Public</span>
+              {{ else }}
+                · <span style="color: #e65100;">🔒 Private</span>
+              {{ end }}
+            </span>
+            <a href="{{ .RelPermalink }}" class="float-end btn btn-outline-info btn-sm">{{ i18n "read" | default "Read" }}</a>
+          </div>
+        </div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
